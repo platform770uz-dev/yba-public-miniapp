@@ -40,6 +40,7 @@ h1,h2,p{margin:0}
 .mic-zone{display:flex;flex-direction:column;align-items:center;margin-top:18px}
 .mic{width:124px;height:124px;border-radius:50%;border:0;background:var(--mint);color:#fff;font-size:46px;line-height:1;display:grid;place-items:center;box-shadow:0 14px 30px rgba(4,127,112,.28)}
 .mic:active{transform:scale(.98)}
+.warm{flex:none;width:min(100%,280px);min-height:64px;font-size:18px;border-radius:20px;box-shadow:0 14px 30px rgba(4,127,112,.22)}
 .mic.rec{background:var(--orange);animation:pulse 1.2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,127,88,.45)}70%{box-shadow:0 0 0 22px rgba(255,127,88,0)}100%{box-shadow:0 0 0 0 rgba(255,127,88,0)}}
 .timer{margin-top:12px;font-size:15px;font-weight:850;font-variant-numeric:tabular-nums;min-height:22px}
@@ -100,9 +101,10 @@ details.diag[open] summary:after{content:'⌃'}
     <div class="listen"><button id="listen" type="button">▶ Tinglash</button></div>
 
     <div class="mic-zone">
+      <button class="btn primary warm hide" id="warmDone" type="button">✓ Aytdim</button>
       <button class="mic" id="mic" type="button" aria-label="Gapirish">🎤</button>
       <div class="timer" id="timer"></div>
-      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <div class="meter" id="meterBox" aria-hidden="true"><i id="meter"></i></div>
       <p class="hint" id="hint"></p>
     </div>
 
@@ -127,6 +129,8 @@ details.diag[open] summary:after{content:'⌃'}
   'use strict';
   const API = 'https://trxnsqpdekokqvtefxlt.supabase.co/functions/v1/tez-aytish-api';
   const STAGES = ['sekin', 'orta', 'tez'];
+  // sekin and o'rta are warm-ups said aloud without a check; only tez goes to the (paid) speech check.
+  const WARMUP = ['sekin', 'orta'];
   const STAGE_LABEL = { sekin: 'Sekin', orta: 'Oʻrta', tez: 'Tez' };
   const PHRASE_KEYS = ['your_turn', 'great', 'almost', 'retry', 'faster', 'later', 'done'];
   const TYPES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/ogg;codecs=opus', 'audio/webm'];
@@ -134,7 +138,7 @@ details.diag[open] summary:after{content:'⌃'}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v5';
+  const PAGE_VERSION = 'v6';
   const CONSENT_KEY = 'tez_consent_v2', PROGRESS_KEY = 'tez_progress_v1';
 
   const $ = (id) => document.getElementById(id);
@@ -167,6 +171,7 @@ details.diag[open] summary:after{content:'⌃'}
   const fmt = (n) => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
   const flag = (v) => (v === true ? 'on' : v === false ? 'off' : '?');
   const twister = () => state.twisters[state.idx];
+  const isWarmup = () => WARMUP.includes(state.stage);
   const words = (text) => text.replace(/[.,!?;:—–-]/g, ' ').split(/\s+/).filter(Boolean).length;
 
   // ---------- API ----------
@@ -190,7 +195,7 @@ details.diag[open] summary:after{content:'⌃'}
     if (path === 'check') {
       const t = twister();
       const toks = t.text.split(/[\s-]+/).map((w) => w.replace(/[.,!?;:]/g, ''));
-      const fail = state.attempt === 1 && state.stage === 'sekin';
+      const fail = state.attempt === 1 && state.stage === 'tez';
       return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? 'gʻani gildirakni gʻizillatib' : t.text, extras: [],
         words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? 'gildirakni' : d.toLowerCase(), v: fail ? (i === 1 ? 'wrong' : i === 3 ? 'missing' : 'ok') : (i === 2 ? 'near' : 'ok') })) };
     }
@@ -303,9 +308,14 @@ details.diag[open] summary:after{content:'⌃'}
       : state.stage === 'sekin' ? 'Sekin va aniq ayt, har bir boʻgʻinni eshittir' : 'Oddiy suhbatdagidek ayt';
     const waitingForNext = !$('result').classList.contains('hide') && !$('next').classList.contains('hide');
     $('listen').parentElement.classList.toggle('hide', !state.ttsReady);
-    $('hint').textContent = waitingForNext ? '' : !state.ttsReady ? 'Matnni oʻqib chiq, keyin mikrofonni bosib ayt.' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
+    const warm = isWarmup();
+    $('warmDone').classList.toggle('hide', !warm || waitingForNext);
+    $('mic').classList.toggle('hide', warm);
+    $('meterBox').classList.toggle('hide', warm);
+    $('hint').textContent = waitingForNext ? '' : warm ? 'Isinish: ovoz chiqarib ayt, keyin «✓ Aytdim» tugmasini bos.' : !state.ttsReady ? 'Endi tez ayt! Mikrofonni bos: shu bosqich tekshiriladi.' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
     $('listen').disabled = state.recording || state.busy;
     $('mic').disabled = state.busy;
+    $('warmDone').disabled = state.busy;
     $('pick').value = String(state.idx);
     $('pick').disabled = state.recording || state.busy;
     renderDiag();
@@ -643,6 +653,7 @@ details.diag[open] summary:after{content:'⌃'}
   $('mic').addEventListener('click', () => (state.recording ? stop('manual') : start()));
   $('again').addEventListener('click', () => { $('result').classList.add('hide'); start(); });
   $('next').addEventListener('click', () => advance());
+  $('warmDone').addEventListener('click', () => { if (state.busy || state.recording || !isWarmup()) return; haptic('impact'); advance(); });
   $('skip').addEventListener('click', () => { if (state.recording || state.busy) return; state.giveUp = false; nextTwister(); });
   $('pick').addEventListener('change', (e) => {
     if (state.recording || state.busy) { e.target.value = String(state.idx); return; }
