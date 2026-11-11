@@ -134,7 +134,7 @@ details.diag[open] summary:after{content:'⌃'}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v4';
+  const PAGE_VERSION = 'v5';
   const CONSENT_KEY = 'tez_consent_v2', PROGRESS_KEY = 'tez_progress_v1';
 
   const $ = (id) => document.getElementById(id);
@@ -220,6 +220,8 @@ details.diag[open] summary:after{content:'⌃'}
     $('who').textContent = state.isAdmin ? 'Admin' : 'Sinov';
     $('who').className = state.isAdmin ? 'pill admin' : 'pill';
     $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
+    // While the trainer is closed for children they get a friendly 'coming soon' instead of a mic that cannot check.
+    if (!state.sttReady && !state.isAdmin) { showBanner('🎙 Tez aytish trenajyori tez orada ochiladi! Hozircha tayyorlanmoqda.'); $('who').textContent = 'Tez orada'; return; }
     if (!state.sttReady) showBanner('Ovozli tekshiruv hali ulanmagan: kalit kutilmoqda. Mikrofon ishlaydi, lekin natija chiqmaydi.');
     $('consentText').textContent = `Mashqda bolaning ovozi tekshirish uchun ${state.provider || 'nutqni aniqlash'} xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.`;
     if (!state.twisters.length) { showBanner('Tez aytishlar roʻyxati boʻsh.'); return; }
