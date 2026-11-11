@@ -4,15 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8f8f5">
-<title>Tez aytish — mikrofon sinovi</title>
+<title>Tez aytish — trenajyor</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#f8f8f5;--ink:#1c2430;--sub:#66727f;--line:#e8ebe8;--mint:#047f70;--mint-dark:#03695d;--mint-pale:#e6f7ef;--orange:#ff7f58;--red-pale:#fdeceb;--shadow:0 12px 28px rgba(23,40,44,.06)}
+:root{--bg:#f8f8f5;--ink:#1c2430;--sub:#66727f;--line:#e8ebe8;--mint:#047f70;--mint-dark:#03695d;--mint-pale:#e6f7ef;--orange:#ff7f58;--gold:#ffcf70;--red:#c9483f;--red-pale:#fdeceb;--yellow-pale:#fff5df;--shadow:0 12px 28px rgba(23,40,44,.06)}
 *{box-sizing:border-box}
 html{background:#1c2430}
 body{margin:0;color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#1c2430;line-height:1.48;-webkit-tap-highlight-color:transparent}
 button{font:inherit;cursor:pointer;touch-action:manipulation}
 button:focus-visible{outline:3px solid #f0a64c;outline-offset:3px}
+button:disabled{opacity:.45;cursor:default}
 h1,h2,p{margin:0}
 .hide{display:none!important}
 .phone{width:min(100%,480px);min-height:100vh;min-height:100dvh;background:var(--bg);margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
@@ -24,36 +25,42 @@ h1,h2,p{margin:0}
 .pill{font-size:11px;font-weight:800;color:#55655f;background:#fff;border:1px solid var(--line);padding:7px 10px;border-radius:20px;white-space:nowrap}
 .pill.admin{color:var(--mint-dark);background:var(--mint-pale);border-color:#c9e7da}
 .card{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:26px;padding:20px 18px;box-shadow:var(--shadow)}
+.banner{margin-top:14px;padding:12px 14px;border-radius:15px;font-size:13px;line-height:1.5;background:var(--yellow-pale);color:#806b49}
 .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:850;color:var(--sub)}
 .meta button{border:0;background:#f3f5f3;color:#3c5750;font-weight:800;font-size:12px;border-radius:11px;padding:8px 12px}
 .twister{font-size:clamp(22px,6vw,28px);line-height:1.32;font-weight:875;letter-spacing:-.6px;margin-top:14px;overflow-wrap:anywhere}
 .stages{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
-.stage{min-height:46px;border-radius:14px;border:1.5px solid #e1e8e4;background:#fbfcfa;color:#4c5d58;font-weight:850;font-size:13px}
+.stage{min-height:44px;border-radius:14px;border:1.5px solid #e1e8e4;background:#fbfcfa;color:#4c5d58;font-weight:850;font-size:13px;display:grid;place-items:center}
 .stage.on{background:var(--mint);border-color:var(--mint);color:#fff}
+.stage.done{background:var(--mint-pale);border-color:#bfe3d3;color:var(--mint-dark)}
 .target{margin-top:10px;font-size:12px;color:var(--sub);text-align:center;min-height:18px}
-.mic-zone{display:flex;flex-direction:column;align-items:center;margin-top:22px}
-.mic{width:132px;height:132px;border-radius:50%;border:0;background:var(--mint);color:#fff;font-size:50px;line-height:1;display:grid;place-items:center;box-shadow:0 14px 30px rgba(4,127,112,.28)}
+.listen{display:flex;justify-content:center;margin-top:16px}
+.listen button{min-height:48px;padding:0 20px;border-radius:15px;border:1.5px solid #c9e7da;background:var(--mint-pale);color:var(--mint-dark);font-weight:850;font-size:14px}
+.mic-zone{display:flex;flex-direction:column;align-items:center;margin-top:18px}
+.mic{width:124px;height:124px;border-radius:50%;border:0;background:var(--mint);color:#fff;font-size:46px;line-height:1;display:grid;place-items:center;box-shadow:0 14px 30px rgba(4,127,112,.28)}
 .mic:active{transform:scale(.98)}
 .mic.rec{background:var(--orange);animation:pulse 1.2s infinite}
-.mic:disabled{opacity:.45}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,127,88,.45)}70%{box-shadow:0 0 0 22px rgba(255,127,88,0)}100%{box-shadow:0 0 0 0 rgba(255,127,88,0)}}
-.timer{margin-top:14px;font-size:15px;font-weight:850;font-variant-numeric:tabular-nums;min-height:22px}
-.meter{width:min(100%,280px);height:10px;border-radius:99px;background:#e6ebe8;overflow:hidden;margin-top:8px}
+.timer{margin-top:12px;font-size:15px;font-weight:850;font-variant-numeric:tabular-nums;min-height:22px}
+.meter{width:min(100%,280px);height:10px;border-radius:99px;background:#e6ebe8;overflow:hidden;margin-top:6px}
 .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4cc29a,#047f70);border-radius:99px}
-.hint{margin-top:12px;font-size:13px;color:var(--sub);text-align:center;max-width:310px}
-.result{margin-top:20px;border-top:1px solid var(--line);padding-top:18px}
-.result h2{font-size:17px;letter-spacing:-.4px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.stat{background:#f4f6f4;border-radius:14px;padding:10px 6px;text-align:center}
-.stat b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
-.stat span{font-size:10px;color:var(--sub);font-weight:800}
-.verdict{margin-top:12px;padding:12px 13px;border-radius:13px;font-size:13px;line-height:1.45;background:var(--mint-pale);color:#1f5e50}
-.verdict.warn{background:#fff5df;color:#806b49}
+.hint{margin-top:12px;font-size:13px;color:var(--sub);text-align:center;max-width:310px;min-height:20px}
+.result{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+.words{display:flex;flex-wrap:wrap;gap:7px}
+.w{padding:6px 10px;border-radius:11px;font-weight:800;font-size:15px;background:var(--mint-pale);color:#1f5e50}
+.w.near{background:var(--yellow-pale);color:#806b49}
+.w.wrong{background:var(--red-pale);color:#8d3730}
+.w.missing{background:#f1f3f1;color:#9aa3a0;text-decoration:line-through}
+.w small{display:block;font-size:11px;font-weight:700;opacity:.85}
+.verdict{margin-top:12px;padding:12px 13px;border-radius:13px;font-size:14px;line-height:1.45;background:var(--mint-pale);color:#1f5e50;font-weight:700}
+.verdict.warn{background:var(--yellow-pale);color:#806b49}
 .verdict.bad{background:var(--red-pale);color:#8d3730}
+.heard{margin-top:8px;font-size:12px;color:var(--sub)}
 .row{display:flex;gap:10px;margin-top:12px}
 .btn{flex:1;min-height:52px;border-radius:15px;border:1px solid #dce4df;background:#fff;color:#243b35;font-weight:850;font-size:14px}
 .btn.primary{background:var(--mint);border-color:var(--mint);color:#fff}
-.send{margin-top:10px;font-size:12px;color:var(--sub);text-align:center;min-height:18px}
+.consent h2{font-size:20px;letter-spacing:-.5px}
+.consent p{font-size:14px;color:#4a5356;margin-top:10px;line-height:1.55}
 details.diag{margin-top:18px;border-radius:17px;border:1px solid var(--line);background:#fff;overflow:hidden}
 details.diag summary{list-style:none;cursor:pointer;padding:15px 17px;font-weight:850;font-size:13px;display:flex;justify-content:space-between}
 details.diag summary::-webkit-details-marker{display:none}
@@ -67,37 +74,41 @@ details.diag[open] summary:after{content:'⌃'}
 <body>
 <main class="phone">
   <header class="top">
-    <div class="brand"><div class="brand-sign" aria-hidden="true">🎙</div><div><div class="brand-name">Tez aytish</div><div class="brand-sub">MIKROFON SINOVI</div></div></div>
-    <span class="pill" id="who">Tekshirilmoqda…</span>
+    <div class="brand"><div class="brand-sign" aria-hidden="true">🎙</div><div><div class="brand-name">Tez aytish</div><div class="brand-sub">DIKSIYA TRENAJYORI</div></div></div>
+    <span class="pill" id="who">Yuklanmoqda…</span>
   </header>
 
-  <section class="card">
-    <div class="meta"><span id="level"></span><button id="next" type="button">Keyingisi →</button></div>
+  <p class="banner hide" id="banner"></p>
+
+  <section class="card consent hide" id="consentCard">
+    <h2>Ota-onalar uchun</h2>
+    <p>Mashqda bolaning ovozi tekshirish uchun Microsoft Azure nutqni aniqlash xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.</p>
+    <div class="row"><button class="btn primary" id="consentYes" type="button">Roziman, boshlaymiz</button></div>
+  </section>
+
+  <section class="card hide" id="trainer">
+    <div class="meta"><span id="progress"></span><button id="skip" type="button">Keyingisi →</button></div>
     <p class="twister" id="twister"></p>
-    <div class="stages" role="group" aria-label="Surʼat">
-      <button class="stage" data-stage="sekin" type="button">Sekin</button>
-      <button class="stage" data-stage="orta" type="button">Oʻrta</button>
-      <button class="stage" data-stage="tez" type="button">Tez</button>
+    <div class="stages" aria-label="Bosqichlar">
+      <div class="stage" data-stage="sekin">Sekin</div>
+      <div class="stage" data-stage="orta">Oʻrta</div>
+      <div class="stage" data-stage="tez">Tez</div>
     </div>
     <p class="target" id="target"></p>
+    <div class="listen"><button id="listen" type="button">▶ Tinglash</button></div>
 
     <div class="mic-zone">
       <button class="mic" id="mic" type="button" aria-label="Gapirish">🎤</button>
       <div class="timer" id="timer"></div>
       <div class="meter" aria-hidden="true"><i id="meter"></i></div>
-      <p class="hint" id="hint">Tugmani bosing va tez aytishni ayting. Gapirib boʻlgach, yozuv oʻzi toʻxtaydi.</p>
+      <p class="hint" id="hint"></p>
     </div>
 
     <div class="result hide" id="result">
-      <h2>Natija</h2>
-      <div class="stats">
-        <div class="stat"><b id="sTotal">–</b><span>yozuv, s</span></div>
-        <div class="stat"><b id="sSpeech">–</b><span>nutq, s</span></div>
-        <div class="stat"><b id="sLevel">–</b><span>ovoz</span></div>
-      </div>
+      <div class="words" id="words"></div>
       <p class="verdict" id="verdict"></p>
-      <div class="row"><button class="btn" id="play" type="button">▶ Eshitish</button><button class="btn primary" id="again" type="button">Yana bir marta</button></div>
-      <p class="send" id="send"></p>
+      <p class="heard" id="heard"></p>
+      <div class="row"><button class="btn" id="again" type="button">Yana bir marta</button><button class="btn primary hide" id="next" type="button">Davom etish →</button></div>
     </div>
   </section>
 
@@ -106,28 +117,36 @@ details.diag[open] summary:after{content:'⌃'}
     <pre id="diag"></pre>
     <div class="row"><button class="btn" id="copy" type="button">Nusxa olish</button></div>
   </details>
-  <p class="note" id="note">Sinov versiyasi. Ovoz yozuvi telefoningizda qoladi; serverga faqat qurilma haqidagi texnik maʼlumot yuboriladi.</p>
+  <p class="note" id="note"></p>
 </main>
-<audio id="player" playsinline></audio>
+<audio id="voice" playsinline preload="auto"></audio>
 <script>
 (() => {
   'use strict';
-  const API = 'https://trxnsqpdekokqvtefxlt.supabase.co/functions/v1/tez-aytish-api/mic-check';
-  const TWISTERS = [
-    { id: 6, level: 2, text: 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.' },
-    { id: 1, level: 1, text: 'Togʻdan tosh tushdi.' },
-    { id: 15, level: 3, text: 'Besh mis barkash, besh mis barkashning ichida besh ming mis barkash.' },
-  ];
+  const API = 'https://trxnsqpdekokqvtefxlt.supabase.co/functions/v1/tez-aytish-api';
+  const STAGES = ['sekin', 'orta', 'tez'];
+  const STAGE_LABEL = { sekin: 'Sekin', orta: 'Oʻrta', tez: 'Tez' };
+  const PHRASE_KEYS = ['your_turn', 'great', 'almost', 'retry', 'faster', 'later', 'done'];
   const TYPES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/ogg;codecs=opus', 'audio/webm'];
-  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_UPLOAD = 1400000;
+  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_ATTEMPTS = 3;
+  const CONSENT_KEY = 'tez_consent_v1', PROGRESS_KEY = 'tez_progress_v1';
 
   const $ = (id) => document.getElementById(id);
   const tg = window.Telegram && window.Telegram.WebApp;
   const inTelegram = !!(tg && tg.initData);
+  const mock = !inTelegram && new URLSearchParams(location.search).has('mock');
+
+  const store = {
+    get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} },
+  };
+
   const state = {
-    twister: 0, stage: 'orta', isAdmin: false, server: inTelegram ? 'tekshirilmoqda' : 'yuborilmaydi (Telegramdan tashqarida)',
+    isAdmin: false, speechReady: false, twisters: [], idx: 0, stage: 'sekin', attempt: 1,
+    urls: {}, tezTarget: null, listened: false, busy: false, consent: !!store.get(CONSENT_KEY, false),
+    progress: store.get(PROGRESS_KEY, { idx: 0, stars: {}, later: [] }),
     ctx: null, stream: null, source: null, analyser: null, rec: null, chunks: [], frames: [],
-    t0: 0, raf: 0, recording: false, stopReason: '', mime: '', blob: null, url: '', last: null, error: null,
+    t0: 0, raf: 0, recording: false, stopReason: '', mime: '', last: null, error: null, server: '', lastCheck: null,
   };
   let mic = {};
 
@@ -141,78 +160,157 @@ details.diag[open] summary:after{content:'⌃'}
 
   const fmt = (n) => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
   const flag = (v) => (v === true ? 'on' : v === false ? 'off' : '?');
+  const twister = () => state.twisters[state.idx];
   const words = (text) => text.replace(/[.,!?;:—–-]/g, ' ').split(/\s+/).filter(Boolean).length;
-  const targetSeconds = (text) => Math.max(1.5, Math.round(words(text) * 0.6 * 10) / 10);
-  const extFor = (type) => (/mp4|m4a/.test(type) ? 'm4a' : /ogg/.test(type) ? 'ogg' : /aac/.test(type) ? 'aac' : 'webm');
 
+  // ---------- API ----------
+  async function api(path, body, isForm) {
+    if (mock) return mockApi(path, body);
+    const headers = { 'x-telegram-init-data': tg.initData };
+    if (!isForm) headers['content-type'] = 'application/json';
+    const res = await fetch(`${API}/${path}`, { method: 'POST', headers, body: isForm ? body : JSON.stringify(body || {}) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.code = data.error || `http_${res.status}`; throw e; }
+    return data;
+  }
+
+  // Local preview only (?mock=1 outside Telegram): no server, no narrator audio.
+  async function mockApi(path, body) {
+    await new Promise((r) => setTimeout(r, 300));
+    if (path === 'session') return { ok: true, isAdmin: true, speechReady: true, twisters: [
+      { id: 6, level: 2, text: 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.' },
+      { id: 1, level: 1, text: 'Togʻdan tosh tushdi.' }] };
+    if (path === 'tts') return { ok: true, urls: {} };
+    if (path === 'check') {
+      const t = twister();
+      const toks = t.text.split(/[\s-]+/).map((w) => w.replace(/[.,!?;:]/g, ''));
+      const fail = state.attempt === 1 && state.stage === 'sekin';
+      return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? 'gʻani gildirakni gʻizillatib' : t.text, extras: [],
+        words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? 'gildirakni' : d.toLowerCase(), v: fail ? (i === 1 ? 'wrong' : i === 3 ? 'missing' : 'ok') : (i === 2 ? 'near' : 'ok') })) };
+    }
+    return { ok: true };
+  }
+
+  // ---------- flow ----------
+  async function init() {
+    renderDiag();
+    if (!inTelegram && !mock) {
+      showBanner('Bu trenajyor Telegram ichida ishlaydi. Uni botdagi havola orqali oching.');
+      $('who').textContent = 'Brauzer';
+      return;
+    }
+    try {
+      const s = await api('session');
+      state.isAdmin = !!s.isAdmin; state.speechReady = !!s.speechReady; state.twisters = s.twisters || [];
+      state.server = 'ok';
+    } catch (e) {
+      state.server = `xato: ${e.message}`;
+      showBanner(e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.' : `Serverga ulanib boʻlmadi (${e.message}). Internetni tekshirib, qayta oching.`);
+      $('who').textContent = 'Xato';
+      renderDiag();
+      return;
+    }
+    $('who').textContent = state.isAdmin ? 'Admin' : 'Sinov';
+    $('who').className = state.isAdmin ? 'pill admin' : 'pill';
+    $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
+    if (!state.speechReady) showBanner('Ovozli tekshiruv hali ulanmagan: Azure kaliti kutilmoqda. Mikrofon ishlaydi, lekin natija chiqmaydi.');
+    if (!state.twisters.length) { showBanner('Tez aytishlar roʻyxati boʻsh.'); return; }
+    state.idx = Math.min(state.progress.idx || 0, state.twisters.length - 1);
+    if (!state.isAdmin && !state.consent) { $('consentCard').classList.remove('hide'); return; }
+    startTrainer();
+    reportMic('opened');
+  }
+
+  function startTrainer() {
+    $('consentCard').classList.add('hide');
+    $('trainer').classList.remove('hide');
+    prepareTwister();
+  }
+
+  function prepareTwister() {
+    state.stage = 'sekin'; state.attempt = 1; state.listened = false; state.tezTarget = null;
+    state.progress.idx = state.idx; store.set(PROGRESS_KEY, state.progress);
+    $('result').classList.add('hide');
+    render();
+    prefetchVoice();
+  }
+
+  async function prefetchVoice() {
+    if (!state.speechReady) return;
+    const t = twister();
+    const items = STAGES.map((s) => `tw:${t.id}:${s}`).concat(Object.keys(state.urls).some((k) => k.startsWith('ph:')) ? [] : PHRASE_KEYS.map((p) => `ph:${p}`));
+    try {
+      const r = await api('tts', { items });
+      Object.assign(state.urls, r.urls || {});
+      const tezUrl = state.urls[`tw:${t.id}:tez`];
+      if (tezUrl) measureDuration(tezUrl).then((d) => { if (d && twister() === t) { state.tezTarget = Math.max(1.5, Math.round(d * 1.4 * 10) / 10); render(); } });
+    } catch (e) {
+      state.server = `tts xato: ${e.message}`; renderDiag();
+    }
+  }
+
+  function measureDuration(url) {
+    return new Promise((resolve) => {
+      const a = new Audio();
+      a.preload = 'metadata';
+      a.onloadedmetadata = () => resolve(isFinite(a.duration) ? a.duration : null);
+      a.onerror = () => resolve(null);
+      a.src = url;
+      setTimeout(() => resolve(null), 8000);
+    });
+  }
+
+  function targetSeconds() {
+    return state.tezTarget || Math.max(1.5, Math.round(words(twister().text) * 0.6 * 10) / 10);
+  }
+
+  function render() {
+    const t = twister();
+    const stars = Object.values(state.progress.stars).reduce((a, b) => a + b, 0);
+    $('progress').textContent = `${t.level}-daraja · ${state.idx + 1}/${state.twisters.length} · ⭐ ${stars}`;
+    $('twister').textContent = t.text;
+    const at = STAGES.indexOf(state.stage);
+    document.querySelectorAll('.stage').forEach((el, i) => {
+      el.className = 'stage' + (i < at ? ' done' : i === at ? ' on' : '');
+      el.textContent = (i < at ? '✓ ' : '') + STAGE_LABEL[el.dataset.stage];
+    });
+    $('target').textContent = state.stage === 'tez'
+      ? `Tez ayt: ${fmt(targetSeconds())} soniya ichida`
+      : state.stage === 'sekin' ? 'Sekin va aniq ayt, har bir boʻgʻinni eshittir' : 'Oddiy suhbatdagidek ayt';
+    const waitingForNext = !$('result').classList.contains('hide') && !$('next').classList.contains('hide');
+    $('hint').textContent = waitingForNext ? '' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
+    $('listen').disabled = state.recording || state.busy;
+    $('mic').disabled = state.busy;
+    renderDiag();
+  }
+
+  function playUrl(url) {
+    const v = $('voice');
+    if (!url) return Promise.resolve(false);
+    v.src = url; v.currentTime = 0;
+    return v.play().then(() => new Promise((resolve) => { v.onended = () => resolve(true); })).catch(() => false);
+  }
+
+  async function listen() {
+    const t = twister();
+    let url = state.urls[`tw:${t.id}:${state.stage}`];
+    if (!url && state.speechReady) { await prefetchVoice(); url = state.urls[`tw:${t.id}:${state.stage}`]; }
+    if (!url) { showBanner('Diktor ovozi hali tayyor emas. Matnni oʻzing oʻqib, keyin ayt.'); state.listened = true; render(); return; }
+    $('listen').disabled = true;
+    $('hint').textContent = 'Tingla…';
+    await playUrl(url);
+    state.listened = true;
+    render();
+    playUrl(state.urls['ph:your_turn']);
+  }
+
+  // ---------- recording (from the mic test, verified in Chromium) ----------
   function supported() {
     const out = {};
-    for (const t of TYPES) {
-      try { out[t] = !!(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)); } catch (e) { out[t] = false; }
-    }
+    for (const t of TYPES) { try { out[t] = !!(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)); } catch (e) { out[t] = false; } }
     return out;
   }
   function pickMime() { const s = supported(); return TYPES.find((t) => s[t]) || ''; }
-
-  function renderTwister() {
-    const t = TWISTERS[state.twister];
-    $('twister').textContent = t.text;
-    $('level').textContent = `${t.level}-daraja · roʻyxatda ${t.id}`;
-    document.querySelectorAll('.stage').forEach((b) => b.classList.toggle('on', b.dataset.stage === state.stage));
-    $('target').textContent = state.stage === 'tez'
-      ? `Tez bosqich: ${fmt(targetSeconds(t.text))} s ichida ayting (taxminiy maqsad)`
-      : state.stage === 'sekin' ? 'Sekin: har bir boʻgʻinni aniq ayting' : 'Oʻrta: oddiy suhbat tezligida';
-  }
-
-  function renderWho() {
-    const el = $('who');
-    if (!inTelegram) { el.textContent = 'Brauzer rejimi'; el.className = 'pill'; return; }
-    el.textContent = state.isAdmin ? 'Admin: yozuv saqlanadi' : 'Sinov rejimi';
-    el.className = state.isAdmin ? 'pill admin' : 'pill';
-    $('note').textContent = state.isAdmin
-      ? 'Admin rejimi: yozuvlar tekshirish uchun serverga saqlanadi. Bolalar ovozi ota-ona roziligisiz saqlanmaydi.'
-      : 'Sinov versiyasi. Ovoz yozuvi telefoningizda qoladi; serverga faqat qurilma haqidagi texnik maʼlumot yuboriladi.';
-  }
-
-  function diagnostics() {
-    const types = supported();
-    return {
-      inTelegram, platform: tg ? tg.platform : null, tgVersion: tg ? tg.version : null,
-      secure: window.isSecureContext,
-      getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-      mediaRecorder: typeof window.MediaRecorder !== 'undefined',
-      audioContext: !!(window.AudioContext || window.webkitAudioContext),
-      types, chosen: state.mime || pickMime(), mic,
-      viewport: `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio}`,
-      twisterId: TWISTERS[state.twister].id, stage: state.stage, last: state.last, error: state.error,
-    };
-  }
-
-  function renderDiag() {
-    const d = diagnostics();
-    const okTypes = Object.keys(d.types).filter((t) => d.types[t]);
-    const L = state.last;
-    $('diag').textContent = [
-      `Telegram: ${d.inTelegram ? `${d.platform} v${d.tgVersion}` : 'yoʻq (oddiy brauzer)'}`,
-      `Brauzer: ${navigator.userAgent}`,
-      `Xavfsiz kontekst: ${d.secure ? 'ha' : 'yoʻq'} · getUserMedia: ${d.getUserMedia ? 'ha' : 'yoʻq'} · MediaRecorder: ${d.mediaRecorder ? 'ha' : 'yoʻq'}`,
-      `Format: ${d.chosen || 'standart'} · qoʻllaydi: ${okTypes.join(', ') || 'hech biri'}`,
-      mic.sampleRate || mic.ctxRate
-        ? `Mikrofon: ${mic.sampleRate || '?'} Hz, kanal ${mic.channelCount || '?'}, EC ${flag(mic.echoCancellation)}, NS ${flag(mic.noiseSuppression)}, AGC ${flag(mic.autoGainControl)}, AudioContext ${mic.ctxRate || '?'} Hz`
-        : 'Mikrofon: hali ochilmagan',
-      L ? `Oxirgi yozuv: ${L.totalMs} ms, nutq ${L.speechMs} ms, peak ${L.peakDb} dB, fon ${L.noiseDb} dB, ${L.bytes} bayt, ${L.chunks} boʻlak, toʻxtash: ${L.stop}` : 'Oxirgi yozuv: yoʻq',
-      state.error ? `Xato: ${state.error.name}: ${state.error.message}` : 'Xato: yoʻq',
-      `Server: ${state.server}`,
-    ].join('\n');
-  }
-
-  function haptic(kind) {
-    try {
-      if (!inTelegram || !tg.HapticFeedback) return;
-      if (kind === 'impact') tg.HapticFeedback.impactOccurred('medium'); else tg.HapticFeedback.notificationOccurred(kind);
-    } catch (e) {}
-  }
-
   function ensureContext() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -220,39 +318,27 @@ details.diag[open] summary:after{content:'⌃'}
     if (state.ctx.state === 'suspended') state.ctx.resume().catch(() => {});
     return state.ctx;
   }
-
   async function openMic() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      const e = new Error('getUserMedia mavjud emas'); e.name = 'NotSupportedError'; throw e;
-    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { const e = new Error('getUserMedia mavjud emas'); e.name = 'NotSupportedError'; throw e; }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
     const track = stream.getAudioTracks()[0];
     const s = track && track.getSettings ? track.getSettings() : {};
     mic = { sampleRate: s.sampleRate || null, channelCount: s.channelCount || null, echoCancellation: s.echoCancellation, noiseSuppression: s.noiseSuppression, autoGainControl: s.autoGainControl, ctxRate: state.ctx ? state.ctx.sampleRate : null };
     return stream;
   }
-
   function releaseMic() {
     if (state.source) { try { state.source.disconnect(); } catch (e) {} state.source = null; }
     if (state.stream) { state.stream.getTracks().forEach((t) => t.stop()); state.stream = null; }
     state.analyser = null;
   }
-
   function measure() {
     const a = state.analyser;
     if (!a) return -100;
     let sum = 0, n;
-    if (a.getFloatTimeDomainData) {
-      const buf = new Float32Array(a.fftSize); a.getFloatTimeDomainData(buf); n = buf.length;
-      for (let i = 0; i < n; i++) sum += buf[i] * buf[i];
-    } else {
-      const buf = new Uint8Array(a.fftSize); a.getByteTimeDomainData(buf); n = buf.length;
-      for (let i = 0; i < n; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
-    }
+    if (a.getFloatTimeDomainData) { const buf = new Float32Array(a.fftSize); a.getFloatTimeDomainData(buf); n = buf.length; for (let i = 0; i < n; i++) sum += buf[i] * buf[i]; }
+    else { const buf = new Uint8Array(a.fftSize); a.getByteTimeDomainData(buf); n = buf.length; for (let i = 0; i < n; i++) { const v = (buf[i] - 128) / 128; sum += v * v; } }
     return 20 * Math.log10(Math.sqrt(sum / n) + 1e-9);
   }
-
-  // Simple voice activity: noise floor from the first 400 ms, speech = 3+ frames 12 dB above it.
   function vad(frames) {
     const early = frames.filter((f) => f[0] < 400).map((f) => f[1]);
     const pool = (early.length >= 5 ? early : frames.map((f) => f[1])).slice().sort((a, b) => a - b);
@@ -260,16 +346,12 @@ details.diag[open] summary:after{content:'⌃'}
     const thr = Math.max(noise + 12, -52);
     let speechStart = null, lastLoud = null, run = 0, runStart = 0;
     for (const [t, d] of frames) {
-      if (d > thr) {
-        if (run === 0) runStart = t;
-        run++;
-        if (speechStart === null && run >= 3) speechStart = runStart;
-        if (speechStart !== null) lastLoud = t;
-      } else run = 0;
+      // 3 loud frames in a row, or a loud stretch of 150 ms+ (frames get sparse when the WebView throttles timers).
+      if (d > thr) { if (run === 0) runStart = t; run++; if (speechStart === null && (run >= 3 || (run >= 2 && t - runStart >= 150))) speechStart = runStart; if (speechStart !== null) lastLoud = t; }
+      else run = 0;
     }
     return { noise, speechStart, lastLoud };
   }
-
   function loop() {
     if (!state.recording) return;
     const now = performance.now() - state.t0;
@@ -285,9 +367,8 @@ details.diag[open] summary:after{content:'⌃'}
     }
     state.raf = requestAnimationFrame(loop);
   }
-
   async function start() {
-    if (state.recording) return;
+    if (state.recording || state.busy) return;
     state.error = null;
     const ctx = ensureContext(); // inside the tap, before any await (iOS)
     $('mic').disabled = true;
@@ -298,17 +379,10 @@ details.diag[open] summary:after{content:'⌃'}
       releaseMic();
       const stream = await openMic();
       state.stream = stream;
-      if (ctx) {
-        state.source = ctx.createMediaStreamSource(stream);
-        state.analyser = ctx.createAnalyser();
-        state.analyser.fftSize = 2048;
-        state.source.connect(state.analyser);
-        mic.ctxRate = ctx.sampleRate;
-      }
+      if (ctx) { state.source = ctx.createMediaStreamSource(stream); state.analyser = ctx.createAnalyser(); state.analyser.fftSize = 2048; state.source.connect(state.analyser); mic.ctxRate = ctx.sampleRate; }
       const mime = pickMime();
       let rec;
-      try { rec = mime ? new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: 64000 }) : new MediaRecorder(stream); }
-      catch (e) { rec = new MediaRecorder(stream); }
+      try { rec = mime ? new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: 64000 }) : new MediaRecorder(stream); } catch (e) { rec = new MediaRecorder(stream); }
       state.rec = rec; state.chunks = []; state.frames = []; state.mime = rec.mimeType || mime;
       rec.ondataavailable = (ev) => { if (ev.data && ev.data.size) state.chunks.push(ev.data); };
       rec.onstop = finish;
@@ -316,75 +390,43 @@ details.diag[open] summary:after{content:'⌃'}
       rec.start(250);
       state.recording = true; state.t0 = performance.now(); state.stopReason = '';
       $('mic').disabled = false; $('mic').classList.add('rec'); $('mic').textContent = '■'; $('mic').setAttribute('aria-label', 'Toʻxtatish');
-      $('hint').textContent = 'Gapiring… Toʻxtatish uchun yana bosing.';
+      $('listen').disabled = true;
+      $('hint').textContent = 'Gapir… Tugatgach, yozuv oʻzi toʻxtaydi.';
       haptic('impact');
       try { if (inTelegram && tg.isVersionAtLeast('6.2')) tg.enableClosingConfirmation(); } catch (e) {}
       loop();
-    } catch (e) {
-      $('mic').disabled = false;
-      fail(e);
-    }
+    } catch (e) { $('mic').disabled = false; fail(e); }
   }
-
   function stop(reason) {
     if (!state.recording) return;
     state.recording = false; state.stopReason = reason || 'manual';
     cancelAnimationFrame(state.raf);
     resetMicButton();
-    $('hint').textContent = 'Yozuv tayyorlanmoqda…';
+    $('hint').textContent = 'Tekshirilmoqda…';
     try { if (state.rec && state.rec.state !== 'inactive') state.rec.stop(); } catch (e) { fail(e); }
   }
-
   function resetMicButton() {
     $('mic').classList.remove('rec'); $('mic').textContent = '🎤'; $('mic').setAttribute('aria-label', 'Gapirish');
-    $('meter').style.width = '0%';
+    $('meter').style.width = '0%'; $('timer').textContent = '';
     try { if (inTelegram && tg.isVersionAtLeast('6.2')) tg.disableClosingConfirmation(); } catch (e) {}
   }
-
-  function finish() {
+  async function finish() {
     const totalMs = Math.round(performance.now() - state.t0);
     const type = (state.rec && state.rec.mimeType) || state.mime || 'audio/webm';
     const blob = new Blob(state.chunks, { type });
     const metered = !!state.analyser;
-    releaseMic(); // frees the mic so playback uses the speaker, and turns off the mic indicator
-    state.blob = blob;
-    if (state.url) URL.revokeObjectURL(state.url);
-    state.url = URL.createObjectURL(blob);
-    $('player').src = state.url;
+    releaseMic();
     const v = vad(state.frames);
     let peak = -100;
     for (const f of state.frames) if (f[1] > peak) peak = f[1];
     const speechMs = v.speechStart !== null && v.lastLoud !== null ? Math.max(0, v.lastLoud - v.speechStart) : 0;
     state.last = { totalMs, speechMs, peakDb: Math.round(peak), noiseDb: Math.round(v.noise), bytes: blob.size, chunks: state.chunks.length, stop: state.stopReason, type, metered };
-    $('hint').textContent = 'Tugmani bosing va tez aytishni ayting. Gapirib boʻlgach, yozuv oʻzi toʻxtaydi.';
-    showResult();
     renderDiag();
-    report('recorded');
-    haptic(blob.size > 0 ? 'success' : 'error');
+    if (!blob.size) { showVerdict('bad', 'Yozuv boʻsh chiqdi: mikrofon ovoz bermadi. Yana urinib koʻr.'); return; }
+    if (metered && state.stopReason === 'no_speech') { showVerdict('warn', 'Ovozing eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.'); return; }
+    const trim = metered && v.speechStart !== null ? { start: v.speechStart - 400, end: v.lastLoud + 600 } : null;
+    await submit(blob, trim, speechMs, totalMs);
   }
-
-  function showResult() {
-    const L = state.last;
-    $('result').classList.remove('hide');
-    $('send').textContent = '';
-    $('sTotal').textContent = fmt(L.totalMs / 1000);
-    $('sSpeech').textContent = L.metered ? fmt(L.speechMs / 1000) : '–';
-    $('sLevel').textContent = !L.metered ? '–' : L.peakDb < -40 ? 'past' : L.peakDb > -3 ? 'baland' : 'yaxshi';
-    const box = $('verdict');
-    box.className = 'verdict';
-    if (!L.bytes) { box.classList.add('bad'); box.textContent = 'Yozuv boʻsh chiqdi: mikrofon ovoz bermadi. Texnik maʼlumotni ochib, nusxasini yuboring.'; return; }
-    if (L.metered && L.stop === 'no_speech') { box.classList.add('warn'); box.textContent = 'Ovoz eshitilmadi. Mikrofonga yaqinroq gapiring yoki quloqchin mikrofonini tekshiring.'; return; }
-    if (L.metered && L.peakDb < -40) { box.classList.add('warn'); box.textContent = 'Ovoz juda past. Telefonni ogʻzingizga yaqinroq ushlang.'; return; }
-    if (state.stage === 'tez' && L.metered) {
-      const target = targetSeconds(TWISTERS[state.twister].text);
-      const s = L.speechMs / 1000;
-      if (s <= target) box.textContent = `Zoʻr, tez aytdingiz: ${fmt(s)} s (maqsad ${fmt(target)} s gacha).`;
-      else { box.classList.add('warn'); box.textContent = `${fmt(s)} s. Yana tezroq: maqsad ${fmt(target)} s gacha.`; }
-      return;
-    }
-    box.textContent = 'Yozuv tayyor. «Eshitish» tugmasini bosib, tinglab koʻring.';
-  }
-
   function fail(e, quiet) {
     if (state.rec) state.rec.onstop = null;
     state.recording = false;
@@ -394,84 +436,191 @@ details.diag[open] summary:after{content:'⌃'}
     state.error = { name, message: String((e && e.message) || e || '').slice(0, 300) };
     if (!quiet) { resetMicButton(); $('hint').textContent = explain(name); }
     renderDiag();
-    report('error');
+    reportMic('error');
     haptic('error');
   }
-
   function explain(name) {
-    if (name === 'NotAllowedError' || name === 'SecurityError') return 'Mikrofonga ruxsat berilmadi. Telegram va telefon sozlamalarida mikrofonga ruxsat bering, keyin qayta urinib koʻring.';
-    if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'Mikrofon topilmadi. Quloqchinni tekshiring yoki telefon mikrofonidan foydalaning.';
-    if (name === 'NotReadableError' || name === 'AbortError') return 'Mikrofon band: uni boshqa ilova ishlatayotgan boʻlishi mumkin. Qoʻngʻiroqni yoki boshqa ilovani yoping.';
-    if (name === 'NotSupportedError') return 'Bu qurilmada ovoz yozish ishlamayapti. Texnik maʼlumotni ochib, nusxasini yuboring.';
-    return 'Ovoz yozishda xato. Texnik maʼlumotni ochib, nusxasini yuboring.';
+    if (name === 'NotAllowedError' || name === 'SecurityError') return 'Mikrofonga ruxsat berilmadi. Telegram va telefon sozlamalarida mikrofonga ruxsat ber, keyin qayta urinib koʻr.';
+    if (name === 'NotFoundError' || name === 'OverconstrainedError') return 'Mikrofon topilmadi. Quloqchinni tekshir yoki telefon mikrofonidan foydalan.';
+    if (name === 'NotReadableError' || name === 'AbortError') return 'Mikrofon band: uni boshqa ilova ishlatayotgan boʻlishi mumkin.';
+    if (name === 'NotSupportedError') return 'Bu qurilmada ovoz yozish ishlamayapti. Texnik maʼlumotni nusxalab yubor.';
+    return 'Ovoz yozishda xato. Texnik maʼlumotni nusxalab yubor.';
   }
 
-  let queue = Promise.resolve();
-  function report(outcome) {
+  // ---------- WAV 16 kHz mono (what the speech service accepts) ----------
+  async function toWav16k(blob, trim) {
+    const ctx = state.ctx || ensureContext();
+    const ab = await blob.arrayBuffer();
+    const decoded = await new Promise((resolve, reject) => {
+      try { const p = ctx.decodeAudioData(ab, resolve, reject); if (p && p.then) p.then(resolve, reject); } catch (e) { reject(e); }
+    });
+    const sr = decoded.sampleRate, ch = decoded.numberOfChannels;
+    let mono = new Float32Array(decoded.length);
+    for (let c = 0; c < ch; c++) { const d = decoded.getChannelData(c); for (let i = 0; i < d.length; i++) mono[i] += d[i] / ch; }
+    if (trim) {
+      const s = Math.max(0, Math.floor((trim.start / 1000) * sr)), e = Math.min(mono.length, Math.ceil((trim.end / 1000) * sr));
+      if (e - s > sr * 0.4) mono = mono.subarray(s, e);
+    }
+    const ratio = sr / 16000, outLen = Math.max(1, Math.floor(mono.length / ratio));
+    const pcm = new Int16Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      const a = Math.floor(i * ratio), b = Math.max(a + 1, Math.min(mono.length, Math.floor((i + 1) * ratio)));
+      let sum = 0; for (let k = a; k < b; k++) sum += mono[k];
+      const v = Math.max(-1, Math.min(1, sum / (b - a)));
+      pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
+    }
+    const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
+    const put = (o, s) => { for (let i = 0; i < 4; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+    put(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); put(8, 'WAVE'); put(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true);
+    dv.setUint32(28, 32000, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); put(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+    new Int16Array(buf, 44).set(pcm);
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+
+  // ---------- checking ----------
+  async function submit(blob, trim, speechMs, totalMs) {
+    state.busy = true; render();
+    $('hint').textContent = 'Tekshirilmoqda…';
+    try {
+      const wav = await toWav16k(blob, trim);
+      const fd = new FormData();
+      fd.append('meta', JSON.stringify({ twisterId: twister().id, stage: state.stage, attempt: state.attempt, consent: state.consent || state.isAdmin, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser' }));
+      fd.append('audio', wav, 'attempt.wav');
+      const r = await api('check', fd, true);
+      state.lastCheck = { status: r.status, passed: r.passed, recognized: r.recognized, confidence: r.confidence, wavBytes: wav.size };
+      showCheck(r, speechMs);
+    } catch (e) {
+      state.lastCheck = { error: e.message };
+      if (e.code === 'speech_not_configured') showVerdict('warn', 'Ovozli tekshiruv hali ulanmagan. Birozdan keyin urinib koʻr.');
+      else if (e.code === 'invalid_or_expired_init_data') showVerdict('bad', 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.');
+      else if (e.code === 'consent_required') { $('trainer').classList.add('hide'); $('consentCard').classList.remove('hide'); }
+      else showVerdict('bad', `Tekshirib boʻlmadi (${e.message}). Yana urinib koʻr.`);
+    } finally {
+      state.busy = false; render(); renderDiag();
+    }
+  }
+
+  function showCheck(r, speechMs) {
+    const box = $('words');
+    box.innerHTML = '';
+    for (const w of r.words || []) {
+      const el = document.createElement('span');
+      el.className = 'w ' + (w.v === 'ok' ? '' : w.v);
+      el.textContent = w.d;
+      if (w.v === 'wrong' && w.h) { const s = document.createElement('small'); s.textContent = `→ ${w.h}`; el.appendChild(s); }
+      box.appendChild(el);
+    }
+    $('heard').textContent = r.recognized ? `Eshitildi: «${r.recognized}»` : '';
+    if (r.status && r.status !== 'Success') return showVerdict('warn', 'Ovozing aniq eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.', true);
+    const tooSlow = state.stage === 'tez' && r.passed && speechMs / 1000 > targetSeconds();
+    if (r.passed && !tooSlow) {
+      const near = (r.words || []).some((w) => w.v === 'near');
+      showVerdict('ok', near ? 'Toʻgʻri! Sariq soʻzlarni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.', true, true);
+      playUrl(state.urls['ph:great']);
+      haptic('success');
+      return;
+    }
+    if (tooSlow) { showVerdict('warn', `Soʻzlar toʻgʻri, lekin sekinroq: ${fmt(speechMs / 1000)} s. Maqsad: ${fmt(targetSeconds())} s gacha.`, true); playUrl(state.urls['ph:faster']); }
+    else { showVerdict('bad', `Qizil soʻzlarga eʼtibor ber va yana urinib koʻr (${state.attempt}/${MAX_ATTEMPTS}).`, true); playUrl(state.urls['ph:retry']); }
+    haptic('warning');
+    state.attempt += 1;
+    if (state.attempt > MAX_ATTEMPTS) {
+      showVerdict('warn', 'Bu tez aytishga keyinroq qaytamiz. Keyingisiga oʻtamiz!', true, true);
+      if (!state.progress.later.includes(twister().id)) state.progress.later.push(twister().id);
+      store.set(PROGRESS_KEY, state.progress);
+      state.giveUp = true;
+    }
+  }
+
+  function showVerdict(kind, message, keepWords, canAdvance) {
+    $('result').classList.remove('hide');
+    if (!keepWords) { $('words').innerHTML = ''; $('heard').textContent = ''; }
+    const v = $('verdict');
+    v.className = 'verdict' + (kind === 'warn' ? ' warn' : kind === 'bad' ? ' bad' : '');
+    v.textContent = message;
+    $('next').classList.toggle('hide', !canAdvance);
+    $('again').classList.toggle('hide', !!canAdvance && !state.giveUp ? true : !!state.giveUp);
+    $('hint').textContent = canAdvance ? '' : 'Yana bir marta tingla yoki darhol ayt.';
+  }
+
+  function advance() {
+    $('result').classList.add('hide');
+    if (state.giveUp) { state.giveUp = false; return nextTwister(); }
+    const i = STAGES.indexOf(state.stage);
+    if (i < STAGES.length - 1) {
+      state.stage = STAGES[i + 1]; state.attempt = 1; state.listened = false;
+      render();
+      return;
+    }
+    const t = twister();
+    state.progress.stars[t.id] = Math.max(state.progress.stars[t.id] || 0, 1);
+    state.progress.later = state.progress.later.filter((id) => id !== t.id);
+    store.set(PROGRESS_KEY, state.progress);
+    nextTwister();
+  }
+
+  function nextTwister() {
+    if (state.idx >= state.twisters.length - 1) { state.idx = 0; playUrl(state.urls['ph:done']); showBanner('Hamma tez aytishlarni aytib chiqding! Endi boshidan takrorlaymiz.'); }
+    else state.idx += 1;
+    prepareTwister();
+  }
+
+  // ---------- misc ----------
+  function showBanner(text) { const b = $('banner'); b.textContent = text; b.classList.remove('hide'); }
+  function haptic(kind) {
+    try { if (!inTelegram || !tg.HapticFeedback) return; if (kind === 'impact') tg.HapticFeedback.impactOccurred('medium'); else tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
+  }
+  function diagnostics() {
+    return { inTelegram, mock, platform: tg ? tg.platform : null, tgVersion: tg ? tg.version : null, secure: window.isSecureContext,
+      getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia), mediaRecorder: typeof window.MediaRecorder !== 'undefined',
+      types: supported(), chosen: state.mime || pickMime(), mic, last: state.last, error: state.error, check: state.lastCheck,
+      twisterId: state.twisters.length ? twister().id : null, stage: state.stage, attempt: state.attempt };
+  }
+  function renderDiag() {
+    const d = diagnostics();
+    const okTypes = Object.keys(d.types).filter((t) => d.types[t]);
+    const L = state.last, C = state.lastCheck;
+    $('diag').textContent = [
+      `Telegram: ${d.inTelegram ? `${d.platform} v${d.tgVersion}` : mock ? 'mock rejimi' : 'yoʻq (oddiy brauzer)'}`,
+      `Brauzer: ${navigator.userAgent}`,
+      `getUserMedia: ${d.getUserMedia ? 'ha' : 'yoʻq'} · MediaRecorder: ${d.mediaRecorder ? 'ha' : 'yoʻq'} · format: ${d.chosen || 'standart'}`,
+      `Qoʻllaydi: ${okTypes.join(', ') || 'hech biri'}`,
+      mic.sampleRate || mic.ctxRate ? `Mikrofon: ${mic.sampleRate || '?'} Hz, EC ${flag(mic.echoCancellation)}, NS ${flag(mic.noiseSuppression)}, AGC ${flag(mic.autoGainControl)}, AudioContext ${mic.ctxRate || '?'} Hz` : 'Mikrofon: hali ochilmagan',
+      L ? `Oxirgi yozuv: ${L.totalMs} ms, nutq ${L.speechMs} ms, peak ${L.peakDb} dB, ${L.bytes} bayt, toʻxtash: ${L.stop}` : 'Oxirgi yozuv: yoʻq',
+      C ? `Tekshiruv: ${C.error ? 'xato ' + C.error : `${C.status}, passed=${C.passed}, ishonch ${C.confidence}, WAV ${C.wavBytes} bayt`}` : 'Tekshiruv: yoʻq',
+      state.error ? `Xato: ${state.error.name}: ${state.error.message}` : 'Xato: yoʻq',
+      `Server: ${state.server || '—'} · nutq: ${state.speechReady ? 'ulangan' : 'ulanmagan'}`,
+    ].join('\n');
+  }
+  function reportMic(outcome) {
     if (!inTelegram) return;
     const fd = new FormData();
     fd.append('meta', JSON.stringify({ outcome, platform: tg.platform, tgVersion: tg.version, userAgent: navigator.userAgent, mimeType: state.mime || pickMime(), diagnostics: diagnostics() }));
-    const withAudio = outcome === 'recorded' && state.isAdmin && state.blob && state.blob.size > 0 && state.blob.size < MAX_UPLOAD;
-    if (withAudio) fd.append('audio', state.blob, `yozuv.${extFor(state.blob.type)}`);
-    queue = queue.then(async () => {
-      if (withAudio) $('send').textContent = 'Yozuv serverga yuborilmoqda…';
-      try {
-        const res = await fetch(API, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData }, body: fd });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-        state.isAdmin = !!data.isAdmin;
-        state.server = `ok (${outcome}${data.audioSaved ? ', audio saqlandi' : ''})`;
-        renderWho();
-        if (outcome === 'recorded') $('send').textContent = data.audioSaved ? 'Yozuv serverga saqlandi ✓' : 'Texnik natija serverga yuborildi ✓';
-      } catch (e) {
-        state.server = `xato: ${e.message}`;
-        if (outcome !== 'opened') $('send').textContent = e.message === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.' : `Serverga yuborilmadi: ${e.message}`;
-      }
-      renderDiag();
-    });
+    fetch(`${API}/mic-check`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData }, body: fd }).catch(() => {});
   }
 
+  // ---------- events ----------
+  $('consentYes').addEventListener('click', () => { state.consent = true; store.set(CONSENT_KEY, true); startTrainer(); reportMic('opened'); });
+  $('listen').addEventListener('click', () => listen());
   $('mic').addEventListener('click', () => (state.recording ? stop('manual') : start()));
-  $('again').addEventListener('click', () => start());
-  $('play').addEventListener('click', () => {
-    const p = $('player');
-    if (!state.url) return;
-    p.currentTime = 0;
-    p.play().catch((e) => fail(e, true));
-  });
-  $('next').addEventListener('click', () => {
-    if (state.recording) return;
-    state.twister = (state.twister + 1) % TWISTERS.length;
-    $('result').classList.add('hide');
-    renderTwister(); renderDiag();
-  });
-  document.querySelectorAll('.stage').forEach((b) => b.addEventListener('click', () => {
-    if (state.recording) return;
-    state.stage = b.dataset.stage;
-    renderTwister(); renderDiag();
-  }));
+  $('again').addEventListener('click', () => { $('result').classList.add('hide'); start(); });
+  $('next').addEventListener('click', () => advance());
+  $('skip').addEventListener('click', () => { if (state.recording || state.busy) return; state.giveUp = false; nextTwister(); });
   $('copy').addEventListener('click', async () => {
     const text = $('diag').textContent;
     let ok = false;
     try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { ok = document.execCommand('copy'); } catch (e2) {}
-      ta.remove();
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e2) {} ta.remove();
     }
-    $('copy').textContent = ok ? 'Nusxa olindi ✓' : 'Nusxa olinmadi: matnni qoʻlda belgilang';
+    $('copy').textContent = ok ? 'Nusxa olindi ✓' : 'Nusxa olinmadi';
     setTimeout(() => { $('copy').textContent = 'Nusxa olish'; }, 2500);
   });
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) return;
-    if (state.recording) stop('hidden'); else releaseMic();
-  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) return; if (state.recording) stop('hidden'); else releaseMic(); });
 
-  renderTwister();
-  renderWho();
-  renderDiag();
-  report('opened');
+  if (mock) window.__tez = { state, toWav16k, submit, vad }; // local preview tests only
+  init();
 })();
 </script>
 </body>
