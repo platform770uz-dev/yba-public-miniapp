@@ -82,7 +82,7 @@ details.diag[open] summary:after{content:'⌃'}
 
   <section class="card consent hide" id="consentCard">
     <h2>Ota-onalar uchun</h2>
-    <p>Mashqda bolaning ovozi tekshirish uchun Microsoft Azure nutqni aniqlash xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.</p>
+    <p id="consentText">Mashqda bolaning ovozi tekshirish uchun nutqni aniqlash xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.</p>
     <div class="row"><button class="btn primary" id="consentYes" type="button">Roziman, boshlaymiz</button></div>
   </section>
 
@@ -129,7 +129,7 @@ details.diag[open] summary:after{content:'⌃'}
   const PHRASE_KEYS = ['your_turn', 'great', 'almost', 'retry', 'faster', 'later', 'done'];
   const TYPES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/ogg;codecs=opus', 'audio/webm'];
   const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_ATTEMPTS = 3;
-  const CONSENT_KEY = 'tez_consent_v1', PROGRESS_KEY = 'tez_progress_v1';
+  const CONSENT_KEY = 'tez_consent_v2', PROGRESS_KEY = 'tez_progress_v1';
 
   const $ = (id) => document.getElementById(id);
   const tg = window.Telegram && window.Telegram.WebApp;
@@ -142,7 +142,7 @@ details.diag[open] summary:after{content:'⌃'}
   };
 
   const state = {
-    isAdmin: false, speechReady: false, twisters: [], idx: 0, stage: 'sekin', attempt: 1,
+    isAdmin: false, sttReady: false, ttsReady: false, provider: '', twisters: [], idx: 0, stage: 'sekin', attempt: 1,
     urls: {}, tezTarget: null, listened: false, busy: false, consent: !!store.get(CONSENT_KEY, false),
     progress: store.get(PROGRESS_KEY, { idx: 0, stars: {}, later: [] }),
     ctx: null, stream: null, source: null, analyser: null, rec: null, chunks: [], frames: [],
@@ -177,7 +177,7 @@ details.diag[open] summary:after{content:'⌃'}
   // Local preview only (?mock=1 outside Telegram): no server, no narrator audio.
   async function mockApi(path, body) {
     await new Promise((r) => setTimeout(r, 300));
-    if (path === 'session') return { ok: true, isAdmin: true, speechReady: true, twisters: [
+    if (path === 'session') return { ok: true, isAdmin: true, sttReady: true, ttsReady: false, sttProvider: 'Google Cloud', twisters: [
       { id: 6, level: 2, text: 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.' },
       { id: 1, level: 1, text: 'Togʻdan tosh tushdi.' }] };
     if (path === 'tts') return { ok: true, urls: {} };
@@ -201,7 +201,8 @@ details.diag[open] summary:after{content:'⌃'}
     }
     try {
       const s = await api('session');
-      state.isAdmin = !!s.isAdmin; state.speechReady = !!s.speechReady; state.twisters = s.twisters || [];
+      state.isAdmin = !!s.isAdmin; state.sttReady = !!(s.sttReady ?? s.speechReady); state.ttsReady = !!s.ttsReady;
+      state.provider = s.sttProvider || ''; state.twisters = s.twisters || [];
       state.server = 'ok';
     } catch (e) {
       state.server = `xato: ${e.message}`;
@@ -213,7 +214,8 @@ details.diag[open] summary:after{content:'⌃'}
     $('who').textContent = state.isAdmin ? 'Admin' : 'Sinov';
     $('who').className = state.isAdmin ? 'pill admin' : 'pill';
     $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
-    if (!state.speechReady) showBanner('Ovozli tekshiruv hali ulanmagan: Azure kaliti kutilmoqda. Mikrofon ishlaydi, lekin natija chiqmaydi.');
+    if (!state.sttReady) showBanner('Ovozli tekshiruv hali ulanmagan: kalit kutilmoqda. Mikrofon ishlaydi, lekin natija chiqmaydi.');
+    $('consentText').textContent = `Mashqda bolaning ovozi tekshirish uchun ${state.provider || 'nutqni aniqlash'} xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.`;
     if (!state.twisters.length) { showBanner('Tez aytishlar roʻyxati boʻsh.'); return; }
     state.idx = Math.min(state.progress.idx || 0, state.twisters.length - 1);
     if (!state.isAdmin && !state.consent) { $('consentCard').classList.remove('hide'); return; }
@@ -228,7 +230,7 @@ details.diag[open] summary:after{content:'⌃'}
   }
 
   function prepareTwister() {
-    state.stage = 'sekin'; state.attempt = 1; state.listened = false; state.tezTarget = null;
+    state.stage = 'sekin'; state.attempt = 1; state.listened = !state.ttsReady; state.tezTarget = null;
     state.progress.idx = state.idx; store.set(PROGRESS_KEY, state.progress);
     $('result').classList.add('hide');
     render();
@@ -236,7 +238,7 @@ details.diag[open] summary:after{content:'⌃'}
   }
 
   async function prefetchVoice() {
-    if (!state.speechReady) return;
+    if (!state.ttsReady) return;
     const t = twister();
     const items = STAGES.map((s) => `tw:${t.id}:${s}`).concat(Object.keys(state.urls).some((k) => k.startsWith('ph:')) ? [] : PHRASE_KEYS.map((p) => `ph:${p}`));
     try {
@@ -278,7 +280,8 @@ details.diag[open] summary:after{content:'⌃'}
       ? `Tez ayt: ${fmt(targetSeconds())} soniya ichida`
       : state.stage === 'sekin' ? 'Sekin va aniq ayt, har bir boʻgʻinni eshittir' : 'Oddiy suhbatdagidek ayt';
     const waitingForNext = !$('result').classList.contains('hide') && !$('next').classList.contains('hide');
-    $('hint').textContent = waitingForNext ? '' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
+    $('listen').parentElement.classList.toggle('hide', !state.ttsReady);
+    $('hint').textContent = waitingForNext ? '' : !state.ttsReady ? 'Matnni oʻqib chiq, keyin mikrofonni bosib ayt.' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
     $('listen').disabled = state.recording || state.busy;
     $('mic').disabled = state.busy;
     renderDiag();
@@ -294,7 +297,7 @@ details.diag[open] summary:after{content:'⌃'}
   async function listen() {
     const t = twister();
     let url = state.urls[`tw:${t.id}:${state.stage}`];
-    if (!url && state.speechReady) { await prefetchVoice(); url = state.urls[`tw:${t.id}:${state.stage}`]; }
+    if (!url && state.ttsReady) { await prefetchVoice(); url = state.urls[`tw:${t.id}:${state.stage}`]; }
     if (!url) { showBanner('Diktor ovozi hali tayyor emas. Matnni oʻzing oʻqib, keyin ayt.'); state.listened = true; render(); return; }
     $('listen').disabled = true;
     $('hint').textContent = 'Tingla…';
@@ -549,7 +552,7 @@ details.diag[open] summary:after{content:'⌃'}
     if (state.giveUp) { state.giveUp = false; return nextTwister(); }
     const i = STAGES.indexOf(state.stage);
     if (i < STAGES.length - 1) {
-      state.stage = STAGES[i + 1]; state.attempt = 1; state.listened = false;
+      state.stage = STAGES[i + 1]; state.attempt = 1; state.listened = !state.ttsReady;
       render();
       return;
     }
@@ -590,7 +593,7 @@ details.diag[open] summary:after{content:'⌃'}
       L ? `Oxirgi yozuv: ${L.totalMs} ms, nutq ${L.speechMs} ms, peak ${L.peakDb} dB, ${L.bytes} bayt, toʻxtash: ${L.stop}` : 'Oxirgi yozuv: yoʻq',
       C ? `Tekshiruv: ${C.error ? 'xato ' + C.error : `${C.status}, passed=${C.passed}, ishonch ${C.confidence}, WAV ${C.wavBytes} bayt`}` : 'Tekshiruv: yoʻq',
       state.error ? `Xato: ${state.error.name}: ${state.error.message}` : 'Xato: yoʻq',
-      `Server: ${state.server || '—'} · nutq: ${state.speechReady ? 'ulangan' : 'ulanmagan'}`,
+      `Server: ${state.server || '—'} · aniqlash: ${state.sttReady ? state.provider || 'ulangan' : 'ulanmagan'} · diktor: ${state.ttsReady ? 'bor' : 'yoʻq'}`,
     ].join('\n');
   }
   function reportMic(outcome) {
