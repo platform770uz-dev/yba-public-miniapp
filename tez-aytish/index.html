@@ -2,127 +2,187 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f8f8f5">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
 <title>Tez aytish — trenajyor</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#f8f8f5;--ink:#1c2430;--sub:#66727f;--line:#e8ebe8;--mint:#047f70;--mint-dark:#03695d;--mint-pale:#e6f7ef;--orange:#ff7f58;--gold:#ffcf70;--red:#c9483f;--red-pale:#fdeceb;--yellow-pale:#fff5df;--shadow:0 12px 28px rgba(23,40,44,.06)}
+:root{--bg:#fff;--surface:#f5f5f7;--ink:#1d1d1f;--sub:#6e6e73;--faint:#b0b0b6;--line:#e5e5ea;--accent:#ff5a3c;--accent-press:#e8492c;--accent-tint:#ffebe6;--ok:#1e8e3e;--warn:#8a5a00;--warn-tint:#fff1cc;--warn-line:#f0b429;--star:#f5a623;--ease:cubic-bezier(.2,.8,.2,1)}
 *{box-sizing:border-box}
-html{background:#1c2430}
-body{margin:0;color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#1c2430;line-height:1.48;-webkit-tap-highlight-color:transparent}
-button{font:inherit;cursor:pointer;touch-action:manipulation}
-button:focus-visible{outline:3px solid #f0a64c;outline-offset:3px}
+html,body{height:100%;margin:0;background:var(--bg);overscroll-behavior:none}
+body{color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none;padding:0}
+button:focus-visible{outline:3px solid #0a84ff;outline-offset:3px}
 button:disabled{opacity:.45;cursor:default}
-h1,h2,p{margin:0}
+h1,h2,p,ul{margin:0}
 .hide{display:none!important}
-.phone{width:min(100%,480px);min-height:100vh;min-height:100dvh;background:var(--bg);margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand-sign{display:grid;place-items:center;flex:none;width:39px;height:39px;border-radius:13px;background:#112c2a;color:#baf3d6;font-size:20px;transform:rotate(-8deg)}
-.brand-name{font-size:21px;letter-spacing:-1px;line-height:1;font-weight:900}
-.brand-sub{font-size:9px;letter-spacing:2px;margin-top:5px;color:#94a09f;font-weight:800}
-.pill{font-size:11px;font-weight:800;color:#55655f;background:#fff;border:1px solid var(--line);padding:7px 10px;border-radius:20px;white-space:nowrap}
-.pill.admin{color:var(--mint-dark);background:var(--mint-pale);border-color:#c9e7da}
-.card{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:26px;padding:20px 18px;box-shadow:var(--shadow)}
-.banner{margin-top:14px;padding:12px 14px;border-radius:15px;font-size:13px;line-height:1.5;background:var(--yellow-pale);color:#806b49}
-.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11px;font-weight:850;color:var(--sub)}
-.meta button{border:0;background:#f3f5f3;color:#3c5750;font-weight:800;font-size:12px;border-radius:11px;padding:8px 12px}
-.pick{display:block;width:100%;margin-top:10px;border:1px dashed #c9e7da;background:var(--mint-pale);color:var(--mint-dark);font:inherit;font-weight:800;font-size:13px;border-radius:12px;padding:9px 10px}
-.twister{font-size:clamp(22px,6vw,28px);line-height:1.32;font-weight:875;letter-spacing:-.6px;margin-top:14px;overflow-wrap:anywhere}
-.stages{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
-.stage{min-height:44px;border-radius:14px;border:1.5px solid #e1e8e4;background:#fbfcfa;color:#4c5d58;font-weight:850;font-size:13px;display:grid;place-items:center}
-.stage.on{background:var(--mint);border-color:var(--mint);color:#fff}
-.stage.done{background:var(--mint-pale);border-color:#bfe3d3;color:var(--mint-dark)}
-.target{margin-top:10px;font-size:12px;color:var(--sub);text-align:center;min-height:18px}
-.listen{display:flex;justify-content:center;margin-top:16px}
-.listen button{min-height:48px;padding:0 20px;border-radius:15px;border:1.5px solid #c9e7da;background:var(--mint-pale);color:var(--mint-dark);font-weight:850;font-size:14px}
-.mic-zone{display:flex;flex-direction:column;align-items:center;margin-top:18px}
-.mic{width:124px;height:124px;border-radius:50%;border:0;background:var(--mint);color:#fff;font-size:46px;line-height:1;display:grid;place-items:center;box-shadow:0 14px 30px rgba(4,127,112,.28)}
-.mic:active{transform:scale(.98)}
-.warm{flex:none;width:min(100%,280px);min-height:64px;font-size:18px;border-radius:20px;box-shadow:0 14px 30px rgba(4,127,112,.22)}
-.mic.rec{background:var(--orange);animation:pulse 1.2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,127,88,.45)}70%{box-shadow:0 0 0 22px rgba(255,127,88,0)}100%{box-shadow:0 0 0 0 rgba(255,127,88,0)}}
-.timer{margin-top:12px;font-size:15px;font-weight:850;font-variant-numeric:tabular-nums;min-height:22px}
-.meter{width:min(100%,280px);height:10px;border-radius:99px;background:#e6ebe8;overflow:hidden;margin-top:6px}
-.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4cc29a,#047f70);border-radius:99px}
-.hint{margin-top:12px;font-size:13px;color:var(--sub);text-align:center;max-width:310px;min-height:20px}
-.result{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
-.words{display:flex;flex-wrap:wrap;gap:7px}
-.w{padding:6px 10px;border-radius:11px;font-weight:800;font-size:15px;background:var(--mint-pale);color:#1f5e50}
-.w.near{background:var(--yellow-pale);color:#806b49}
-.w.wrong{background:var(--red-pale);color:#8d3730}
-.w.missing{background:#f1f3f1;color:#9aa3a0;text-decoration:line-through}
-.w small{display:block;font-size:11px;font-weight:700;opacity:.85}
-.verdict{margin-top:12px;padding:12px 13px;border-radius:13px;font-size:14px;line-height:1.45;background:var(--mint-pale);color:#1f5e50;font-weight:700}
-.verdict.warn{background:var(--yellow-pale);color:#806b49}
-.verdict.bad{background:var(--red-pale);color:#8d3730}
-.heard{margin-top:8px;font-size:12px;color:var(--sub)}
-.row{display:flex;gap:10px;margin-top:12px}
-.btn{flex:1;min-height:52px;border-radius:15px;border:1px solid #dce4df;background:#fff;color:#243b35;font-weight:850;font-size:14px}
-.btn.primary{background:var(--mint);border-color:var(--mint);color:#fff}
-.consent h2{font-size:20px;letter-spacing:-.5px}
-.consent p{font-size:14px;color:#4a5356;margin-top:10px;line-height:1.55}
-details.diag{margin-top:18px;border-radius:17px;border:1px solid var(--line);background:#fff;overflow:hidden}
-details.diag summary{list-style:none;cursor:pointer;padding:15px 17px;font-weight:850;font-size:13px;display:flex;justify-content:space-between}
-details.diag summary::-webkit-details-marker{display:none}
-details.diag summary:after{content:'⌄';font-size:18px;line-height:1}
-details.diag[open] summary:after{content:'⌃'}
-.diag pre{margin:0;padding:0 17px 4px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#40504c}
-.diag .row{padding:0 17px 16px}
-.note{margin-top:16px;font-size:11px;line-height:1.6;color:#88918f;text-align:center}
+.i{display:block;width:22px;height:22px}
+
+/* The feed: one full-screen card per tongue twister, swiped vertically like Reels. */
+.feed{position:fixed;top:0;right:0;bottom:0;left:0;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:none;scrollbar-width:none}
+.feed::-webkit-scrollbar{display:none}
+.feed.lock{overflow:hidden}
+.card{position:relative;height:100%;width:min(100%,480px);margin:0 auto;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 20px calc(12px + env(safe-area-inset-bottom))}
+
+/* Stage segments on top, like Stories. */
+.segs{display:flex;gap:5px}
+.seg{flex:1;height:22px;display:flex;align-items:center}
+.seg i{display:block;width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.seg b{display:block;height:100%;width:0;border-radius:2px;background:var(--accent)}
+.seg.on i{background:var(--accent-tint)}
+.seg.done b{width:100%}
+.seglab{display:flex;gap:5px;margin-top:-3px}
+.seglab span{flex:1;font-size:12px;font-weight:700;color:var(--faint)}
+.seglab span.on{color:var(--accent)}
+.seglab span.done{color:var(--sub)}
+.meta{display:flex;align-items:center;gap:4px;margin-top:6px;min-height:40px;font-size:14px;font-weight:700;color:var(--sub);font-variant-numeric:tabular-nums}
+.meta .sp{flex:1}
+.brand{font-size:16px;font-weight:800;color:var(--ink)}
+.total{display:inline-flex;align-items:center;gap:4px;color:var(--ink);margin-right:4px}
+.total .i{width:17px;height:17px}
+.star path{fill:var(--star);stroke:var(--star);stroke-width:1.6;stroke-linejoin:round}
+.ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--ink)}
+.ico:active{background:var(--surface)}
+.admin-only{display:none}
+.is-admin .admin-only{display:grid}
+
+/* Text and the side rail. */
+.box{flex:1;min-height:0;display:flex;align-items:center;gap:12px}
+.body{flex:1;min-width:0}
+.cap{margin-bottom:10px;font-size:14px;font-weight:600;color:var(--sub)}
+.cap b{color:var(--accent);font-weight:800}
+.tw{font-weight:800;letter-spacing:-.02em;line-height:1.3;font-size:34px}
+.tw.s1{font-size:42px}.tw.s2{font-size:34px}.tw.s3{font-size:29px}.tw.s4{font-size:25px}
+.w{display:inline-block;max-width:100%;overflow-wrap:anywhere;vertical-align:top;border-bottom:3px solid transparent;border-radius:8px;transition:background-color .15s,box-shadow .15s,color .2s}
+.w u{text-decoration:none}
+.hs{font-weight:inherit;color:var(--accent)}
+.sy{font-style:normal;font-weight:500;color:var(--faint);margin:0 .03em}
+.w.on{background:var(--accent-tint);box-shadow:0 0 0 4px var(--accent-tint)}
+.tw.res .hs{color:inherit}
+.w.ok,.w.near{color:var(--ok)}
+.w.near{border-bottom:3px dotted var(--warn-line);border-radius:0}
+.w.wrong{color:var(--warn);background:var(--warn-tint);box-shadow:0 0 0 4px var(--warn-tint)}
+.w.missing{color:var(--faint);border-bottom:3px dashed var(--faint);border-radius:0}
+.w small{display:block;margin-top:1px;font-size:13px;line-height:1.2;font-weight:700;letter-spacing:0}
+.rail{flex:none;display:flex;flex-direction:column;align-items:center;gap:12px}
+.rb{width:46px;height:46px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:21px;line-height:1;transition:transform .15s var(--ease),background-color .15s,color .15s}
+.rb:active{transform:scale(.93)}
+.rb.on{background:var(--accent-tint);color:var(--accent)}
+.rb.ask{animation:ask 1.1s var(--ease) 3}
+
+/* The snow leopard. */
+.bars svg{display:block;width:100%;height:100%}
+.bars.sm{width:50px;height:50px;border-radius:50%;background:var(--accent-tint);padding:3px}
+.bars.lg{width:92px;height:92px;flex:none}
+.bars.xl{width:164px;height:164px;flex:none}
+.bars .e-happy,.bars .e-wink,.bars .m-open{display:none}
+.bars .e-open{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+.bars[data-mood=happy] .e-open,.bars[data-mood=happy] .m-smile{display:none}
+.bars[data-mood=happy] .e-happy,.bars[data-mood=happy] .m-open{display:inline}
+.bars[data-mood=happy]{animation:hop .5s var(--ease) 2}
+.bars[data-mood=wink] .e-open.r{display:none}
+.bars[data-mood=wink] .e-wink{display:inline}
+.bars[data-mood=listen] .e-open{animation:none;transform:scale(1.18)}
+
+/* Status line, action zone, foot. */
+.status{min-height:62px;margin-top:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;text-align:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:30px;height:30px}
+.stars path,.st path{fill:var(--line);stroke:var(--line);stroke-width:1.6;stroke-linejoin:round}
+.stars .f path,.st .f path{fill:var(--star);stroke:var(--star)}
+.stars .a{animation:pop .4s var(--ease) both}
+.msg{font-size:15px;line-height:1.35;font-weight:700;color:var(--sub);max-width:310px}
+.msg.ok{color:var(--ok)}
+.msg.warn{color:var(--warn)}
+.act{min-height:134px;margin-top:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.pill{width:min(100%,300px);min-height:56px;padding:0 26px;border-radius:28px;background:var(--surface);color:var(--ink);font-size:17px;font-weight:800;transition:transform .15s var(--ease),background-color .15s}
+.pill:active{transform:scale(.97)}
+.pill.primary{background:var(--accent);color:#fff}
+.pill.primary:active{background:var(--accent-press)}
+.pill.small{width:auto;min-height:44px;font-size:15px}
+.micbox{position:relative;width:128px;height:128px;display:grid;place-items:center}
+.ring{position:absolute;top:0;left:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:7}
+.ring .trk{stroke:var(--accent-tint)}
+.ring .prg{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:377;stroke-dashoffset:377;transition:stroke .2s}
+.micbox.over .prg{stroke:var(--warn-line)}
+.halo{position:absolute;width:92px;height:92px;border-radius:50%;background:var(--accent-tint);transition:transform .09s linear}
+.mic{position:relative;width:92px;height:92px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;transition:transform .15s var(--ease),background-color .15s}
+.mic:active{transform:scale(.96);background:var(--accent-press)}
+.mic .i{width:36px;height:36px;grid-area:1/1}
+.mic .i-stop,.mic .i-dots{display:none}
+.micbox.rec .i-mic{display:none}
+.micbox.rec .i-stop{display:block}
+.micbox.busy .i-mic,.micbox.busy .i-stop{display:none}
+.micbox.busy .i-dots{display:block}
+.i-dots circle{animation:dots 1.1s infinite}
+.i-dots circle:nth-child(2){animation-delay:.15s}
+.i-dots circle:nth-child(3){animation-delay:.3s}
+.foot{margin-top:6px;min-height:24px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:13px;font-weight:600;color:var(--sub);text-align:center}
+.foot .i{width:16px;height:16px}
+.foot.up{color:var(--ink)}
+.foot.up .i{animation:nudge 1.4s var(--ease) infinite}
+.foot.shake{animation:shake .4s}
+.link{font-size:13px;font-weight:600;color:var(--sub);text-decoration:underline;text-underline-offset:3px;padding:6px 8px}
+
+/* Welcome and summary cards. */
+.hero{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.hero h1{margin-top:8px;font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-.02em}
+.lead{font-size:17px;line-height:1.45;font-weight:500;color:var(--sub);max-width:310px}
+.consent .lead{font-size:15px}
+.summary .hero{justify-content:flex-start;gap:6px;overflow-y:auto;overscroll-behavior:contain;padding-top:4px}
+.summary .hero h1{font-size:28px;margin-top:2px}
+.summary .lead{font-size:15px}
+.sum{list-style:none;padding:0;width:100%;margin-top:6px}
+.sum li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px;font-weight:600}
+.sum li>span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.st{display:flex;gap:2px;flex:none}
+.st svg{width:17px;height:17px}
+.hard{width:100%;margin-top:10px;text-align:left}
+.hard p{margin-bottom:7px;font-size:13px;font-weight:700;color:var(--sub)}
+.chip{display:inline-block;margin:0 6px 6px 0;padding:5px 10px;border-radius:10px;background:var(--warn-tint);color:var(--warn);font-size:14px;font-weight:700}
+
+/* Bottom sheet: technical info and the admin picker. */
+.sheet-wrap{position:fixed;top:0;right:0;bottom:0;left:0;z-index:10;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.32)}
+.sheet{width:min(100%,480px);max-height:84%;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(18px + env(safe-area-inset-bottom))}
+.grab{width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.sheet h2{margin-bottom:12px;font-size:20px;font-weight:800}
+.sheet label{display:block;margin-bottom:6px;font-size:13px;font-weight:700;color:var(--sub)}
+.sheet select{display:block;width:100%;margin-bottom:14px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:15px;font-weight:600}
+.sheet pre{margin:0;padding:12px;border-radius:12px;background:var(--surface);color:#3a3a3c;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
+.sheet .row{display:flex;gap:10px;margin-top:14px}
+.sheet .row .pill{flex:1;width:auto;min-height:50px;font-size:15px}
+.note{margin-top:12px;font-size:12px;line-height:1.5;color:var(--sub);text-align:center}
+
+@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+@keyframes dots{0%,80%,100%{opacity:.3}40%{opacity:1}}
+@keyframes ask{0%,100%{box-shadow:0 0 0 0 rgba(255,90,60,.45)}60%{box-shadow:0 0 0 12px rgba(255,90,60,0)}}
+@media (max-height:620px){
+  .status{min-height:50px}.act{min-height:112px}.micbox{width:108px;height:108px}.mic,.halo{width:78px;height:78px}.mic .i{width:30px;height:30px}
+  .bars.xl{width:120px;height:120px}.bars.lg{width:64px;height:64px}.hero h1{font-size:28px}.tw.s1{font-size:34px}.tw.s2{font-size:29px}.tw.s3{font-size:25px}.tw.s4{font-size:22px}.sum li{padding:6px 0}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<main class="phone">
-  <header class="top">
-    <div class="brand"><div class="brand-sign" aria-hidden="true">🎙</div><div><div class="brand-name">Tez aytish</div><div class="brand-sub">DIKSIYA TRENAJYORI</div></div></div>
-    <span class="pill" id="who">Yuklanmoqda…</span>
-  </header>
-
-  <p class="banner hide" id="banner"></p>
-
-  <section class="card consent hide" id="consentCard">
-    <h2>Ota-onalar uchun</h2>
-    <p id="consentText">Mashqda bolaning ovozi tekshirish uchun nutqni aniqlash xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.</p>
-    <div class="row"><button class="btn primary" id="consentYes" type="button">Roziman, boshlaymiz</button></div>
-  </section>
-
-  <section class="card hide" id="trainer">
-    <div class="meta"><span id="progress"></span><button id="skip" type="button">Keyingisi →</button></div>
-    <select id="pick" class="pick hide" aria-label="Tez aytishni tanlash (admin)"></select>
-    <p class="twister" id="twister"></p>
-    <div class="stages" aria-label="Bosqichlar">
-      <div class="stage" data-stage="sekin">Sekin</div>
-      <div class="stage" data-stage="orta">Oʻrta</div>
-      <div class="stage" data-stage="tez">Tez</div>
+<main class="feed" id="feed"></main>
+<div class="sheet-wrap hide" id="sheetWrap">
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grab" aria-hidden="true"></div>
+    <h2 id="sheetTitle">Texnik maʼlumot</h2>
+    <div class="hide" id="adminBox">
+      <label for="pick">Admin: shu tez aytishdan boshlash</label>
+      <select id="pick"></select>
     </div>
-    <p class="target" id="target"></p>
-    <div class="listen"><button id="listen" type="button">▶ Tinglash</button></div>
-
-    <div class="mic-zone">
-      <button class="btn primary warm hide" id="warmDone" type="button">✓ Aytdim</button>
-      <button class="mic" id="mic" type="button" aria-label="Gapirish">🎤</button>
-      <div class="timer" id="timer"></div>
-      <div class="meter" id="meterBox" aria-hidden="true"><i id="meter"></i></div>
-      <p class="hint" id="hint"></p>
-    </div>
-
-    <div class="result hide" id="result">
-      <div class="words" id="words"></div>
-      <p class="verdict" id="verdict"></p>
-      <p class="heard" id="heard"></p>
-      <div class="row"><button class="btn" id="again" type="button">Yana bir marta</button><button class="btn primary hide" id="next" type="button">Davom etish →</button></div>
-    </div>
-  </section>
-
-  <details class="diag">
-    <summary>Texnik maʼlumot</summary>
     <pre id="diag"></pre>
-    <div class="row"><button class="btn" id="copy" type="button">Nusxa olish</button></div>
-  </details>
-  <p class="note" id="note"></p>
-</main>
+    <div class="row"><button class="pill" id="copy" type="button">Nusxa olish</button><button class="pill primary" id="sheetClose" type="button">Yopish</button></div>
+    <p class="note" id="note"></p>
+  </section>
+</div>
 <audio id="voice" playsinline preload="auto"></audio>
 <script>
 (() => {
@@ -132,19 +192,24 @@ details.diag[open] summary:after{content:'⌃'}
   // sekin and o'rta are warm-ups said aloud without a check; only tez goes to the (paid) speech check.
   const WARMUP = ['sekin', 'orta'];
   const STAGE_LABEL = { sekin: 'Sekin', orta: 'Oʻrta', tez: 'Tez' };
-  const PHRASE_KEYS = ['your_turn', 'great', 'almost', 'retry', 'faster', 'later', 'done'];
+  const STAGE_CAP = { sekin: 'boʻgʻinlab, aniq ayt', orta: 'oddiy suhbatdagidek ayt', tez: 'iloji boricha tez va aniq ayt' };
+  // One sample recording per tongue twister at a normal tempo; the player slows it down for the warm-ups.
+  const RATE = { sekin: 0.7, orta: 0.85, tez: 1 }, SLOW_RATE = 0.55;
   const TYPES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/ogg;codecs=opus', 'audio/webm'];
-  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_ATTEMPTS = 3;
+  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_ATTEMPTS = 3, SESSION_SIZE = 5;
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v6';
-  const CONSENT_KEY = 'tez_consent_v2', PROGRESS_KEY = 'tez_progress_v1';
+  const PAGE_VERSION = 'v7';
+  const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
+  const RING = 377; // circumference of the timer ring (r = 60)
 
   const $ = (id) => document.getElementById(id);
+  const feed = $('feed');
   const tg = window.Telegram && window.Telegram.WebApp;
   const inTelegram = !!(tg && tg.initData);
-  const mock = !inTelegram && new URLSearchParams(location.search).has('mock');
+  const query = new URLSearchParams(location.search);
+  const mock = !inTelegram && query.has('mock');
 
   const store = {
     get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } },
@@ -152,27 +217,144 @@ details.diag[open] summary:after{content:'⌃'}
   };
 
   const state = {
-    isAdmin: false, sttReady: false, ttsReady: false, provider: '', twisters: [], idx: 0, stage: 'sekin', attempt: 1,
-    urls: {}, tezTarget: null, listened: false, busy: false, consent: !!store.get(CONSENT_KEY, false),
+    isAdmin: false, sttReady: false, provider: '', twisters: [], cards: [],
+    welcomeEl: null, summaryEl: null, activeEl: null,
+    consent: !!store.get(CONSENT_KEY, false), sound: store.get(SOUND_KEY, true) !== false,
     progress: store.get(PROGRESS_KEY, { idx: 0, stars: {}, later: [] }),
-    ctx: null, stream: null, source: null, analyser: null, rec: null, chunks: [], frames: [],
-    t0: 0, raf: 0, recording: false, stopReason: '', mime: '', last: null, error: null, server: '', lastCheck: null,
+    voiceCard: null, voiceRate: 1, voiceLocked: false, vraf: 0, vdraw: null,
+    ctx: null, stream: null, source: null, analyser: null, rec: null, recCard: null, chunks: [], frames: [],
+    t0: 0, raf: 0, recording: false, busy: false, stopReason: '', mime: '', last: null, error: null, server: '', lastCheck: null,
   };
+  if (!state.progress || typeof state.progress !== 'object') state.progress = { idx: 0, stars: {}, later: [] };
+  if (!state.progress.stars) state.progress.stars = {};
+  if (!Array.isArray(state.progress.later)) state.progress.later = [];
   let mic = {};
 
   if (tg) {
     try { tg.ready(); tg.expand(); } catch (e) {}
     if (inTelegram) {
-      try { if (tg.isVersionAtLeast('6.1')) { tg.setHeaderColor('#f8f8f5'); tg.setBackgroundColor('#f8f8f5'); } } catch (e) {}
+      try { if (tg.isVersionAtLeast('6.1')) { tg.setHeaderColor('#ffffff'); tg.setBackgroundColor('#ffffff'); } } catch (e) {}
+      // Vertical swipes belong to the feed, not to closing the Mini App.
       try { if (tg.isVersionAtLeast('7.7')) tg.disableVerticalSwipes(); } catch (e) {}
     }
   }
 
   const fmt = (n) => (Math.round(n * 10) / 10).toFixed(1).replace('.', ',');
   const flag = (v) => (v === true ? 'on' : v === false ? 'off' : '?');
-  const twister = () => state.twisters[state.idx];
-  const isWarmup = () => WARMUP.includes(state.stage);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const words = (text) => text.replace(/[.,!?;:—–-]/g, ' ').split(/\s+/).filter(Boolean).length;
+
+  // ---------- icons and the mascot ----------
+  const LINE = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  const icon = (cls, body, attrs) => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true" ${attrs || ''}>${body}</svg>`;
+  const STAR_PATH = '<path d="M12 3.2l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.8 6.6 19.7l1.2-6L3.3 9.5l6.1-.7z"/>';
+  const ICON = {
+    play: icon('', '<path fill="currentColor" d="M8 5.6v12.8a1 1 0 0 0 1.5.9l10.4-6.4a1 1 0 0 0 0-1.8L9.5 4.7A1 1 0 0 0 8 5.6z"/>'),
+    mic: icon('i-mic', '<rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/>', LINE),
+    stop: icon('i-stop', '<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor"/>'),
+    dots: icon('i-dots', '<circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/>', 'fill="currentColor"'),
+    sound: icon('', '<path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/>', LINE),
+    mute: icon('', '<path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>', LINE),
+    tune: icon('', '<path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/>', LINE),
+    up: icon('', '<path d="M6 14.5l6-6 6 6"/>', LINE),
+    lock: icon('', '<rect x="5.5" y="10.5" width="13" height="9" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', LINE),
+    star: icon('star', STAR_PATH),
+  };
+  // The snow leopard: moods are switched with data-mood on the wrapper (idle, happy, wink, listen).
+  const BARS = `<svg viewBox="0 0 120 120" aria-hidden="true">
+    <circle cx="30" cy="34" r="17" fill="#dfe3e8"/><circle cx="90" cy="34" r="17" fill="#dfe3e8"/>
+    <circle cx="30" cy="35" r="9" fill="#4a4f57"/><circle cx="90" cy="35" r="9" fill="#4a4f57"/>
+    <ellipse cx="60" cy="68" rx="46" ry="42" fill="#f4f5f7" stroke="#d9dde2" stroke-width="1.5"/>
+    <g fill="#555b63"><ellipse cx="47" cy="38" rx="4" ry="3" transform="rotate(-20 47 38)"/><ellipse cx="60" cy="34" rx="3.5" ry="3"/><ellipse cx="73" cy="38" rx="4" ry="3" transform="rotate(20 73 38)"/>
+      <circle cx="24" cy="62" r="3"/><circle cx="96" cy="62" r="3"/><circle cx="22" cy="76" r="2.5"/><circle cx="98" cy="76" r="2.5"/><circle cx="31" cy="50" r="2.5"/><circle cx="89" cy="50" r="2.5"/></g>
+    <ellipse cx="60" cy="86" rx="22" ry="16" fill="#fff"/>
+    <g class="e-open l"><ellipse cx="42" cy="66" rx="5.5" ry="6.5" fill="#1d1d1f"/><circle cx="44" cy="63.5" r="1.8" fill="#fff"/></g>
+    <g class="e-open r"><ellipse cx="78" cy="66" rx="5.5" ry="6.5" fill="#1d1d1f"/><circle cx="80" cy="63.5" r="1.8" fill="#fff"/></g>
+    <g class="e-happy" fill="none" stroke="#1d1d1f" stroke-width="3.2" stroke-linecap="round"><path d="M36 68q6-8 12 0"/><path d="M72 68q6-8 12 0"/></g>
+    <path class="e-wink" d="M72 67q6-6 12 0" fill="none" stroke="#1d1d1f" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M54 79h12l-6 7z" fill="#ff8f7a" stroke="#ff8f7a" stroke-width="2" stroke-linejoin="round"/>
+    <g class="m-smile" fill="none" stroke="#3a3f45" stroke-width="2" stroke-linecap="round"><path d="M60 87v3"/><path d="M60 90q-5 5-10 1"/><path d="M60 90q5 5 10 1"/></g>
+    <g class="m-open"><path d="M50 89q10 13 20 0z" fill="#3a3f45"/><path d="M55 94.5q5 4 10 0q-5-3-10 0z" fill="#ff8f7a"/></g>
+    <g stroke="#c5cad1" stroke-width="1.5" stroke-linecap="round"><path d="M34 86l-12-3"/><path d="M34 91l-12 2"/><path d="M86 86l12-3"/><path d="M86 91l12 2"/></g>
+  </svg>`;
+
+  // ---------- text: words, syllables, hard sounds ----------
+  const LETTER = "A-Za-zʻʼ‘’`'ʹ′´";
+  const TOKEN_RE = new RegExp(`[${LETTER}]+|[^${LETTER}]+`, 'g'), WORD_RE = new RegExp(`^[${LETTER}]`);
+  const MARK_RE = /[ʻ‘`']/; // the turned comma of oʻ and gʻ, however it was typed
+  const HARD = new Set(['q', 'x', 'ch', 'sh', 'gʻ', 'oʻ']);
+
+  // Letters as Uzbek counts them: sh, ch, oʻ and gʻ are one letter each.
+  function units(word) {
+    const out = [];
+    for (let i = 0; i < word.length; i++) {
+      const c = word[i], n = word[i + 1] || '', lc = c.toLowerCase();
+      if ((lc === 'o' || lc === 'g') && MARK_RE.test(n)) { out.push(c + n); i++; }
+      else if ((lc === 's' || lc === 'c') && n.toLowerCase() === 'h') { out.push(c + n); i++; }
+      else out.push(c);
+    }
+    return out;
+  }
+  const isVowel = (u) => /^[aeiou]/i.test(u);
+  // One vowel per syllable: V-V, V-CV, VC-CV, VCC-CV (soat -> so-at, gʻildirakni -> gʻil-di-rak-ni, toʻrtta -> toʻrt-ta).
+  function syllables(word) {
+    const u = units(word), v = [];
+    u.forEach((x, i) => { if (isVowel(x)) v.push(i); });
+    const out = [];
+    let from = 0;
+    for (let k = 0; k + 1 < v.length; k++) {
+      const gap = v[k + 1] - v[k] - 1, cut = gap <= 1 ? v[k] + 1 : v[k + 1] - 1;
+      out.push(u.slice(from, cut));
+      from = cut;
+    }
+    out.push(u.slice(from));
+    return out;
+  }
+  const unitHtml = (u) => (HARD.has(u.toLowerCase().replace(MARK_RE, 'ʻ')) ? `<b class="hs">${esc(u)}</b>` : esc(u));
+  const wordHtml = (word, split) => (split ? syllables(word) : [units(word)]).map((s) => s.map(unitHtml).join('')).join('<i class="sy">-</i>');
+
+  // Split a tongue twister into words (the same ones the server judges) and the gaps between them.
+  function parse(text) {
+    const parts = [];
+    for (const s of text.match(TOKEN_RE) || []) {
+      if (WORD_RE.test(s)) { parts.push({ word: true, text: s, tail: '' }); continue; }
+      // Punctuation right after a word stays glued to it, so a line never starts with a comma.
+      const glued = /^\S+/.exec(s), last = parts[parts.length - 1];
+      if (glued && last && last.word) {
+        last.tail = glued[0];
+        if (s.length > glued[0].length) parts.push({ text: s.slice(glued[0].length) });
+      } else parts.push({ text: s });
+    }
+    return parts;
+  }
+  // Where each word ends in the sample, as a share of its length: longer words and pauses take more time.
+  function timeline(parts) {
+    const w = parts.filter((p) => p.word).map((p) => p.text.length + (/[.,!?;:]/.test(p.tail) ? 4 : 1));
+    const total = w.reduce((a, b) => a + b, 0) || 1;
+    let acc = 0;
+    return w.map((x) => (acc += x) / total);
+  }
+
+  // ---------- audio helpers ----------
+  function wavBlob(pcm, rate) {
+    const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
+    const put = (o, s) => { for (let i = 0; i < 4; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+    put(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); put(8, 'WAVE'); put(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, rate, true);
+    dv.setUint32(28, rate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); put(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+    new Int16Array(buf, 44).set(pcm);
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+  // Local preview only: a soft beep per word stands in for the narrator's recording.
+  function mockVoice(text) {
+    const n = words(text), rate = 16000, per = 0.42;
+    const pcm = new Int16Array(Math.round((n * per + 0.3) * rate));
+    for (let w = 0; w < n; w++) {
+      const f = 300 + (w % 5) * 60, s0 = Math.round((0.15 + w * per) * rate), len = Math.round(0.3 * rate);
+      for (let i = 0; i < len; i++) pcm[s0 + i] = Math.sin((2 * Math.PI * f * i) / rate) * Math.sin((Math.PI * i) / len) * 5000;
+    }
+    return URL.createObjectURL(wavBlob(pcm, rate));
+  }
 
   // ---------- API ----------
   async function api(path, body, isForm) {
@@ -185,163 +367,443 @@ details.diag[open] summary:after{content:'⌃'}
     return data;
   }
 
-  // Local preview only (?mock=1 outside Telegram): no server, no narrator audio.
-  async function mockApi(path, body) {
+  // Local preview only (?mock=1 outside Telegram; ?mock=noaudio hides the narrator): no server.
+  async function mockApi(path) {
     await new Promise((r) => setTimeout(r, 300));
-    if (path === 'session') return { ok: true, isAdmin: true, sttReady: true, ttsReady: false, sttProvider: 'Google Cloud', twisters: [
-      { id: 6, level: 2, text: 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.' },
-      { id: 1, level: 1, text: 'Togʻdan tosh tushdi.' }] };
-    if (path === 'tts') return { ok: true, urls: {} };
+    if (path === 'session') {
+      const list = [[6, 2, 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.'], [1, 1, 'Togʻdan tosh tushdi.'], [4, 1, 'Raʼno rasmlariga rang-barang rang tanladi.'],
+        [10, 2, 'Oq choynakka koʻk qopqoq, koʻk choynakka oq qopqoq.'], [13, 3, 'Bahodir bayroqni Botirga berdimi, Botir Bahodirga bayroqni berdimi?'],
+        [12, 3, 'Shokir shifokorlarning shart-sharoitini shoshilmasdan sharhladi.'], [3, 1, 'Qora-qura qoʻzilar qirda quvonib oʻtlar.']];
+      const audio = query.get('mock') !== 'noaudio';
+      return { ok: true, isAdmin: query.get('as') !== 'child', sttReady: true, sttProvider: 'VoiceLab (Aisha)',
+        twisters: list.map(([id, level, text]) => ({ id, level, text, audio: audio ? mockVoice(text) : null })) };
+    }
     if (path === 'check') {
-      const t = twister();
-      const toks = t.text.split(/[\s-]+/).map((w) => w.replace(/[.,!?;:]/g, ''));
-      const fail = state.attempt === 1 && state.stage === 'tez';
-      return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? 'gʻani gildirakni gʻizillatib' : t.text, extras: [],
-        words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? 'gildirakni' : d.toLowerCase(), v: fail ? (i === 1 ? 'wrong' : i === 3 ? 'missing' : 'ok') : (i === 2 ? 'near' : 'ok') })) };
+      const card = state.recCard, t = card.t;
+      const toks = t.text.split(/[\s\-–—]+/).map((w) => w.replace(/[.,!?;:«»"()]/g, '')).filter(Boolean);
+      const fail = card.attempt === 1 && (t.id === 6 || t.id === 10);
+      const heard = t.id === 6 ? 'gildirakni' : 'shoynakka';
+      return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? `${toks[0]} ${heard}` : t.text, extras: [],
+        words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? heard : d.toLowerCase(),
+          v: fail ? (i === 1 ? 'wrong' : i === toks.length - 1 ? 'missing' : 'ok') : (t.id === 4 && i === 2 ? 'near' : 'ok') })) };
     }
     return { ok: true };
   }
 
-  // ---------- flow ----------
-  async function init() {
-    renderDiag();
-    if (!inTelegram && !mock) {
-      showBanner('Bu trenajyor Telegram ichida ishlaydi. Uni botdagi havola orqali oching.');
-      $('who').textContent = 'Brauzer';
-      return;
+  // ---------- cards ----------
+  const running = (card) => !card.done || card.again;
+  const cardOf = (node) => { const el = node.closest('.card'); return state.cards.find((c) => c.el === el) || null; };
+  const cur = () => state.cards.find((c) => c.el === state.activeEl) || null;
+  const part = (card, r) => card.el.querySelector(`[data-r="${r}"]`);
+  const totalStars = () => Object.values(state.progress.stars).reduce((a, b) => a + (Number(b) || 0), 0);
+  const targetSeconds = (card) => Math.max(1.5, Math.round(words(card.t.text) * 0.6 * 10) / 10);
+  const starHtml = (filled, anim, i) => `<svg class="${filled ? 'f' : ''}${anim ? ' a' : ''}" viewBox="0 0 24 24" aria-hidden="true"${anim ? ` style="animation-delay:${i * 130}ms"` : ''}>${STAR_PATH}</svg>`;
+  const metaHtml = (left) => `<div class="meta">${left}<span class="sp"></span><span class="total">${ICON.star}<b data-total>0</b></span>`
+    + `<button class="ico" type="button" data-act="sound" aria-label="Ovoz">${state.sound ? ICON.sound : ICON.mute}</button>`
+    + `<button class="ico admin-only" type="button" data-act="sheet" aria-label="Sozlamalar">${ICON.tune}</button></div>`;
+
+  function makeCard(ti, n) {
+    const t = state.twisters[ti], parts = parse(t.text);
+    return { ti, n, t, parts, cum: timeline(parts), el: null, stage: 'sekin', reached: 0, attempt: 1, done: false, again: false, gaveUp: false,
+      stars: 0, fresh: false, result: null, msg: null, hard: new Set(), hi: -1 };
+  }
+
+  function mount(card) {
+    const el = document.createElement('section');
+    el.className = 'card';
+    el.innerHTML = `<div class="segs">${STAGES.map((s) => `<button class="seg" type="button" data-act="stage" data-stage="${s}" aria-label="${STAGE_LABEL[s]}"><i><b></b></i></button>`).join('')}</div>
+      <div class="seglab" aria-hidden="true">${STAGES.map((s) => `<span>${STAGE_LABEL[s]}</span>`).join('')}</div>
+      ${metaHtml('<span data-r="count"></span>')}
+      <div class="box">
+        <div class="body"><p class="cap" data-r="cap"></p><p class="tw" data-r="tw"></p></div>
+        <div class="rail">
+          <div class="bars sm" data-r="bars" data-mood="idle">${BARS}</div>
+          <button class="rb" type="button" data-act="play" aria-label="Tinglash">${ICON.play}</button>
+          <button class="rb" type="button" data-act="slow" aria-label="Sekin tinglash"><span aria-hidden="true">🐢</span></button>
+        </div>
+      </div>
+      <div class="status"><div class="stars" data-r="stars"></div><p class="msg" data-r="msg" aria-live="polite"></p></div>
+      <div class="act">
+        <button class="pill primary" type="button" data-act="said" data-r="said">Aytdim</button>
+        <div class="micbox" data-r="micbox">
+          <svg class="ring" viewBox="0 0 128 128" aria-hidden="true"><circle class="trk" cx="64" cy="64" r="60"/><circle class="prg" data-r="prg" cx="64" cy="64" r="60"/></svg>
+          <span class="halo" data-r="halo"></span>
+          <button class="mic" type="button" data-act="mic" data-r="mic" aria-label="Gapirish">${ICON.mic}${ICON.stop}${ICON.dots}</button>
+        </div>
+        <button class="pill primary" type="button" data-act="next" data-r="next">Keyingisi</button>
+        <button class="pill small" type="button" data-act="retry" data-r="retry">Yaxshilash</button>
+      </div>
+      <p class="foot" data-r="foot"></p>`;
+    card.el = el;
+    if (state.summaryEl) feed.insertBefore(el, state.summaryEl); else feed.appendChild(el);
+    io.observe(el);
+    paint(card);
+    // Warm the cache so the sample starts at once when the card is swiped in.
+    if (card.t.audio) { try { const a = new Audio(); a.preload = 'auto'; a.src = card.t.audio; state.pre = a; } catch (e) {} }
+  }
+
+  function twHtml(card) {
+    const split = card.stage === 'sekin' && running(card) && !card.result;
+    let wi = -1;
+    return card.parts.map((p) => {
+      if (!p.word) return esc(p.text);
+      wi++;
+      const r = card.result && card.result[wi];
+      const heard = r && r.v === 'wrong' && r.h ? `<small>${esc(r.h)}</small>` : '';
+      return `<span class="w${r ? ` ${r.v}` : ''}" data-i="${wi}">${wordHtml(p.text, split)}${p.tail ? `<u>${esc(p.tail)}</u>` : ''}${heard}</span>`;
+    }).join('');
+  }
+  function sizeClass(card) {
+    const len = card.t.text.length + (card.stage === 'sekin' && running(card) && !card.result ? 8 : 0);
+    return len <= 22 ? 's1' : len <= 42 ? 's2' : len <= 62 ? 's3' : 's4';
+  }
+  function defaultMsg(card) {
+    if (!running(card)) return card.gaveUp && !card.stars ? { kind: 'warn', text: 'Bu tez aytishga keyinroq qaytamiz.' } : { kind: 'ok', text: 'Barakalla!' };
+    if (card.stage === 'tez') return { text: state.sttReady ? `Mikrofonni bos va ${fmt(targetSeconds(card))} soniyada ayt.` : 'Ovozli tekshiruv hali ulanmagan.' };
+    return { text: card.t.audio ? 'Tingla va ovoz chiqarib takrorla.' : 'Ovoz chiqarib oʻqi.' };
+  }
+
+  function paint(card) {
+    if (!card.el) return;
+    const el = card.el, run = running(card), at = STAGES.indexOf(card.stage), last = card.n === state.cards.length - 1;
+    el.querySelectorAll('.seg').forEach((s, i) => {
+      const on = run && i === at;
+      s.classList.toggle('done', !run || i < at);
+      s.classList.toggle('on', on);
+      if (!on) s.querySelector('b').style.width = '';
+    });
+    el.querySelectorAll('.seglab span').forEach((s, i) => { s.className = !run || i < at ? 'done' : i === at ? 'on' : ''; });
+    part(card, 'count').textContent = `${card.n + 1} / ${state.cards.length}`;
+    part(card, 'cap').innerHTML = run ? `<b>${STAGE_LABEL[card.stage]}</b> · ${STAGE_CAP[card.stage]}` : `${card.t.level}-daraja`;
+    const tw = part(card, 'tw');
+    tw.className = `tw ${sizeClass(card)}${card.result ? ' res' : ''}`;
+    tw.innerHTML = twHtml(card);
+    card.hi = -1;
+    el.querySelectorAll('[data-act="play"],[data-act="slow"]').forEach((b) => b.classList.toggle('hide', !card.t.audio));
+
+    const stars = part(card, 'stars');
+    stars.classList.toggle('hide', run);
+    if (!run) stars.innerHTML = [1, 2, 3].map((i) => starHtml(i <= card.stars, card.fresh && i <= card.stars, i - 1)).join('');
+    card.fresh = false;
+    const m = card.msg || defaultMsg(card), msg = part(card, 'msg');
+    msg.className = `msg ${m.kind || ''}`;
+    msg.textContent = m.text;
+
+    const tez = run && card.stage === 'tez';
+    part(card, 'said').classList.toggle('hide', !run || tez);
+    part(card, 'micbox').classList.toggle('hide', !tez);
+    part(card, 'mic').disabled = !state.sttReady;
+    const next = part(card, 'next'), retry = part(card, 'retry');
+    next.classList.toggle('hide', run);
+    next.textContent = last ? 'Natijalar' : 'Keyingisi';
+    retry.classList.toggle('hide', run || card.stars >= 3 || !state.sttReady);
+    retry.textContent = card.stars ? 'Yaxshilash' : 'Yana urinish';
+
+    const foot = part(card, 'foot');
+    foot.className = run ? 'foot' : 'foot up';
+    if (state.error && run) foot.innerHTML = '<button class="link" type="button" data-act="sheet">Texnik maʼlumot</button>';
+    else foot.innerHTML = run ? `${ICON.lock}<span>Aytgach, yuqoriga sur</span>` : `${ICON.up}<span>${last ? 'Natijalar uchun yuqoriga sur' : 'Yuqoriga sur'}</span>`;
+  }
+  function paintTotals() {
+    const n = String(totalStars());
+    document.querySelectorAll('[data-total]').forEach((b) => { b.textContent = n; });
+  }
+  // A message for right now (recording, checking) that is not kept on the card.
+  function setMsg(card, text, kind) {
+    const msg = part(card, 'msg');
+    msg.className = `msg ${kind || ''}`;
+    msg.textContent = text;
+  }
+  function say(card, kind, text) { card.msg = { kind, text }; paint(card); }
+  function mood(card, m, ms) {
+    const b = part(card, 'bars');
+    b.dataset.mood = m;
+    clearTimeout(card.moodTimer);
+    if (ms) card.moodTimer = setTimeout(() => { b.dataset.mood = 'idle'; }, ms);
+  }
+
+  // ---------- welcome and summary ----------
+  function userName() {
+    try { return String((tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name) || '').trim().slice(0, 18); } catch (e) { return ''; }
+  }
+  function consentText() {
+    const service = state.provider || 'nutqni aniqlash';
+    const removed = /voicelab/i.test(state.provider) ? ' va tekshirilgach, u yerdan darhol oʻchiriladi' : '';
+    return `Mashqda bolaning ovozi tekshirish uchun ${service} xizmatiga yuboriladi${removed}. Bizda ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.`;
+  }
+  function buildWelcome() {
+    const el = document.createElement('section');
+    el.className = 'card welcome';
+    el.innerHTML = `${metaHtml('<span class="brand">Tez aytish</span>')}
+      <div class="hero"><div class="bars xl" data-r="bars" data-mood="idle">${BARS}</div><h1 data-r="h1">Tez aytish</h1><p class="lead" data-r="lead">Yuklanmoqda…</p></div>
+      <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button></div>
+      <p class="foot"><button class="link" type="button" data-act="sheet">Texnik maʼlumot</button></p>`;
+    feed.appendChild(el);
+    state.welcomeEl = el;
+    state.activeEl = el;
+    io.observe(el);
+  }
+  function welcome(kind, text) {
+    const el = state.welcomeEl, q = (r) => el.querySelector(`[data-r="${r}"]`), go = q('go'), name = userName();
+    const set = (h1, lead, btn, act, m) => {
+      q('h1').textContent = h1;
+      q('lead').textContent = lead;
+      go.classList.toggle('hide', !btn);
+      if (btn) { go.textContent = btn; go.dataset.act = act; }
+      q('bars').dataset.mood = m || 'idle';
+    };
+    el.classList.toggle('consent', kind === 'consent');
+    if (kind === 'ready') {
+      set(name ? `Salom, ${name}!` : 'Salom!', state.sttReady ? `Bugun ${state.cards.length} ta tez aytish. Tingla, takrorla va tez ayt!`
+        : 'Ovozli tekshiruv hali ulanmagan: mashq ishlaydi, lekin natija chiqmaydi.', 'Boshlash', 'begin');
+    } else if (kind === 'consent') set('Ota-onalar uchun', consentText(), 'Roziman, boshlaymiz', 'consent');
+    else if (kind === 'soon') set('Tez orada!', 'Tez aytish trenajyori hozircha tayyorlanmoqda. Tez orada ochiladi!', '', '', 'wink');
+    else if (kind === 'error') set('Ulanib boʻlmadi', text, 'Qayta urinish', 'reload', 'wink');
+    else set('Tez aytish', text || 'Yuklanmoqda…', '', '');
+  }
+  function mountSummary() {
+    let el = state.summaryEl;
+    if (!el) {
+      el = document.createElement('section');
+      el.className = 'card summary';
+      feed.appendChild(el);
+      state.summaryEl = el;
+      io.observe(el);
     }
-    try {
-      const s = await api('session');
-      state.isAdmin = !!s.isAdmin; state.sttReady = !!(s.sttReady ?? s.speechReady); state.ttsReady = !!s.ttsReady;
-      state.provider = s.sttProvider || ''; state.twisters = s.twisters || [];
-      state.server = 'ok';
-    } catch (e) {
-      state.server = `xato: ${e.message}`;
-      showBanner(e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.' : `Serverga ulanib boʻlmadi (${e.message}). Internetni tekshirib, qayta oching.`);
-      $('who').textContent = 'Xato';
-      renderDiag();
-      return;
-    }
-    $('who').textContent = state.isAdmin ? 'Admin' : 'Sinov';
-    $('who').className = state.isAdmin ? 'pill admin' : 'pill';
-    $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
-    // While the trainer is closed for children they get a friendly 'coming soon' instead of a mic that cannot check.
-    if (!state.sttReady && !state.isAdmin) { showBanner('🎙 Tez aytish trenajyori tez orada ochiladi! Hozircha tayyorlanmoqda.'); $('who').textContent = 'Tez orada'; return; }
-    if (!state.sttReady) showBanner('Ovozli tekshiruv hali ulanmagan: kalit kutilmoqda. Mikrofon ishlaydi, lekin natija chiqmaydi.');
-    $('consentText').textContent = `Mashqda bolaning ovozi tekshirish uchun ${state.provider || 'nutqni aniqlash'} xizmatiga yuboriladi. Ovoz yozuvi saqlanmaydi: faqat natija, yaʼni qaysi soʻz toʻgʻri aytilgani yoziladi.`;
-    if (!state.twisters.length) { showBanner('Tez aytishlar roʻyxati boʻsh.'); return; }
-    state.idx = Math.min(state.progress.idx || 0, state.twisters.length - 1);
-    if (state.isAdmin) fillPicker();
-    if (!state.isAdmin && !state.consent) { $('consentCard').classList.remove('hide'); return; }
-    startTrainer();
+    const got = state.cards.reduce((a, c) => a + c.stars, 0);
+    const hard = [...new Set(state.cards.flatMap((c) => [...c.hard]))].slice(0, 6);
+    el.innerHTML = `${metaHtml('<span class="brand">Natijalar</span>')}
+      <div class="hero">
+        <div class="bars lg" data-mood="${got ? 'happy' : 'wink'}">${BARS}</div>
+        <h1>${got ? 'Barakalla!' : 'Yaxshi urinish!'}</h1>
+        <p class="lead">${state.cards.length} ta tez aytishda ${got} ta yulduz yigʻding.</p>
+        <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
+        ${hard.length ? `<div class="hard"><p>Yana mashq qilish uchun soʻzlar</p>${hard.map((w) => `<span class="chip">${esc(w)}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="act"><button class="pill primary" type="button" data-act="again">Yana ${Math.min(SESSION_SIZE, state.twisters.length)} ta</button><button class="pill small" type="button" data-act="close">Tugatish</button></div>
+      <p class="foot"></p>`;
+    paintTotals();
+  }
+
+  // ---------- feed ----------
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting && e.intersectionRatio >= 0.6) activate(e.target);
+  }, { root: feed, threshold: [0.6] });
+
+  function activate(el) {
+    if (state.activeEl === el) return;
+    state.activeEl = el;
+    const card = state.cards.find((c) => c.el === el);
+    if (card && state.voiceCard === card) return; // a tap already started this card's sample
+    stopVoice();
+    if (card && running(card)) autoplay(card);
+  }
+  function go(el, instant) { if (el) feed.scrollTo({ top: el.offsetTop, behavior: instant ? 'auto' : 'smooth' }); }
+  function lockFeed(on) { feed.classList.toggle('lock', !!on); }
+
+  // A session is the next few tongue twisters. Only the first card exists at the start: the next one is added when
+  // the current one is finished, which is what keeps the swipe forward locked until the child has spoken.
+  function newSession(start) {
+    stopVoice();
+    for (const c of state.cards) if (c.el) { io.unobserve(c.el); c.el.remove(); }
+    if (state.summaryEl) { io.unobserve(state.summaryEl); state.summaryEl.remove(); state.summaryEl = null; }
+    const n = state.twisters.length, size = Math.min(SESSION_SIZE, n), from = (((Number(start) || 0) % n) + n) % n;
+    state.cards = [];
+    for (let k = 0; k < size; k++) state.cards.push(makeCard((from + k) % n, k));
+    mount(state.cards[0]);
+    paintTotals();
+  }
+
+  function complete(card, stars, gaveUp) {
+    const first = !card.done, p = state.progress, id = card.t.id;
+    card.done = true; card.again = false; card.fresh = stars > 0;
+    if (first) card.gaveUp = !!gaveUp; else if (stars) card.gaveUp = false;
+    card.stars = Math.max(card.stars, stars);
+    if (stars) { p.stars[id] = Math.max(Number(p.stars[id]) || 0, stars); p.later = p.later.filter((x) => x !== id); }
+    else if (!p.later.includes(id)) p.later.push(id);
+    if (first) p.idx = (card.ti + 1) % state.twisters.length;
+    store.set(PROGRESS_KEY, p);
+    const next = state.cards[card.n + 1];
+    if (next && !next.el) mount(next);
+    if (state.cards.every((c) => c.done)) mountSummary();
+    paintTotals();
+  }
+
+  function begin() {
+    const card = state.cards[0];
+    if (!card) return;
+    // Start the sample inside the tap: after that the player may also start from code when a card is swiped in.
+    if (state.sound && card.t.audio && running(card)) playVoice(card, RATE[card.stage], true); else blessVoice();
+    go(card.el);
+  }
+  function acceptConsent() {
+    state.consent = true;
+    store.set(CONSENT_KEY, true);
+    newSession(state.progress.idx);
+    welcome('ready');
+    begin();
     reportMic('opened');
   }
-
-  function startTrainer() {
-    $('consentCard').classList.add('hide');
-    $('trainer').classList.remove('hide');
-    prepareTwister();
+  function said(card) {
+    const i = STAGES.indexOf(card.stage);
+    if (!running(card) || i >= STAGES.length - 1) return;
+    haptic('impact');
+    card.stage = STAGES[i + 1]; card.reached = Math.max(card.reached, i + 1); card.msg = null;
+    stopVoice();
+    paint(card);
+    autoplay(card);
+  }
+  // Tapping a segment goes back to a warm-up stage that was already opened.
+  function jumpStage(card, stage) {
+    const i = STAGES.indexOf(stage);
+    if (!running(card) || card.again || i < 0 || i > card.reached || stage === card.stage) return;
+    card.stage = stage; card.result = null; card.msg = null;
+    stopVoice();
+    paint(card);
+    autoplay(card);
+  }
+  function goNext(card) {
+    const next = state.cards[card.n + 1];
+    go(next && next.el ? next.el : state.summaryEl);
+  }
+  // A finished card with fewer than three stars can be tried again to earn more.
+  function improve(card) {
+    if (running(card) || !state.sttReady) return;
+    card.again = true; card.stage = 'tez'; card.attempt = 1; card.result = null; card.msg = null;
+    paint(card);
+  }
+  function restart() {
+    newSession(state.progress.idx);
+    welcome('ready');
+    const card = state.cards[0];
+    go(card.el, true);
+    if (state.sound && card.t.audio) playVoice(card, RATE[card.stage], true);
+  }
+  function closeApp() {
+    if (inTelegram) { try { tg.close(); } catch (e) {} } else go(state.welcomeEl);
+  }
+  function toggleSound() {
+    state.sound = !state.sound;
+    store.set(SOUND_KEY, state.sound);
+    document.querySelectorAll('[data-act="sound"]').forEach((b) => { b.innerHTML = state.sound ? ICON.sound : ICON.mute; b.setAttribute('aria-pressed', String(!state.sound)); });
+    if (state.sound) sfx('tap'); else stopVoice();
+  }
+  function nudge(card) {
+    const foot = part(card, 'foot');
+    foot.classList.remove('shake');
+    void foot.offsetWidth;
+    foot.classList.add('shake');
+    haptic('light');
   }
 
-  // Admin only: jump to any tongue twister to test it (children go through them in order).
-  function fillPicker() {
-    const sel = $('pick');
-    sel.innerHTML = '';
-    state.twisters.forEach((t, i) => {
-      const o = document.createElement('option');
-      o.value = String(i);
-      o.textContent = `${i + 1}. ${t.text.length > 44 ? t.text.slice(0, 42) + '…' : t.text}`;
-      sel.appendChild(o);
-    });
-    sel.classList.remove('hide');
+  // ---------- narrator sample ----------
+  let voiceToken = 0, silence = '';
+  const wordAt = (card, f) => { const g = Math.min(1, Math.max(0, (f - 0.03) / 0.9)), i = card.cum.findIndex((c) => g <= c); return i < 0 ? card.cum.length - 1 : i; };
+  function markWord(card, i) {
+    if (card.hi === i) return;
+    const tw = part(card, 'tw');
+    if (card.hi >= 0) { const o = tw.querySelector(`.w[data-i="${card.hi}"]`); if (o) o.classList.remove('on'); }
+    if (i >= 0) { const n = tw.querySelector(`.w[data-i="${i}"]`); if (n) n.classList.add('on'); }
+    card.hi = i;
   }
-
-  function prepareTwister() {
-    state.stage = 'sekin'; state.attempt = 1; state.listened = !state.ttsReady; state.tezTarget = null;
-    state.progress.idx = state.idx; store.set(PROGRESS_KEY, state.progress);
-    $('result').classList.add('hide');
-    render();
-    prefetchVoice();
-  }
-
-  async function prefetchVoice() {
-    if (!state.ttsReady) return;
-    const t = twister();
-    const items = STAGES.map((s) => `tw:${t.id}:${s}`).concat(Object.keys(state.urls).some((k) => k.startsWith('ph:')) ? [] : PHRASE_KEYS.map((p) => `ph:${p}`));
-    try {
-      const r = await api('tts', { items });
-      Object.assign(state.urls, r.urls || {});
-      const tezUrl = state.urls[`tw:${t.id}:tez`];
-      if (tezUrl) measureDuration(tezUrl).then((d) => { if (d && twister() === t) { state.tezTarget = Math.max(1.5, Math.round(d * 1.4 * 10) / 10); render(); } });
-    } catch (e) {
-      state.server = `tts xato: ${e.message}`; renderDiag();
-    }
-  }
-
-  function measureDuration(url) {
-    return new Promise((resolve) => {
-      const a = new Audio();
-      a.preload = 'metadata';
-      a.onloadedmetadata = () => resolve(isFinite(a.duration) ? a.duration : null);
-      a.onerror = () => resolve(null);
-      a.src = url;
-      setTimeout(() => resolve(null), 8000);
-    });
-  }
-
-  function targetSeconds() {
-    return state.tezTarget || Math.max(1.5, Math.round(words(twister().text) * 0.6 * 10) / 10);
-  }
-
-  function render() {
-    const t = twister();
-    const stars = Object.values(state.progress.stars).reduce((a, b) => a + b, 0);
-    $('progress').textContent = `${t.level}-daraja · ${state.idx + 1}/${state.twisters.length} · ⭐ ${stars}`;
-    $('twister').textContent = t.text;
-    const at = STAGES.indexOf(state.stage);
-    document.querySelectorAll('.stage').forEach((el, i) => {
-      el.className = 'stage' + (i < at ? ' done' : i === at ? ' on' : '');
-      el.textContent = (i < at ? '✓ ' : '') + STAGE_LABEL[el.dataset.stage];
-    });
-    $('target').textContent = state.stage === 'tez'
-      ? `Tez ayt: ${fmt(targetSeconds())} soniya ichida`
-      : state.stage === 'sekin' ? 'Sekin va aniq ayt, har bir boʻgʻinni eshittir' : 'Oddiy suhbatdagidek ayt';
-    const waitingForNext = !$('result').classList.contains('hide') && !$('next').classList.contains('hide');
-    $('listen').parentElement.classList.toggle('hide', !state.ttsReady);
-    const warm = isWarmup();
-    $('warmDone').classList.toggle('hide', !warm || waitingForNext);
-    $('mic').classList.toggle('hide', warm);
-    $('meterBox').classList.toggle('hide', warm);
-    $('hint').textContent = waitingForNext ? '' : warm ? 'Isinish: ovoz chiqarib ayt, keyin «✓ Aytdim» tugmasini bos.' : !state.ttsReady ? 'Endi tez ayt! Mikrofonni bos: shu bosqich tekshiriladi.' : state.listened ? 'Endi sen ayt! Mikrofonni bos.' : 'Avval tingla: ▶ Tinglash tugmasini bos.';
-    $('listen').disabled = state.recording || state.busy;
-    $('mic').disabled = state.busy;
-    $('warmDone').disabled = state.busy;
-    $('pick').value = String(state.idx);
-    $('pick').disabled = state.recording || state.busy;
-    renderDiag();
-  }
-
-  function playUrl(url) {
+  // iOS lets a media element play from code only after it has played once inside a tap.
+  function blessVoice() {
     const v = $('voice');
-    if (!url) return Promise.resolve(false);
-    v.src = url; v.currentTime = 0;
-    return v.play().then(() => new Promise((resolve) => { v.onended = () => resolve(true); })).catch(() => false);
+    try {
+      if (!silence) silence = URL.createObjectURL(wavBlob(new Int16Array(800), 16000));
+      v.src = silence; v.dataset.src = '';
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
+  }
+  function playVoice(card, rate, auto) {
+    const url = card.t.audio, v = $('voice');
+    if (!url || !card.el) return;
+    stopVoice();
+    const token = ++voiceToken;
+    state.voiceCard = card; state.voiceRate = rate;
+    if (v.dataset.src !== url) { v.src = url; v.dataset.src = url; }
+    try { v.currentTime = 0; } catch (e) {}
+    v.defaultPlaybackRate = rate; v.playbackRate = rate;
+    try { v.preservesPitch = true; v.webkitPreservesPitch = true; } catch (e) {}
+    const btn = card.el.querySelector(rate === SLOW_RATE ? '[data-act="slow"]' : '[data-act="play"]');
+    if (btn) btn.classList.add('on');
+    const started = () => { if (token !== voiceToken) return; state.voiceLocked = false; v.playbackRate = rate; voiceLoop(card, token); };
+    const refused = () => {
+      if (token !== voiceToken) return;
+      stopVoice();
+      // The phone did not allow sound without a tap: point at the play button instead.
+      if (auto) { state.voiceLocked = true; const b = card.el && card.el.querySelector('[data-act="play"]'); if (b) { b.classList.remove('ask'); void b.offsetWidth; b.classList.add('ask'); } }
+    };
+    let p;
+    try { p = v.play(); } catch (e) { return refused(); }
+    if (p && p.then) p.then(started, refused); else started();
+  }
+  // While the sample plays: highlight the word being said and fill the stage segment, like a story.
+  function voiceLoop(card, token) {
+    cancelAnimationFrame(state.vraf);
+    const v = $('voice');
+    const draw = () => {
+      if (token !== voiceToken || !card.el) return false;
+      const d = v.duration;
+      if (isFinite(d) && d > 0) {
+        const f = Math.min(1, v.currentTime / d);
+        markWord(card, wordAt(card, f));
+        const bar = card.el.querySelector('.seg.on b');
+        if (bar) bar.style.width = `${Math.round(f * 100)}%`;
+      }
+      if (v.ended) { stopVoice(true); return false; }
+      if (v.paused && !v.seeking) { stopVoice(); return false; }
+      return true;
+    };
+    const step = () => { if (draw()) state.vraf = requestAnimationFrame(step); };
+    state.vdraw = draw; // the player's own events drive it too, for when the WebView throttles animation frames
+    step();
+  }
+  function stopVoice(finished) {
+    const v = $('voice'), card = state.voiceCard;
+    voiceToken++;
+    cancelAnimationFrame(state.vraf);
+    state.voiceCard = null; state.vdraw = null;
+    if (!finished) { try { v.pause(); } catch (e) {} }
+    if (!card || !card.el) return;
+    markWord(card, -1);
+    card.el.querySelectorAll('.rb.on').forEach((b) => b.classList.remove('on'));
+    const bar = card.el.querySelector('.seg.on b');
+    if (bar) bar.style.width = finished ? '100%' : '';
+  }
+  function autoplay(card) {
+    if (!state.sound || !card.t.audio || state.recording || state.busy) return;
+    playVoice(card, RATE[card.stage], true);
+  }
+  function manualPlay(card, rate) {
+    if (state.recording || state.busy || !card.t.audio) return;
+    if (state.voiceCard === card && state.voiceRate === rate) return stopVoice(); // a second tap stops it
+    playVoice(card, rate, false);
   }
 
-  async function listen() {
-    const t = twister();
-    let url = state.urls[`tw:${t.id}:${state.stage}`];
-    if (!url && state.ttsReady) { await prefetchVoice(); url = state.urls[`tw:${t.id}:${state.stage}`]; }
-    if (!url) { showBanner('Diktor ovozi hali tayyor emas. Matnni oʻzing oʻqib, keyin ayt.'); state.listened = true; render(); return; }
-    $('listen').disabled = true;
-    $('hint').textContent = 'Tingla…';
-    await playUrl(url);
-    state.listened = true;
-    render();
-    playUrl(state.urls['ph:your_turn']);
+  // ---------- short sounds ----------
+  function tone(freq, at, dur, type, gain) {
+    const ctx = state.ctx;
+    if (!ctx || ctx.state !== 'running') return;
+    try {
+      const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + at;
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + dur + 0.03);
+    } catch (e) {}
+  }
+  function sfx(kind, n) {
+    if (!state.sound) return;
+    if (kind === 'win') [1046.5, 1318.5, 1568].slice(0, Math.max(1, n || 3)).forEach((f, i) => tone(f, i * 0.12, 0.24, 'sine', 0.14));
+    else if (kind === 'soft') { tone(440, 0, 0.16, 'triangle', 0.09); tone(349.2, 0.14, 0.24, 'triangle', 0.09); }
+    else if (kind === 'tap') tone(880, 0, 0.06, 'sine', 0.05);
   }
 
-  // ---------- recording (from the mic test, verified in Chromium) ----------
+  // ---------- recording (from the mic test, verified in Chromium and on an iPhone) ----------
   function supported() {
     const out = {};
     for (const t of TYPES) { try { out[t] = !!(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)); } catch (e) { out[t] = false; } }
@@ -351,7 +813,7 @@ details.diag[open] summary:after{content:'⌃'}
   function ensureContext() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
-    if (!state.ctx) state.ctx = new AC();
+    if (!state.ctx) { try { state.ctx = new AC(); } catch (e) { return null; } }
     if (state.ctx.state === 'suspended') state.ctx.resume().catch(() => {});
     return state.ctx;
   }
@@ -395,29 +857,36 @@ details.diag[open] summary:after{content:'⌃'}
     }
     return { noise, speechStart, lastLoud, lastAny };
   }
+  // The ring fills with the time spent speaking and is full at the target time; past it the colour changes.
+  function setRing(card, p) {
+    part(card, 'prg').style.strokeDashoffset = String(RING * (1 - Math.max(0, Math.min(1, p))));
+    part(card, 'micbox').classList.toggle('over', p > 1);
+  }
   function loop() {
     if (!state.recording) return;
-    const now = performance.now() - state.t0;
-    const db = measure();
+    const card = state.recCard, now = performance.now() - state.t0, db = measure();
     state.frames.push([Math.round(now), Math.round(db * 10) / 10]);
-    $('meter').style.width = `${Math.max(0, Math.min(100, ((db + 60) / 50) * 100))}%`;
-    $('timer').textContent = `0:${String(Math.floor(now / 1000)).padStart(2, '0')}`;
+    part(card, 'halo').style.transform = `scale(${(1 + Math.max(0, Math.min(1, (db + 60) / 50)) * 0.24).toFixed(3)})`;
     if (now > MAX_MS) return stop('max');
     if (state.analyser) {
       const v = vad(state.frames);
       const spoke = v.speechStart !== null && v.lastLoud - v.speechStart >= MIN_SPEECH_MS;
+      if (v.speechStart !== null) setRing(card, (v.lastLoud - v.speechStart) / (targetSeconds(card) * 1000));
       if (!spoke && now > NO_SPEECH_MS && now - (v.lastAny ?? 0) > SILENCE_STOP_MS) return stop('no_speech');
       if (spoke && now - v.lastLoud > SILENCE_STOP_MS) return stop('silence');
     }
     state.raf = requestAnimationFrame(loop);
   }
-  async function start() {
-    if (state.recording || state.busy) return;
-    state.error = null;
+  async function start(card) {
+    if (state.recording || state.busy || !card || !running(card) || card.stage !== 'tez' || !state.sttReady) return;
+    state.error = null; state.recCard = card;
+    stopVoice();
     const ctx = ensureContext(); // inside the tap, before any await (iOS)
-    $('mic').disabled = true;
-    $('hint').textContent = 'Mikrofon ochilmoqda…';
-    $('result').classList.add('hide');
+    card.result = null; card.msg = null;
+    paint(card);
+    const box = part(card, 'micbox'), btn = part(card, 'mic');
+    btn.disabled = true;
+    setMsg(card, 'Mikrofon ochilmoqda…');
     try {
       if (typeof window.MediaRecorder === 'undefined') { const e = new Error('MediaRecorder mavjud emas'); e.name = 'NotSupportedError'; throw e; }
       releaseMic();
@@ -433,28 +902,38 @@ details.diag[open] summary:after{content:'⌃'}
       rec.onerror = (ev) => fail(ev.error || new Error('MediaRecorder xatosi'));
       rec.start(250);
       state.recording = true; state.t0 = performance.now(); state.stopReason = '';
-      $('mic').disabled = false; $('mic').classList.add('rec'); $('mic').textContent = '■'; $('mic').setAttribute('aria-label', 'Toʻxtatish');
-      $('listen').disabled = true;
-      $('hint').textContent = 'Gapir… Tugatgach, yozuv oʻzi toʻxtaydi.';
+      btn.disabled = false; box.classList.add('rec'); btn.setAttribute('aria-label', 'Toʻxtatish');
+      lockFeed(true); // no swiping away in the middle of a recording
+      setMsg(card, 'Gapir… Tugatsang, yozuv oʻzi toʻxtaydi.');
+      mood(card, 'listen');
       haptic('impact');
       try { if (inTelegram && tg.isVersionAtLeast('6.2')) tg.enableClosingConfirmation(); } catch (e) {}
       loop();
-    } catch (e) { $('mic').disabled = false; fail(e); }
+    } catch (e) { btn.disabled = false; fail(e); }
   }
   function stop(reason) {
     if (!state.recording) return;
+    const card = state.recCard;
     state.recording = false; state.stopReason = reason || 'manual';
     cancelAnimationFrame(state.raf);
-    resetMicButton();
-    $('hint').textContent = 'Tekshirilmoqda…';
+    const box = part(card, 'micbox');
+    box.classList.remove('rec'); box.classList.add('busy');
+    part(card, 'mic').disabled = true;
+    part(card, 'halo').style.transform = '';
+    setMsg(card, 'Tekshirilmoqda…');
     try { if (state.rec && state.rec.state !== 'inactive') state.rec.stop(); } catch (e) { fail(e); }
   }
-  function resetMicButton() {
-    $('mic').classList.remove('rec'); $('mic').textContent = '🎤'; $('mic').setAttribute('aria-label', 'Gapirish');
-    $('meter').style.width = '0%'; $('timer').textContent = '';
+  function resetMic(card) {
+    lockFeed(false);
     try { if (inTelegram && tg.isVersionAtLeast('6.2')) tg.disableClosingConfirmation(); } catch (e) {}
+    if (!card || !card.el) return;
+    part(card, 'micbox').classList.remove('rec', 'busy', 'over');
+    part(card, 'prg').style.strokeDashoffset = '';
+    part(card, 'halo').style.transform = '';
+    part(card, 'mic').setAttribute('aria-label', 'Gapirish');
   }
   async function finish() {
+    const card = state.recCard;
     const totalMs = Math.round(performance.now() - state.t0);
     const type = (state.rec && state.rec.mimeType) || state.mime || 'audio/webm';
     const blob = new Blob(state.chunks, { type });
@@ -466,21 +945,24 @@ details.diag[open] summary:after{content:'⌃'}
     const speechMs = v.speechStart !== null && v.lastLoud !== null ? Math.max(0, v.lastLoud - v.speechStart) : 0;
     state.last = { totalMs, speechMs, peakDb: Math.round(peak), noiseDb: Math.round(v.noise), bytes: blob.size, chunks: state.chunks.length, stop: state.stopReason, type, metered };
     renderDiag();
-    if (!blob.size) { showVerdict('bad', 'Yozuv boʻsh chiqdi: mikrofon ovoz bermadi. Yana urinib koʻr.'); return; }
-    if (metered && state.stopReason === 'no_speech') { showVerdict('warn', 'Ovozing eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.'); return; }
+    const quit = (text) => { resetMic(card); mood(card, 'idle'); say(card, 'warn', text); };
+    if (!blob.size) return quit('Yozuv boʻsh chiqdi: mikrofon ovoz bermadi. Yana urinib koʻr.');
+    if (metered && state.stopReason === 'no_speech') return quit('Ovozing eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.');
     // Too little speech to check (a tap, a cough, an early stop): ask again instead of spending a check.
-    if (metered && speechMs < MIN_SUBMIT_MS) { showVerdict('warn', speechMs ? 'Juda qisqa chiqdi. Mikrofonni bosgach, butun tez aytishni ayt.' : 'Ovozing eshitilmadi. Telefonni yaqinroq ushlab, balandroq ayt.'); return; }
+    if (metered && speechMs < MIN_SUBMIT_MS) return quit(speechMs ? 'Juda qisqa chiqdi. Mikrofonni bosgach, butun tez aytishni ayt.' : 'Ovozing eshitilmadi. Telefonni yaqinroq ushlab, balandroq ayt.');
     const trim = metered && v.speechStart !== null ? { start: v.speechStart - 400, end: v.lastLoud + 600 } : null;
-    await submit(blob, trim, speechMs, totalMs);
+    await submit(card, blob, trim, speechMs, totalMs);
   }
   function fail(e, quiet) {
+    const card = state.recCard;
     if (state.rec) state.rec.onstop = null;
-    state.recording = false;
+    state.recording = false; state.busy = false;
     cancelAnimationFrame(state.raf);
     releaseMic();
     const name = (e && e.name) || 'Error';
     state.error = { name, message: String((e && e.message) || e || '').slice(0, 300) };
-    if (!quiet) { resetMicButton(); $('hint').textContent = explain(name); }
+    resetMic(card);
+    if (card && card.el) { mood(card, 'idle'); if (quiet) paint(card); else say(card, 'warn', explain(name)); }
     renderDiag();
     reportMic('error');
     haptic('error');
@@ -515,113 +997,96 @@ details.diag[open] summary:after{content:'⌃'}
       const v = Math.max(-1, Math.min(1, sum / (b - a)));
       pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
     }
-    const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
-    const put = (o, s) => { for (let i = 0; i < 4; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
-    put(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); put(8, 'WAVE'); put(12, 'fmt ');
-    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true);
-    dv.setUint32(28, 32000, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); put(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
-    new Int16Array(buf, 44).set(pcm);
-    return new Blob([buf], { type: 'audio/wav' });
+    return wavBlob(pcm, 16000);
   }
 
   // ---------- checking ----------
-  async function submit(blob, trim, speechMs, totalMs) {
-    state.busy = true; render();
-    $('hint').textContent = 'Tekshirilmoqda…';
+  async function submit(card, blob, trim, speechMs, totalMs) {
+    state.busy = true;
+    let r = null, err = null;
     try {
       const wav = await toWav16k(blob, trim);
       const fd = new FormData();
-      fd.append('meta', JSON.stringify({ twisterId: twister().id, stage: state.stage, attempt: state.attempt, consent: state.consent || state.isAdmin, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser' }));
+      fd.append('meta', JSON.stringify({ twisterId: card.t.id, stage: card.stage, attempt: card.attempt, consent: state.consent || state.isAdmin, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser' }));
       fd.append('audio', wav, 'attempt.wav');
-      const r = await api('check', fd, true);
+      r = await api('check', fd, true);
       state.lastCheck = { status: r.status, passed: r.passed, recognized: r.recognized, confidence: r.confidence, wavBytes: wav.size };
-      showCheck(r, speechMs);
-    } catch (e) {
-      state.lastCheck = { error: e.message };
-      if (e.code === 'speech_not_configured') showVerdict('warn', 'Ovozli tekshiruv hali ulanmagan. Birozdan keyin urinib koʻr.');
-      else if (e.code === 'invalid_or_expired_init_data') showVerdict('bad', 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.');
-      else if (e.code === 'consent_required') { $('trainer').classList.add('hide'); $('consentCard').classList.remove('hide'); }
-      else showVerdict('bad', `Tekshirib boʻlmadi (${e.message}). Yana urinib koʻr.`);
-    } finally {
-      state.busy = false; render(); renderDiag();
-    }
+    } catch (e) { err = e; state.lastCheck = { error: e.message }; }
+    state.busy = false;
+    resetMic(card);
+    mood(card, 'idle');
+    if (r) showCheck(card, r, speechMs);
+    else if (err.code === 'speech_not_configured') say(card, 'warn', 'Ovozli tekshiruv hali ulanmagan. Birozdan keyin urinib koʻr.');
+    else if (err.code === 'invalid_or_expired_init_data') say(card, 'warn', 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.');
+    else if (err.code === 'consent_required') { state.consent = false; store.set(CONSENT_KEY, false); paint(card); welcome('consent'); go(state.welcomeEl); }
+    else say(card, 'warn', `Tekshirib boʻlmadi (${err.message}). Yana urinib koʻr.`);
+    renderDiag();
   }
 
-  function showCheck(r, speechMs) {
-    const box = $('words');
-    box.innerHTML = '';
-    for (const w of r.words || []) {
-      const el = document.createElement('span');
-      el.className = 'w ' + (w.v === 'ok' ? '' : w.v);
-      el.textContent = w.d;
-      if (w.v === 'wrong' && w.h) { const s = document.createElement('small'); s.textContent = `→ ${w.h}`; el.appendChild(s); }
-      box.appendChild(el);
-    }
-    $('heard').textContent = r.recognized ? `Eshitildi: «${r.recognized}»` : '';
-    if (r.status && r.status !== 'Success') return showVerdict('warn', 'Ovozing aniq eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.', true);
-    const tooSlow = state.stage === 'tez' && r.passed && speechMs / 1000 > targetSeconds();
+  // The result is shown in the tongue twister itself: right words turn green, a slip gets a soft yellow marker
+  // with what was heard below it. Stars: first try 3, second 2, third 1.
+  function showCheck(card, r, speechMs) {
+    if (r.status && r.status !== 'Success') { haptic('warning'); return say(card, 'warn', 'Ovozing aniq eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.'); }
+    card.result = Array.isArray(r.words) ? r.words : [];
+    for (const w of card.result) if (w.v === 'wrong' || w.v === 'missing') card.hard.add(w.d || w.t);
+    const target = targetSeconds(card);
+    const tooSlow = !!r.passed && speechMs / 1000 > target;
     if (r.passed && !tooSlow) {
-      const near = (r.words || []).some((w) => w.v === 'near');
-      showVerdict('ok', near ? 'Toʻgʻri! Sariq soʻzlarni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.', true, true);
-      playUrl(state.urls['ph:great']);
+      const stars = Math.max(1, MAX_ATTEMPTS + 1 - card.attempt);
+      const near = card.result.some((w) => w.v === 'near');
+      complete(card, stars);
+      say(card, 'ok', near ? 'Toʻgʻri! Tagiga chizilgan soʻzni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.');
+      mood(card, 'happy', 2600);
+      sfx('win', stars);
       haptic('success');
       return;
     }
-    if (tooSlow) { showVerdict('warn', `Soʻzlar toʻgʻri, lekin sekinroq: ${fmt(speechMs / 1000)} s. Maqsad: ${fmt(targetSeconds())} s gacha.`, true); playUrl(state.urls['ph:faster']); }
-    else { showVerdict('bad', `Qizil soʻzlarga eʼtibor ber va yana urinib koʻr (${state.attempt}/${MAX_ATTEMPTS}).`, true); playUrl(state.urls['ph:retry']); }
+    card.attempt += 1;
+    const left = MAX_ATTEMPTS + 1 - card.attempt;
+    mood(card, 'wink', 2600);
+    sfx('soft');
     haptic('warning');
-    state.attempt += 1;
-    if (state.attempt > MAX_ATTEMPTS) {
-      showVerdict('warn', 'Bu tez aytishga keyinroq qaytamiz. Keyingisiga oʻtamiz!', true, true);
-      if (!state.progress.later.includes(twister().id)) state.progress.later.push(twister().id);
-      store.set(PROGRESS_KEY, state.progress);
-      state.giveUp = true;
+    if (left <= 0) {
+      if (card.again) { card.again = false; return say(card, 'warn', 'Hozircha shu natija qoladi. Keyinroq yana urinib koʻr.'); }
+      complete(card, 0, true);
+      return say(card, 'warn', 'Bu tez aytishga keyinroq qaytamiz. Keyingisiga oʻt!');
     }
+    say(card, 'warn', tooSlow ? `Soʻzlar toʻgʻri! Endi tezroq ayt: ${fmt(speechMs / 1000)} s, maqsad ${fmt(target)} s.` : `Deyarli! Sariq soʻzlarga eʼtibor ber. Yana ${left} ta urinish bor.`);
   }
 
-  function showVerdict(kind, message, keepWords, canAdvance) {
-    $('result').classList.remove('hide');
-    if (!keepWords) { $('words').innerHTML = ''; $('heard').textContent = ''; }
-    const v = $('verdict');
-    v.className = 'verdict' + (kind === 'warn' ? ' warn' : kind === 'bad' ? ' bad' : '');
-    v.textContent = message;
-    $('next').classList.toggle('hide', !canAdvance);
-    $('again').classList.toggle('hide', !!canAdvance && !state.giveUp ? true : !!state.giveUp);
-    $('hint').textContent = canAdvance ? '' : 'Yana bir marta tingla yoki darhol ayt.';
+  // ---------- sheet, diagnostics ----------
+  function fillPicker() {
+    const sel = $('pick');
+    sel.innerHTML = '';
+    state.twisters.forEach((t, i) => {
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = `${i + 1}. ${t.text.length > 44 ? t.text.slice(0, 42) + '…' : t.text}`;
+      sel.appendChild(o);
+    });
+    $('adminBox').classList.remove('hide');
   }
-
-  function advance() {
-    $('result').classList.add('hide');
-    if (state.giveUp) { state.giveUp = false; return nextTwister(); }
-    const i = STAGES.indexOf(state.stage);
-    if (i < STAGES.length - 1) {
-      state.stage = STAGES[i + 1]; state.attempt = 1; state.listened = !state.ttsReady;
-      render();
-      return;
-    }
-    const t = twister();
-    state.progress.stars[t.id] = Math.max(state.progress.stars[t.id] || 0, 1);
-    state.progress.later = state.progress.later.filter((id) => id !== t.id);
-    store.set(PROGRESS_KEY, state.progress);
-    nextTwister();
+  function openSheet() {
+    renderDiag();
+    if (state.cards.length) $('pick').value = String(state.cards[0].ti);
+    $('sheetWrap').classList.remove('hide');
   }
-
-  function nextTwister() {
-    if (state.idx >= state.twisters.length - 1) { state.idx = 0; playUrl(state.urls['ph:done']); showBanner('Hamma tez aytishlarni aytib chiqding! Endi boshidan takrorlaymiz.'); }
-    else state.idx += 1;
-    prepareTwister();
-  }
-
-  // ---------- misc ----------
-  function showBanner(text) { const b = $('banner'); b.textContent = text; b.classList.remove('hide'); }
+  function closeSheet() { $('sheetWrap').classList.add('hide'); }
   function haptic(kind) {
-    try { if (!inTelegram || !tg.HapticFeedback) return; if (kind === 'impact') tg.HapticFeedback.impactOccurred('medium'); else tg.HapticFeedback.notificationOccurred(kind); } catch (e) {}
+    try {
+      if (!inTelegram || !tg.HapticFeedback) return;
+      if (kind === 'impact') tg.HapticFeedback.impactOccurred('medium');
+      else if (kind === 'light') tg.HapticFeedback.impactOccurred('light');
+      else tg.HapticFeedback.notificationOccurred(kind);
+    } catch (e) {}
   }
   function diagnostics() {
+    const card = cur() || state.recCard;
     return { pageVersion: PAGE_VERSION, inTelegram, mock, platform: tg ? tg.platform : null, tgVersion: tg ? tg.version : null, secure: window.isSecureContext,
       getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia), mediaRecorder: typeof window.MediaRecorder !== 'undefined',
       types: supported(), chosen: state.mime || pickMime(), mic, last: state.last, error: state.error, check: state.lastCheck,
-      twisterId: state.twisters.length ? twister().id : null, stage: state.stage, attempt: state.attempt };
+      twisterId: card ? card.t.id : null, stage: card ? card.stage : null, attempt: card ? card.attempt : null,
+      sound: state.sound, voiceLocked: state.voiceLocked, samples: state.twisters.filter((t) => t.audio).length };
   }
   function renderDiag() {
     const d = diagnostics();
@@ -637,7 +1102,7 @@ details.diag[open] summary:after{content:'⌃'}
       L ? `Oxirgi yozuv: ${L.totalMs} ms, nutq ${L.speechMs} ms, peak ${L.peakDb} dB, ${L.bytes} bayt, toʻxtash: ${L.stop}` : 'Oxirgi yozuv: yoʻq',
       C ? `Tekshiruv: ${C.error ? 'xato ' + C.error : `${C.status}, passed=${C.passed}, ishonch ${C.confidence}, WAV ${C.wavBytes} bayt`}` : 'Tekshiruv: yoʻq',
       state.error ? `Xato: ${state.error.name}: ${state.error.message}` : 'Xato: yoʻq',
-      `Server: ${state.server || '—'} · aniqlash: ${state.sttReady ? state.provider || 'ulangan' : 'ulanmagan'} · diktor: ${state.ttsReady ? 'bor' : 'yoʻq'}`,
+      `Server: ${state.server || '—'} · aniqlash: ${state.sttReady ? state.provider || 'ulangan' : 'ulanmagan'} · diktor: ${d.samples} ta yozuv, ovoz ${d.sound ? 'yoqilgan' : 'oʻchirilgan'}${d.voiceLocked ? ', avto-ovoz bloklangan' : ''}`,
     ].join('\n');
   }
   function reportMic(outcome) {
@@ -647,17 +1112,78 @@ details.diag[open] summary:after{content:'⌃'}
     fetch(`${API}/mic-check`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData }, body: fd }).catch(() => {});
   }
 
+  // ---------- start ----------
+  async function init() {
+    buildWelcome();
+    paintTotals();
+    renderDiag();
+    if (!inTelegram && !mock) return welcome('info', 'Bu trenajyor Telegram ichida ishlaydi. Uni botdagi tugma orqali och.');
+    try {
+      const s = await api('session');
+      state.isAdmin = !!s.isAdmin; state.sttReady = !!(s.sttReady ?? s.speechReady); state.provider = s.sttProvider || '';
+      state.twisters = Array.isArray(s.twisters) ? s.twisters : [];
+      state.server = 'ok';
+    } catch (e) {
+      state.server = `xato: ${e.message}`;
+      renderDiag();
+      return welcome('error', e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.' : `Serverga ulanib boʻlmadi (${e.message}). Internetni tekshirib, qayta urinib koʻr.`);
+    }
+    document.body.classList.toggle('is-admin', state.isAdmin);
+    $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
+    // While the trainer is closed for children they get a friendly 'coming soon' instead of a mic that cannot check.
+    if (!state.sttReady && !state.isAdmin) return welcome('soon');
+    if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
+    if (state.isAdmin) fillPicker();
+    if (!state.isAdmin && !state.consent) return welcome('consent');
+    newSession(state.progress.idx);
+    welcome('ready');
+    reportMic('opened');
+    renderDiag();
+  }
+
   // ---------- events ----------
-  $('consentYes').addEventListener('click', () => { state.consent = true; store.set(CONSENT_KEY, true); startTrainer(); reportMic('opened'); });
-  $('listen').addEventListener('click', () => listen());
-  $('mic').addEventListener('click', () => (state.recording ? stop('manual') : start()));
-  $('again').addEventListener('click', () => { $('result').classList.add('hide'); start(); });
-  $('next').addEventListener('click', () => advance());
-  $('warmDone').addEventListener('click', () => { if (state.busy || state.recording || !isWarmup()) return; haptic('impact'); advance(); });
-  $('skip').addEventListener('click', () => { if (state.recording || state.busy) return; state.giveUp = false; nextTwister(); });
+  feed.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]');
+    if (!b || b.disabled) return;
+    ensureContext(); // sounds need a context that was started inside a tap
+    const act = b.dataset.act, card = cardOf(b);
+    if (act === 'sound') return toggleSound();
+    if (act === 'sheet') return openSheet();
+    if (state.recording) { if (act === 'mic') stop('manual'); return; }
+    if (state.busy) return;
+    if (act === 'begin') return begin();
+    if (act === 'consent') return acceptConsent();
+    if (act === 'reload') return location.reload();
+    if (act === 'again') return restart();
+    if (act === 'close') return closeApp();
+    if (!card) return;
+    if (act === 'play') return manualPlay(card, RATE[card.stage]);
+    if (act === 'slow') return manualPlay(card, SLOW_RATE);
+    if (act === 'stage') return jumpStage(card, b.dataset.stage);
+    if (act === 'said') return said(card);
+    if (act === 'mic') return start(card);
+    if (act === 'next') return goNext(card);
+    if (act === 'retry') return improve(card);
+  });
+  // A swipe up on a card that is not finished yet cannot go anywhere: nudge the hint instead.
+  let touchY = null;
+  feed.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  feed.addEventListener('touchend', (e) => {
+    if (touchY === null) return;
+    const dy = e.changedTouches[0].clientY - touchY;
+    touchY = null;
+    const card = cur();
+    if (dy > -60 || !card || card.done || state.recording || state.busy) return;
+    if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2) nudge(card);
+  }, { passive: true });
+  $('sheetWrap').addEventListener('click', (e) => { if (e.target === $('sheetWrap')) closeSheet(); });
+  $('sheetClose').addEventListener('click', closeSheet);
   $('pick').addEventListener('change', (e) => {
-    if (state.recording || state.busy) { e.target.value = String(state.idx); return; }
-    state.giveUp = false; state.idx = Number(e.target.value) || 0; prepareTwister();
+    if (state.recording || state.busy) return;
+    newSession(Number(e.target.value) || 0);
+    welcome('ready');
+    closeSheet();
+    go(state.cards[0].el);
   });
   $('copy').addEventListener('click', async () => {
     const text = $('diag').textContent;
@@ -669,9 +1195,16 @@ details.diag[open] summary:after{content:'⌃'}
     $('copy').textContent = ok ? 'Nusxa olindi ✓' : 'Nusxa olinmadi';
     setTimeout(() => { $('copy').textContent = 'Nusxa olish'; }, 2500);
   });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) return; if (state.recording) stop('hidden'); else releaseMic(); });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) return;
+    stopVoice();
+    if (state.recording) stop('hidden'); else releaseMic();
+  });
 
-  if (mock) window.__tez = { state, toWav16k, submit, vad }; // local preview tests only
+  $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
+  $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
+
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse }; // local preview tests only
   init();
 })();
 </script>
