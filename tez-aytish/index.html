@@ -7,7 +7,7 @@
 <title>Tez aytish — trenajyor</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{--bg:#fff;--surface:#f5f5f7;--ink:#1d1d1f;--sub:#6e6e73;--faint:#b0b0b6;--line:#e5e5ea;--accent:#ff5a3c;--accent-press:#e8492c;--accent-tint:#ffebe6;--ok:#1e8e3e;--warn:#8a5a00;--warn-tint:#fff1cc;--warn-line:#f0b429;--star:#f5a623;--ease:cubic-bezier(.2,.8,.2,1)}
+:root{--bg:#fff;--surface:#f5f5f7;--ink:#1d1d1f;--sub:#6e6e73;--faint:#b0b0b6;--line:#e5e5ea;--accent:#ff5a3c;--accent-press:#e8492c;--accent-tint:#ffebe6;--ok:#1e8e3e;--warn:#8a5a00;--warn-tint:#fff1cc;--warn-line:#f0b429;--star:#f5a623;--ease:cubic-bezier(.2,.8,.2,1);--tabs-h:62px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:var(--bg);overscroll-behavior:none}
 body{color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none}
@@ -22,6 +22,9 @@ h1,h2,p,ul{margin:0}
 .feed{position:fixed;top:0;right:0;bottom:0;left:0;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;overscroll-behavior:none;scrollbar-width:none}
 .feed::-webkit-scrollbar{display:none}
 .feed.lock{overflow:hidden}
+.feed.away{visibility:hidden}
+body.tabs-on .feed{top:calc(var(--tabs-h) + env(safe-area-inset-top))}
+body.tabs-on .card{padding-top:8px}
 .card{position:relative;height:100%;width:min(100%,480px);margin:0 auto;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 20px calc(12px + env(safe-area-inset-bottom))}
 
 /* Stage segments on top, like Stories. */
@@ -142,6 +145,43 @@ h1,h2,p,ul{margin:0}
 .hard p{margin-bottom:7px;font-size:13px;font-weight:700;color:var(--sub)}
 .chip{display:inline-block;margin:0 6px 6px 0;padding:5px 10px;border-radius:10px;background:var(--warn-tint);color:var(--warn);font-size:14px;font-weight:700}
 
+/* Tabs on top (Reels | Modullar) and the modules screen. */
+.tabs{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:center;padding:calc(8px + env(safe-area-inset-top)) 16px 6px;background:var(--bg)}
+.tabs-in{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface)}
+.tab{min-width:112px;min-height:40px;padding:0 18px;border-radius:999px;font-size:15px;font-weight:800;color:var(--sub);transition:background-color .15s,color .15s}
+.tab.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.mods{position:fixed;left:0;right:0;bottom:0;top:calc(var(--tabs-h) + env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain;background:var(--bg)}
+.mods-in{width:min(100%,480px);margin:0 auto;padding:8px 20px calc(28px + env(safe-area-inset-bottom))}
+.overall{display:flex;align-items:center;gap:10px}
+.bar{position:relative;flex:1;height:32px;border-radius:16px;background:var(--surface);overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:16px;background:var(--accent);transition:width .4s var(--ease)}
+.bar span{position:relative;display:block;line-height:32px;text-align:center;font-size:14px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.reset{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent-tint);color:var(--accent);display:grid;place-items:center}
+.confirm{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--accent-tint);font-size:14px;font-weight:700;color:var(--ink)}
+.confirm span{flex:1}
+.confirm button{min-height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:800;background:var(--bg);color:var(--ink)}
+.confirm button.go{background:var(--accent);color:#fff}
+.search{display:flex;align-items:center;gap:10px;margin-top:14px;padding:0 16px;height:52px;border-radius:16px;background:var(--surface);color:var(--sub)}
+.search input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:16px;font-weight:600;color:var(--ink);outline:none;-webkit-user-select:text;user-select:text;-webkit-appearance:none;appearance:none}
+.sect{margin:24px 0 10px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+.mod,.hit{display:flex;align-items:center;gap:14px;width:100%;margin-bottom:12px;padding:16px;border:1px solid var(--line);border-radius:20px;background:var(--bg);text-align:left;transition:transform .15s var(--ease),background-color .15s}
+.mod:active,.hit:active{transform:scale(.98);background:var(--surface)}
+.badge{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--accent-tint);color:var(--accent);font-size:20px;font-weight:800}
+.mod-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mt{font-size:18px;font-weight:800;color:var(--ink)}
+.ms{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--sub)}
+.ms .i{width:15px;height:15px}
+.mbar{display:flex;align-items:center;gap:10px;margin-top:6px}
+.mbar b{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.mbar b i{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.mod.full .mbar b i{background:var(--ok)}
+.mbar span{min-width:42px;text-align:right;font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.chev{flex:none;width:20px;height:20px;color:var(--faint)}
+.hit{flex-wrap:wrap;gap:6px 10px}
+.hit-t{flex:1 1 100%;font-size:16px;font-weight:700;color:var(--ink)}
+.hit-m{flex:1;font-size:13px;font-weight:700;color:var(--sub)}
+.empty{padding:24px 8px;text-align:center;font-size:15px;font-weight:600;color:var(--sub)}
+
 /* Bottom sheet: technical info and the admin picker. */
 .sheet-wrap{position:fixed;top:0;right:0;bottom:0;left:0;z-index:10;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.32)}
 .sheet{width:min(100%,480px);max-height:84%;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(18px + env(safe-area-inset-bottom))}
@@ -170,6 +210,23 @@ h1,h2,p,ul{margin:0}
 </head>
 <body>
 <main class="feed" id="feed"></main>
+<nav class="tabs hide" id="tabs" aria-label="Boʻlimlar">
+  <div class="tabs-in" role="tablist">
+    <button class="tab on" id="tabReels" type="button" role="tab" aria-selected="true">Reels</button>
+    <button class="tab" id="tabMods" type="button" role="tab" aria-selected="false">Modullar</button>
+  </div>
+</nav>
+<section class="mods hide" id="mods" aria-label="Modullar">
+  <div class="mods-in">
+    <div class="overall">
+      <div class="bar" id="allBar" role="img" aria-label="Umumiy natija"><i></i><span>0%</span></div>
+      <button class="reset" id="reset" type="button" aria-label="Natijalarni tozalash"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/></svg></button>
+    </div>
+    <div class="confirm hide" id="confirm"><span>Hamma yulduzlar oʻchadi.</span><button id="resetNo" type="button">Yoʻq</button><button class="go" id="resetYes" type="button">Tozalash</button></div>
+    <label class="search"><svg class="i" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><input id="q" type="search" placeholder="Qidirish…" autocomplete="off" aria-label="Tez aytishni qidirish"></label>
+    <div id="modList"></div>
+  </div>
+</section>
 <div class="sheet-wrap hide" id="sheetWrap">
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="grab" aria-hidden="true"></div>
@@ -200,9 +257,17 @@ h1,h2,p,ul{margin:0}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v7';
+  const PAGE_VERSION = 'v8';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
+  // Modules group the tongue twisters by the sound they train (ids as on the server). A tongue twister that no
+  // module names is shown under «Boshqalar».
+  const MODULES = [
+    { id: 'g', title: 'Gʻ va Oʻ', badge: 'Gʻ', ids: [1, 6, 8, 11] },
+    { id: 'q', title: 'Q va K', badge: 'Q', ids: [3, 5, 9, 10] },
+    { id: 'sh', title: 'Sh va Ch', badge: 'Sh', ids: [7, 12, 15] },
+    { id: 'r', title: 'R, S va X', badge: 'R', ids: [2, 4, 13, 14] },
+  ];
 
   const $ = (id) => document.getElementById(id);
   const feed = $('feed');
@@ -217,7 +282,7 @@ h1,h2,p,ul{margin:0}
   };
 
   const state = {
-    isAdmin: false, sttReady: false, provider: '', twisters: [], cards: [],
+    isAdmin: false, sttReady: false, provider: '', twisters: [], cards: [], mod: null, view: 'reels',
     welcomeEl: null, summaryEl: null, activeEl: null,
     consent: !!store.get(CONSENT_KEY, false), sound: store.get(SOUND_KEY, true) !== false,
     progress: store.get(PROGRESS_KEY, { idx: 0, stars: {}, later: [] }),
@@ -259,6 +324,7 @@ h1,h2,p,ul{margin:0}
     up: icon('', '<path d="M6 14.5l6-6 6 6"/>', LINE),
     lock: icon('', '<rect x="5.5" y="10.5" width="13" height="9" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', LINE),
     star: icon('star', STAR_PATH),
+    chev: icon('chev', '<path d="M9 6l6 6-6 6"/>', LINE),
   };
   // The snow leopard: moods are switched with data-mood on the wrapper (idle, happy, wink, listen).
   const BARS = `<svg viewBox="0 0 120 120" aria-hidden="true">
@@ -373,7 +439,11 @@ h1,h2,p,ul{margin:0}
     if (path === 'session') {
       const list = [[6, 2, 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.'], [1, 1, 'Togʻdan tosh tushdi.'], [4, 1, 'Raʼno rasmlariga rang-barang rang tanladi.'],
         [10, 2, 'Oq choynakka koʻk qopqoq, koʻk choynakka oq qopqoq.'], [13, 3, 'Bahodir bayroqni Botirga berdimi, Botir Bahodirga bayroqni berdimi?'],
-        [12, 3, 'Shokir shifokorlarning shart-sharoitini shoshilmasdan sharhladi.'], [3, 1, 'Qora-qura qoʻzilar qirda quvonib oʻtlar.']];
+        [12, 3, 'Shokir shifokorlarning shart-sharoitini shoshilmasdan sharhladi.'], [3, 1, 'Qora-qura qoʻzilar qirda quvonib oʻtlar.'],
+        [2, 1, 'Soat soatiga soatlab qaradi.'], [5, 1, 'Kitob kitobxonlarga kerak, kitobxonlarga kitob kerak.'],
+        [7, 2, 'Chori chayilgan choynakka choyni chamalab soldi.'], [8, 2, 'Turgʻun toʻrtta toʻrgʻayni toʻrga tushirdi.'],
+        [9, 2, 'Tovuq sovuqda sovqotadimi? Sovuqda tovuq sovqotadimi?'], [11, 3, 'Belbogʻini belga bogʻlab, bogʻbon bobo bogʻga bordi.'],
+        [14, 3, 'Paxta qattiqmi, taxta qattiq? Sodiq momiq paxtani terdi.'], [15, 3, 'Besh mis barkash, besh mis barkashning ichida besh ming mis barkash.']];
       const audio = query.get('mock') !== 'noaudio';
       return { ok: true, isAdmin: query.get('as') !== 'child', sttReady: true, sttProvider: 'VoiceLab (Aisha)',
         twisters: list.map(([id, level, text]) => ({ id, level, text, audio: audio ? mockVoice(text) : null })) };
@@ -473,7 +543,7 @@ h1,h2,p,ul{margin:0}
       if (!on) s.querySelector('b').style.width = '';
     });
     el.querySelectorAll('.seglab span').forEach((s, i) => { s.className = !run || i < at ? 'done' : i === at ? 'on' : ''; });
-    part(card, 'count').textContent = `${card.n + 1} / ${state.cards.length}`;
+    part(card, 'count').textContent = `${state.mod ? `${state.mod.title} · ` : ''}${card.n + 1} / ${state.cards.length}`;
     part(card, 'cap').innerHTML = run ? `<b>${STAGE_LABEL[card.stage]}</b> · ${STAGE_CAP[card.stage]}` : `${card.t.level}-daraja`;
     const tw = part(card, 'tw');
     tw.className = `tw ${sizeClass(card)}${card.result ? ' res' : ''}`;
@@ -553,8 +623,10 @@ h1,h2,p,ul{margin:0}
       q('bars').dataset.mood = m || 'idle';
     };
     el.classList.toggle('consent', kind === 'consent');
+    showTabs(kind === 'ready');
     if (kind === 'ready') {
-      set(name ? `Salom, ${name}!` : 'Salom!', state.sttReady ? `Bugun ${state.cards.length} ta tez aytish. Tingla, takrorla va tez ayt!`
+      const plan = state.mod ? `«${state.mod.title}» moduli: ${state.cards.length} ta tez aytish.` : `Bugun ${state.cards.length} ta tez aytish.`;
+      set(name ? `Salom, ${name}!` : 'Salom!', state.sttReady ? `${plan} Tingla, takrorla va tez ayt!`
         : 'Ovozli tekshiruv hali ulanmagan: mashq ishlaydi, lekin natija chiqmaydi.', 'Boshlash', 'begin');
     } else if (kind === 'consent') set('Ota-onalar uchun', consentText(), 'Roziman, boshlaymiz', 'consent');
     else if (kind === 'soon') set('Tez orada!', 'Tez aytish trenajyori hozircha tayyorlanmoqda. Tez orada ochiladi!', '', '', 'wink');
@@ -580,7 +652,7 @@ h1,h2,p,ul{margin:0}
         <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
         ${hard.length ? `<div class="hard"><p>Yana mashq qilish uchun soʻzlar</p>${hard.map((w) => `<span class="chip">${esc(w)}</span>`).join('')}</div>` : ''}
       </div>
-      <div class="act"><button class="pill primary" type="button" data-act="again">Yana ${Math.min(SESSION_SIZE, state.twisters.length)} ta</button><button class="pill small" type="button" data-act="close">Tugatish</button></div>
+      <div class="act"><button class="pill primary" type="button" data-act="again">${state.mod ? 'Qayta boshlash' : `Yana ${Math.min(SESSION_SIZE, state.twisters.length)} ta`}</button><button class="pill small" type="button" data-act="tomods">Modullar</button></div>
       <p class="foot"></p>`;
     paintTotals();
   }
@@ -601,15 +673,20 @@ h1,h2,p,ul{margin:0}
   function go(el, instant) { if (el) feed.scrollTo({ top: el.offsetTop, behavior: instant ? 'auto' : 'smooth' }); }
   function lockFeed(on) { feed.classList.toggle('lock', !!on); }
 
-  // A session is the next few tongue twisters. Only the first card exists at the start: the next one is added when
-  // the current one is finished, which is what keeps the swipe forward locked until the child has spoken.
-  function newSession(start) {
+  // The day's session: the next few tongue twisters after the last one the child finished.
+  function dailyList(start) {
+    const n = state.twisters.length, from = (((Number(start) || 0) % n) + n) % n;
+    return Array.from({ length: Math.min(SESSION_SIZE, n) }, (_, k) => (from + k) % n);
+  }
+  // A session is a list of tongue twisters (indexes into state.twisters): the day's five or a whole module. Only
+  // the first card exists at the start: the next one is added when the current one is finished, which is what keeps
+  // the swipe forward locked until the child has spoken.
+  function newSession(list, mod) {
     stopVoice();
     for (const c of state.cards) if (c.el) { io.unobserve(c.el); c.el.remove(); }
     if (state.summaryEl) { io.unobserve(state.summaryEl); state.summaryEl.remove(); state.summaryEl = null; }
-    const n = state.twisters.length, size = Math.min(SESSION_SIZE, n), from = (((Number(start) || 0) % n) + n) % n;
-    state.cards = [];
-    for (let k = 0; k < size; k++) state.cards.push(makeCard((from + k) % n, k));
+    state.mod = mod || null;
+    state.cards = list.map((ti, k) => makeCard(ti, k));
     mount(state.cards[0]);
     paintTotals();
   }
@@ -621,7 +698,7 @@ h1,h2,p,ul{margin:0}
     card.stars = Math.max(card.stars, stars);
     if (stars) { p.stars[id] = Math.max(Number(p.stars[id]) || 0, stars); p.later = p.later.filter((x) => x !== id); }
     else if (!p.later.includes(id)) p.later.push(id);
-    if (first) p.idx = (card.ti + 1) % state.twisters.length;
+    if (first && !state.mod) p.idx = (card.ti + 1) % state.twisters.length; // a module does not move the day's place
     store.set(PROGRESS_KEY, p);
     const next = state.cards[card.n + 1];
     if (next && !next.el) mount(next);
@@ -639,7 +716,7 @@ h1,h2,p,ul{margin:0}
   function acceptConsent() {
     state.consent = true;
     store.set(CONSENT_KEY, true);
-    newSession(state.progress.idx);
+    newSession(dailyList(state.progress.idx));
     welcome('ready');
     begin();
     reportMic('opened');
@@ -673,14 +750,88 @@ h1,h2,p,ul{margin:0}
     paint(card);
   }
   function restart() {
-    newSession(state.progress.idx);
+    if (state.mod) newSession(state.mod.list, state.mod); else newSession(dailyList(state.progress.idx));
     welcome('ready');
     const card = state.cards[0];
     go(card.el, true);
     if (state.sound && card.t.audio) playVoice(card, RATE[card.stage], true);
   }
-  function closeApp() {
-    if (inTelegram) { try { tg.close(); } catch (e) {} } else go(state.welcomeEl);
+  // ---------- tabs and modules ----------
+  function showTabs(on) {
+    document.body.classList.toggle('tabs-on', !!on);
+    $('tabs').classList.toggle('hide', !on);
+    if (!on) { state.view = 'reels'; feed.classList.remove('away'); $('mods').classList.add('hide'); }
+  }
+  function setView(view) {
+    if (state.recording || state.busy) return;
+    const mods = view === 'mods';
+    state.view = mods ? 'mods' : 'reels';
+    $('tabReels').classList.toggle('on', !mods);
+    $('tabReels').setAttribute('aria-selected', String(!mods));
+    $('tabMods').classList.toggle('on', mods);
+    $('tabMods').setAttribute('aria-selected', String(mods));
+    feed.classList.toggle('away', mods);
+    $('mods').classList.toggle('hide', !mods);
+    if (mods) { stopVoice(); $('confirm').classList.add('hide'); renderModules(); }
+  }
+  function modulesNow() {
+    const at = new Map(state.twisters.map((t, i) => [t.id, i])), used = new Set(), out = [];
+    for (const m of MODULES) {
+      const list = m.ids.filter((id) => at.has(id)).map((id) => at.get(id));
+      list.forEach((i) => used.add(i));
+      if (list.length) out.push({ ...m, list });
+    }
+    const rest = state.twisters.map((_, i) => i).filter((i) => !used.has(i));
+    if (rest.length) out.push({ id: 'other', title: 'Boshqalar', badge: '+', list: rest });
+    return out;
+  }
+  // Progress of a list of tongue twisters: how many have at least one star, and the stars in all.
+  function stat(list) {
+    let passed = 0, stars = 0;
+    for (const i of list) { const s = Number(state.progress.stars[state.twisters[i].id]) || 0; stars += s; if (s > 0) passed++; }
+    return { passed, stars, pct: list.length ? Math.round((passed * 100) / list.length) : 0 };
+  }
+  // Search ignores case and the turned comma, so «gani» finds «Gʻani».
+  const fold = (s) => String(s).toLowerCase().replace(/[ʻʼ‘’`'´]/g, '').replace(/\s+/g, ' ').trim();
+  function renderModules() {
+    const all = stat(state.twisters.map((_, i) => i));
+    $('allBar').querySelector('i').style.width = `${all.pct}%`;
+    $('allBar').querySelector('span').textContent = `${all.pct}%`;
+    const q = fold($('q').value), mods = modulesNow(), box = $('modList');
+    if (!q) {
+      box.innerHTML = '<p class="sect">Tovushlar</p>' + mods.map((m) => {
+        const s = stat(m.list);
+        return `<button class="mod${s.pct === 100 ? ' full' : ''}" type="button" data-mod="${esc(m.id)}"><span class="badge">${esc(m.badge)}</span>`
+          + `<span class="mod-body"><span class="mt">${esc(m.title)}</span><span class="ms">${m.list.length} ta tez aytish · ${ICON.star}${s.stars}</span>`
+          + `<span class="mbar"><b><i style="width:${s.pct}%"></i></b><span>${s.pct}%</span></span></span>${ICON.chev}</button>`;
+      }).join('');
+      return;
+    }
+    const hits = [];
+    for (const m of mods) for (const i of m.list) if (fold(state.twisters[i].text).includes(q)) hits.push({ m, i });
+    box.innerHTML = `<p class="sect">Topildi: ${hits.length}</p>` + (hits.length ? hits.map(({ m, i }) => {
+      const got = Number(state.progress.stars[state.twisters[i].id]) || 0;
+      return `<button class="hit" type="button" data-mod="${esc(m.id)}" data-tw="${i}"><span class="hit-t">${esc(state.twisters[i].text)}</span>`
+        + `<span class="hit-m">${esc(m.title)}</span><span class="st">${[1, 2, 3].map((k) => starHtml(k <= got)).join('')}</span></button>`;
+    }).join('') : '<p class="empty">Hech narsa topilmadi. Boshqa soʻz bilan qidirib koʻr.</p>');
+  }
+  // Open a module in the Reels tab, from its first tongue twister or from the one picked in the search.
+  function openModule(id, from) {
+    const m = modulesNow().find((x) => x.id === id);
+    if (!m || state.recording || state.busy) return;
+    const at = Math.max(0, m.list.indexOf(Number(from)));
+    newSession(m.list.slice(at).concat(m.list.slice(0, at)), m);
+    welcome('ready');
+    setView('reels');
+    begin();
+  }
+  function resetProgress() {
+    state.progress = { idx: 0, stars: {}, later: [] };
+    store.set(PROGRESS_KEY, state.progress);
+    newSession(dailyList(0));
+    welcome('ready');
+    paintTotals();
+    renderModules();
   }
   function toggleSound() {
     state.sound = !state.sound;
@@ -1135,7 +1286,7 @@ h1,h2,p,ul{margin:0}
     if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
     if (state.isAdmin) fillPicker();
     if (!state.isAdmin && !state.consent) return welcome('consent');
-    newSession(state.progress.idx);
+    newSession(dailyList(state.progress.idx));
     welcome('ready');
     reportMic('opened');
     renderDiag();
@@ -1155,7 +1306,7 @@ h1,h2,p,ul{margin:0}
     if (act === 'consent') return acceptConsent();
     if (act === 'reload') return location.reload();
     if (act === 'again') return restart();
-    if (act === 'close') return closeApp();
+    if (act === 'tomods') return setView('mods');
     if (!card) return;
     if (act === 'play') return manualPlay(card, RATE[card.stage]);
     if (act === 'slow') return manualPlay(card, SLOW_RATE);
@@ -1176,13 +1327,26 @@ h1,h2,p,ul{margin:0}
     if (dy > -60 || !card || card.done || state.recording || state.busy) return;
     if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2) nudge(card);
   }, { passive: true });
+  $('tabReels').addEventListener('click', () => setView('reels'));
+  $('tabMods').addEventListener('click', () => setView('mods'));
+  $('modList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mod]');
+    if (!b) return;
+    ensureContext(); // sounds and the sample need a tap to start
+    openModule(b.dataset.mod, b.dataset.tw);
+  });
+  $('q').addEventListener('input', () => renderModules());
+  $('reset').addEventListener('click', () => $('confirm').classList.toggle('hide'));
+  $('resetNo').addEventListener('click', () => $('confirm').classList.add('hide'));
+  $('resetYes').addEventListener('click', () => { $('confirm').classList.add('hide'); resetProgress(); });
   $('sheetWrap').addEventListener('click', (e) => { if (e.target === $('sheetWrap')) closeSheet(); });
   $('sheetClose').addEventListener('click', closeSheet);
   $('pick').addEventListener('change', (e) => {
     if (state.recording || state.busy) return;
-    newSession(Number(e.target.value) || 0);
+    newSession(dailyList(Number(e.target.value) || 0));
     welcome('ready');
     closeSheet();
+    setView('reels');
     go(state.cards[0].el);
   });
   $('copy').addEventListener('click', async () => {
@@ -1204,7 +1368,7 @@ h1,h2,p,ul{margin:0}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView }; // local preview tests only
   init();
 })();
 </script>
