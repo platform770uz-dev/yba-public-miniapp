@@ -169,6 +169,7 @@ body.tabs-on .card{padding-top:8px}
 .badge{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--accent-tint);color:var(--accent);font-size:20px;font-weight:800}
 .mod-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .mt{font-size:18px;font-weight:800;color:var(--ink)}
+.mt .wk{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--accent-tint);color:var(--accent);font-size:12px;font-weight:800;vertical-align:3px}
 .ms{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--sub)}
 .ms .i{width:15px;height:15px}
 .mbar{display:flex;align-items:center;gap:10px;margin-top:6px}
@@ -257,16 +258,16 @@ body.tabs-on .card{padding-top:8px}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v8';
+  const PAGE_VERSION = 'v9';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
-  // Modules group the tongue twisters by the sound they train (ids as on the server). A tongue twister that no
-  // module names is shown under «Boshqalar».
+  // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
+  // week, 5 tongue twisters, all 3 lessons of the week. A tongue twister that no module names goes to «Boshqalar».
   const MODULES = [
-    { id: 'g', title: 'Gʻ va Oʻ', badge: 'Gʻ', ids: [1, 6, 8, 11] },
-    { id: 'q', title: 'Q va K', badge: 'Q', ids: [3, 5, 9, 10] },
-    { id: 'sh', title: 'Sh va Ch', badge: 'Sh', ids: [7, 12, 15] },
-    { id: 'r', title: 'R, S va X', badge: 'R', ids: [2, 4, 13, 14] },
+    { id: 'g', title: 'Gʻ va Oʻ', badge: 'Gʻ', week: '1-hafta', ids: [1, 6, 8, 11, 16] },
+    { id: 'q', title: 'Q va K', badge: 'Q', week: '2-hafta', ids: [3, 5, 9, 10, 17] },
+    { id: 'sh', title: 'Sh va Ch', badge: 'Sh', week: '3-hafta', ids: [7, 12, 15, 18, 19] },
+    { id: 'r', title: 'R, S va X', badge: 'R', week: '4-hafta', ids: [2, 4, 13, 14, 20] },
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -389,7 +390,7 @@ body.tabs-on .card{padding-top:8px}
       if (glued && last && last.word) {
         last.tail = glued[0];
         if (s.length > glued[0].length) parts.push({ text: s.slice(glued[0].length) });
-      } else parts.push({ text: s });
+      } else parts.push({ text: s.replace(/^ (?=[—–])/, '\u00a0') }); // a dash never starts a line
     }
     return parts;
   }
@@ -443,7 +444,10 @@ body.tabs-on .card{padding-top:8px}
         [2, 1, 'Soat soatiga soatlab qaradi.'], [5, 1, 'Kitob kitobxonlarga kerak, kitobxonlarga kitob kerak.'],
         [7, 2, 'Chori chayilgan choynakka choyni chamalab soldi.'], [8, 2, 'Turgʻun toʻrtta toʻrgʻayni toʻrga tushirdi.'],
         [9, 2, 'Tovuq sovuqda sovqotadimi? Sovuqda tovuq sovqotadimi?'], [11, 3, 'Belbogʻini belga bogʻlab, bogʻbon bobo bogʻga bordi.'],
-        [14, 3, 'Paxta qattiqmi, taxta qattiq? Sodiq momiq paxtani terdi.'], [15, 3, 'Besh mis barkash, besh mis barkashning ichida besh ming mis barkash.']];
+        [14, 3, 'Paxta qattiqmi, taxta qattiq? Sodiq momiq paxtani terdi.'], [15, 3, 'Besh mis barkash, besh mis barkashning ichida besh ming mis barkash.'],
+        [16, 2, 'Oʻroq oʻxshar soʻroqqa, soʻroq oʻxshar oʻroqqa.'], [17, 2, 'Koʻm-koʻk kurtak, koʻkatlar koʻklamga koʻrk koʻrsatar.'],
+        [18, 3, 'Uchuvchi suzuvchini uchratdimi, suzuvchi uchuvchini uchratdimi?'],
+        [19, 3, 'Temur bilan Yoʻlchi — temiryoʻlchi, temiryoʻlchiga aytib koʻr-chi.'], [20, 2, 'Darsda Nasim rasm soldi, Nasim rasmga razm soldi.']];
       const audio = query.get('mock') !== 'noaudio';
       return { ok: true, isAdmin: query.get('as') !== 'child', sttReady: true, sttProvider: 'VoiceLab (Aisha)',
         twisters: list.map(([id, level, text]) => ({ id, level, text, audio: audio ? mockVoice(text) : null })) };
@@ -802,7 +806,7 @@ body.tabs-on .card{padding-top:8px}
       box.innerHTML = '<p class="sect">Tovushlar</p>' + mods.map((m) => {
         const s = stat(m.list);
         return `<button class="mod${s.pct === 100 ? ' full' : ''}" type="button" data-mod="${esc(m.id)}"><span class="badge">${esc(m.badge)}</span>`
-          + `<span class="mod-body"><span class="mt">${esc(m.title)}</span><span class="ms">${m.list.length} ta tez aytish · ${ICON.star}${s.stars}</span>`
+          + `<span class="mod-body"><span class="mt">${esc(m.title)}${m.week ? ` <small class="wk">${esc(m.week)}</small>` : ''}</span><span class="ms">${m.list.length} ta tez aytish · ${ICON.star}${s.stars}</span>`
           + `<span class="mbar"><b><i style="width:${s.pct}%"></i></b><span>${s.pct}%</span></span></span>${ICON.chev}</button>`;
       }).join('');
       return;
