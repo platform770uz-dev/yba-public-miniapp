@@ -195,6 +195,60 @@ body.tabs-on .card{padding-top:8px}
 .sheet .row .pill{flex:1;width:auto;min-height:50px;font-size:15px}
 .note{margin-top:12px;font-size:12px;line-height:1.5;color:var(--sub);text-align:center}
 
+/* Teacher mode: groups, students, the week's module, a student's lesson and the reports. */
+.teach{position:fixed;top:0;right:0;bottom:0;left:0;z-index:4;overflow-y:auto;overscroll-behavior:contain;background:var(--bg)}
+.teach-in{width:min(100%,480px);margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
+body.t-busy .teach-in{opacity:.55;pointer-events:none}
+.t-head{display:flex;align-items:center;gap:12px;margin:6px 0 2px}
+.t-top{display:flex;align-items:center;gap:4px;min-height:44px;margin-top:2px}
+.t-top .t-title{flex:1;min-width:0}
+.t-back{flex:none;width:40px;height:40px;margin-left:-10px;border-radius:50%;display:grid;place-items:center}
+.t-back:active{background:var(--surface)}
+.t-title{font-size:24px;line-height:1.2;font-weight:800;letter-spacing:-.01em;overflow-wrap:anywhere}
+.t-sub{margin-top:4px;font-size:14px;font-weight:600;color:var(--sub)}
+.t-sub a{color:var(--accent);font-weight:700}
+.t-msg{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:var(--warn-tint);color:var(--warn);font-size:14px;font-weight:700}
+.t-card{margin-top:14px;padding:16px;border-radius:20px;background:var(--surface)}
+.t-k{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub)}
+.t-big{margin-top:4px;font-size:20px;font-weight:800}
+.t-big.warn{color:var(--warn)}
+.t-big.ok{color:var(--ok)}
+.t-list{margin:10px 0 0;padding-left:20px;font-size:15px;font-weight:600;line-height:1.45}
+.t-list small{color:var(--warn);font-weight:700}
+.t-hw{margin-top:8px;font-size:14px;font-weight:600;color:var(--sub)}
+.t-link{display:block;margin-top:12px;font-size:14px;font-weight:700;color:var(--accent);text-align:left}
+.t-weeks{display:flex;gap:10px;margin-top:12px}
+.t-week{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:800;color:var(--sub)}
+.t-week small{font-weight:600}
+.t-week select,.t-form input:not([type=checkbox]),.t-form select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:16px;font-weight:600;-webkit-user-select:text;user-select:text}
+.t-row{display:flex;align-items:center;gap:10px;min-height:56px;border-bottom:1px solid var(--line)}
+.t-name{flex:1;min-width:0;padding:10px 0;text-align:left;font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-name small{font-weight:600;color:var(--sub)}
+.t-chip{flex:none;padding:6px 10px;border-radius:10px;background:var(--surface);font-size:13px;font-weight:800;color:var(--sub)}
+.t-chip.ok{background:#e6f4ea;color:var(--ok)}
+.t-chip.warn{background:var(--warn-tint);color:var(--warn)}
+.t-start{flex:none;min-height:40px;padding:0 16px;border-radius:20px;background:var(--accent);color:#fff;font-size:14px;font-weight:800}
+.t-start:active{background:var(--accent-press)}
+.t-btn{flex:none;min-height:36px;padding:0 12px;border-radius:18px;background:var(--surface);font-size:13px;font-weight:800}
+.t-btn.go{background:var(--accent);color:#fff}
+.t-wide{display:block;width:100%;margin-top:14px}
+.t-foot{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.t-line.warn{color:var(--warn)}
+.t-form{display:flex;flex-direction:column;gap:14px;margin-top:10px}
+.t-form label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:800;color:var(--sub)}
+.t-lab{font-size:13px;font-weight:800;color:var(--sub)}
+.t-days{display:flex;gap:6px;margin-top:-8px}
+.t-form .t-day{display:block;flex:1;position:relative}
+.t-day input{position:absolute;opacity:0;pointer-events:none}
+.t-day span{display:grid;place-items:center;height:44px;border-radius:12px;background:var(--surface);font-size:14px;font-weight:800;color:var(--sub)}
+.t-day input:checked+span{background:var(--accent);color:#fff}
+.t-form .t-check{flex-direction:row;align-items:flex-start;gap:10px;font-size:14px;font-weight:600;color:var(--ink)}
+.t-check input{width:22px;height:22px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
+.t-wrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.t-wrow span:first-child{flex:1}
+.t-rep{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
+.t-rs{font-size:13px;font-weight:600;color:var(--sub)}
+
 @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
@@ -228,6 +282,7 @@ body.tabs-on .card{padding-top:8px}
     <div id="modList"></div>
   </div>
 </section>
+<section class="teach hide" id="teach" aria-label="Oʻqituvchi rejimi"><div class="teach-in" id="teachIn"></div></section>
 <div class="sheet-wrap hide" id="sheetWrap">
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="grab" aria-hidden="true"></div>
@@ -259,7 +314,7 @@ body.tabs-on .card{padding-top:8px}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v10';
+  const PAGE_VERSION = 'v11';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -327,6 +382,9 @@ body.tabs-on .card{padding-top:8px}
     lock: icon('', '<rect x="5.5" y="10.5" width="13" height="9" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>', LINE),
     star: icon('star', STAR_PATH),
     chev: icon('chev', '<path d="M9 6l6 6-6 6"/>', LINE),
+    back: icon('', '<path d="M15 6l-6 6 6 6"/>', LINE),
+    edit: icon('', '<path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 8.5l3 3"/>', LINE),
+    close: icon('', '<path d="M6 6l12 12M18 6L6 18"/>', LINE),
   };
   // The snow leopard: moods are switched with data-mood on the wrapper (idle, happy, wink, listen).
   const BARS = `<svg viewBox="0 0 120 120" aria-hidden="true">
@@ -458,6 +516,7 @@ body.tabs-on .card{padding-top:8px}
       const toks = t.text.split(/[\s\-–—]+/).map((w) => w.replace(/[.,!?;:«»"()]/g, '')).filter(Boolean);
       const fail = card.attempt === 1 && (t.id === 6 || t.id === 10);
       const heard = t.id === 6 ? 'gildirakni' : 'shoynakka';
+      if (state.lesson) MOCKT.results.push({ studentId: state.lesson.studentId, key: state.lesson.key, id: t.id, stars: fail ? 0 : t.id === 4 ? 2 : 3 });
       return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? `${toks[0]} ${heard}` : t.text, extras: [],
         words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? heard : d.toLowerCase(),
           v: fail ? (i === 1 ? 'wrong' : i === toks.length - 1 ? 'missing' : 'ok') : (t.id === 4 && i === 2 ? 'near' : 'ok') })) };
@@ -473,9 +532,11 @@ body.tabs-on .card{padding-top:8px}
   const totalStars = () => Object.values(state.progress.stars).reduce((a, b) => a + (Number(b) || 0), 0);
   const targetSeconds = (card) => Math.max(1.5, Math.round(words(card.t.text) * 0.6 * 10) / 10);
   const starHtml = (filled, anim, i) => `<svg class="${filled ? 'f' : ''}${anim ? ' a' : ''}" viewBox="0 0 24 24" aria-hidden="true"${anim ? ` style="animation-delay:${i * 130}ms"` : ''}>${STAR_PATH}</svg>`;
-  const metaHtml = (left) => `<div class="meta">${left}<span class="sp"></span><span class="total">${ICON.star}<b data-total>0</b></span>`
+  // In a student's lesson (teacher mode) the device's own stars are not shown and the corner button leads back to the group.
+  const metaHtml = (left) => `<div class="meta">${left}<span class="sp"></span>${state.lesson ? '' : `<span class="total">${ICON.star}<b data-total>0</b></span>`}`
     + `<button class="ico" type="button" data-act="sound" aria-label="Ovoz">${state.sound ? ICON.sound : ICON.mute}</button>`
-    + `<button class="ico admin-only" type="button" data-act="sheet" aria-label="Sozlamalar">${ICON.tune}</button></div>`;
+    + (state.lesson ? `<button class="ico" type="button" data-act="toteach" aria-label="Guruhga qaytish">${ICON.close}</button>`
+      : `<button class="ico admin-only" type="button" data-act="sheet" aria-label="Sozlamalar">${ICON.tune}</button>`) + '</div>';
 
   function makeCard(ti, n) {
     const t = state.twisters[ti], parts = parse(t.text);
@@ -609,7 +670,7 @@ body.tabs-on .card{padding-top:8px}
     el.innerHTML = `${metaHtml('<span class="brand">Tez aytish</span>')}
       <div class="hero"><div class="bars xl" data-r="bars" data-mood="idle">${BARS}</div><h1 data-r="h1">Tez aytish</h1><p class="lead" data-r="lead">Yuklanmoqda…</p></div>
       <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button></div>
-      <p class="foot"><button class="link" type="button" data-act="sheet">Texnik maʼlumot</button></p>`;
+      <p class="foot"><button class="link" type="button" data-act="sheet">Texnik maʼlumot</button><button class="link hide" type="button" data-act="tmode" data-r="tmode">Oʻqituvchilar uchun</button></p>`;
     feed.appendChild(el);
     state.welcomeEl = el;
     state.activeEl = el;
@@ -646,6 +707,19 @@ body.tabs-on .card{padding-top:8px}
     }
     const got = state.cards.reduce((a, c) => a + c.stars, 0);
     const hard = [...new Set(state.cards.flatMap((c) => [...c.hard]))].slice(0, 6);
+    if (state.lesson) {
+      el.innerHTML = `${metaHtml('<span class="brand">Dars tugadi</span>')}
+        <div class="hero">
+          <div class="bars lg" data-mood="${got ? 'happy' : 'wink'}">${BARS}</div>
+          <h1>${esc(state.lesson.name)}</h1>
+          <p class="lead">${state.cards.length} ta tez aytishda ${got} ta yulduz.</p>
+          <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
+          ${hard.length ? `<div class="hard"><p>Yana mashq qilish uchun soʻzlar</p>${hard.map((w) => `<span class="chip">${esc(w)}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="act"><button class="pill primary" type="button" data-act="toteach">Guruhga qaytish</button></div>
+        <p class="foot"></p>`;
+      return;
+    }
     el.innerHTML = `${metaHtml('<span class="brand">Natijalar</span>')}
       <div class="hero">
         <div class="bars lg" data-mood="${got ? 'happy' : 'wink'}">${BARS}</div>
@@ -699,10 +773,13 @@ body.tabs-on .card{padding-top:8px}
     card.done = true; card.again = false; card.fresh = stars > 0;
     if (first) card.gaveUp = !!gaveUp; else if (stars) card.gaveUp = false;
     card.stars = Math.max(card.stars, stars);
-    if (stars) { p.stars[id] = Math.max(Number(p.stars[id]) || 0, stars); p.later = p.later.filter((x) => x !== id); }
-    else if (!p.later.includes(id)) p.later.push(id);
-    if (first && !state.mod) p.idx = (card.ti + 1) % state.twisters.length; // a module does not move the day's place
-    store.set(PROGRESS_KEY, p);
+    // A lesson on the teacher's phone belongs to the student (the server keeps it), not to this device's progress.
+    if (!state.lesson) {
+      if (stars) { p.stars[id] = Math.max(Number(p.stars[id]) || 0, stars); p.later = p.later.filter((x) => x !== id); }
+      else if (!p.later.includes(id)) p.later.push(id);
+      if (first && !state.mod) p.idx = (card.ti + 1) % state.twisters.length; // a module does not move the day's place
+      store.set(PROGRESS_KEY, p);
+    }
     const next = state.cards[card.n + 1];
     if (next && !next.el) mount(next);
     if (state.cards.every((c) => c.done)) mountSummary();
@@ -1163,7 +1240,9 @@ body.tabs-on .card{padding-top:8px}
     try {
       const wav = await toWav16k(blob, trim);
       const fd = new FormData();
-      fd.append('meta', JSON.stringify({ twisterId: card.t.id, stage: card.stage, attempt: card.attempt, consent: state.consent || state.isAdmin, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser' }));
+      // A teacher's lesson names the student and the lesson date; the server checks the student's consent itself.
+      const lesson = state.lesson ? { studentId: state.lesson.studentId, lessonKey: state.lesson.key } : {};
+      fd.append('meta', JSON.stringify({ twisterId: card.t.id, stage: card.stage, attempt: card.attempt, consent: state.consent || state.isAdmin || !!state.lesson, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser', ...lesson }));
       fd.append('audio', wav, 'attempt.wav');
       r = await api('check', fd, true);
       state.lastCheck = { status: r.status, passed: r.passed, recognized: r.recognized, confidence: r.confidence, wavBytes: wav.size };
@@ -1174,6 +1253,8 @@ body.tabs-on .card{padding-top:8px}
     if (r) showCheck(card, r, speechMs);
     else if (err.code === 'speech_not_configured') say(card, 'warn', 'Ovozli tekshiruv hali ulanmagan. Birozdan keyin urinib koʻr.');
     else if (err.code === 'invalid_or_expired_init_data') say(card, 'warn', 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.');
+    else if (err.code === 'student_consent_missing') say(card, 'warn', 'Ota-ona roziligi belgilanmagan: oʻquvchi kartasida belgilang.');
+    else if (err.code === 'student_not_allowed') say(card, 'warn', 'Bu oʻquvchi sizning guruhingizda emas.');
     else if (err.code === 'consent_required') { state.consent = false; store.set(CONSENT_KEY, false); paint(card); welcome('consent'); go(state.welcomeEl); }
     else say(card, 'warn', `Tekshirib boʻlmadi (${err.message}). Yana urinib koʻr.`);
     renderDiag();
@@ -1265,6 +1346,366 @@ body.tabs-on .card{padding-top:8px}
     fetch(`${API}/mic-check`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData }, body: fd }).catch(() => {});
   }
 
+  // ---------- teacher mode ----------
+  // A teacher approved by the owner runs lessons on their own phone: their groups (lesson weekdays), students added by
+  // hand, the module of each week, and one student at a time going through the lesson's cards. The data lives in the
+  // function tez-aytish-teacher; the lesson's speech checks go to /check with the student's id.
+  const TEACHER_API = 'https://trxnsqpdekokqvtefxlt.supabase.co/functions/v1/tez-aytish-teacher';
+  const DAYS = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
+  const DAYS_SHORT = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
+  const MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+  const T_ERR = {
+    name_required: 'Guruh nomini yozing.', days_required: 'Kamida bitta dars kunini tanlang.', first_name_required: 'Oʻquvchining ismini yozing.',
+    bad_age: 'Yosh 3 dan 18 gacha boʻlsin.', not_a_teacher: 'Siz hali oʻqituvchi emassiz.', owner_only: 'Buni faqat egasi qila oladi.',
+    group_not_found: 'Guruh topilmadi.', student_not_found: 'Oʻquvchi topilmadi.', past_week: 'Oʻtgan hafta uchun modul tanlab boʻlmaydi.',
+    teacher_not_found: 'Oʻqituvchi topilmadi.', invalid_or_expired_init_data: 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.',
+  };
+  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, form: null, busy: false, msg: '' };
+  const myId = () => { try { return Number(tg.initDataUnsafe.user.id) || 0; } catch (e) { return 0; } };
+
+  async function tapi(action, body) {
+    if (mock) return mockTeacher(action, body || {});
+    const res = await fetch(`${TEACHER_API}/${action}`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData, 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.code = data.error || `http_${res.status}`; throw e; }
+    return data;
+  }
+  const tErr = (e) => T_ERR[e.code] || `Xato: ${e.message}`;
+  const dateShort = (key) => { const d = new Date(`${key}T00:00:00Z`); return `${d.getUTCDate()}-${MONTHS[d.getUTCMonth()]}`; };
+  const dayLabel = (key) => `${DAYS[(new Date(`${key}T00:00:00Z`).getUTCDay() || 7) - 1]}, ${dateShort(key)}`;
+  const daysLabel = (days) => (days || []).map((d) => DAYS[d - 1]).join(', ') || 'dars kunlari tanlanmagan';
+  const twText = (id) => { const t = state.twisters.find((x) => x.id === id); return t ? t.text : `№ ${id}`; };
+  const modTitle = (id) => { const m = ((teach.data && teach.data.modules) || []).find((x) => x.id === id); return m ? m.title : ''; };
+  const sname = (s) => `${s.firstName}${s.lastName ? ` ${s.lastName}` : ''}`;
+  const groupById = (id) => ((teach.data && teach.data.groups) || []).find((g) => g.id === id) || null;
+  const starSum = (s) => s.done.reduce((a, d) => a + (d.stars || 0), 0);
+  const finished = (g, s) => g.lesson.status === 'open' && s.done.length >= g.lesson.ids.length;
+  const topHtml = (title, back, right) => `<div class="t-top">${back ? `<button class="t-back" type="button" data-t="${back}" aria-label="Orqaga">${ICON.back}</button>` : ''}<h1 class="t-title">${esc(title)}</h1>${right || ''}</div>`;
+  const msgHtml = () => (teach.msg ? `<p class="t-msg">${esc(teach.msg)}</p>` : '');
+
+  async function loadTeach() {
+    teach.data = await tapi('state');
+    teach.role = teach.data.role || 'none';
+    return teach.data;
+  }
+  function showTeach(on) {
+    if (on) { stopVoice(); showTabs(false); }
+    $('teach').classList.toggle('hide', !on);
+    feed.classList.toggle('away', !!on);
+  }
+  function openView(view, extra) {
+    Object.assign(teach, extra || {}, { view });
+    teach.msg = '';
+    renderTeach();
+    $('teach').scrollTop = 0;
+  }
+  function renderTeach() {
+    const v = teach.view;
+    $('teachIn').innerHTML = !teach.data ? '<p class="empty">Yuklanmoqda…</p>' : v === 'group' ? groupHtml() : v === 'student' ? studentHtml()
+      : v === 'report' ? reportHtml() : v === 'gform' ? groupFormHtml() : v === 'sform' ? studentFormHtml() : homeHtml();
+  }
+  // Run a change, reload the teacher's data and go on; a refusal stays on the screen as a message.
+  async function teachAct(run, after) {
+    if (teach.busy) return;
+    teach.busy = true;
+    document.body.classList.add('t-busy');
+    try {
+      const r = await run();
+      await loadTeach();
+      teach.report = null;
+      if (after) after(r); else { teach.msg = ''; renderTeach(); }
+    } catch (e) { teach.msg = tErr(e); renderTeach(); } finally { teach.busy = false; document.body.classList.remove('t-busy'); }
+  }
+  // A step that is hard to undo needs a second tap within 4 seconds.
+  function armed(b, fn) {
+    if (b.dataset.armed) { delete b.dataset.armed; clearTimeout(Number(b.dataset.timer)); return fn(); }
+    b.dataset.armed = '1'; b.dataset.label = b.textContent; b.textContent = 'Tasdiqlash uchun yana bosing';
+    b.dataset.timer = String(setTimeout(() => { delete b.dataset.armed; b.textContent = b.dataset.label; }, 4000));
+  }
+
+  function homeHtml() {
+    const d = teach.data, owner = d.role === 'owner', name = userName();
+    let h = `<div class="t-head"><div class="bars sm" data-mood="happy">${BARS}</div><div><h1 class="t-title">${esc(name ? `Salom, ${name}!` : 'Salom!')}</h1>`
+      + `<p class="t-sub">${owner ? 'Egasi · barcha guruhlar' : 'Oʻqituvchi'}</p></div></div>${msgHtml()}`;
+    if (owner) h += teachersHtml(d.teachers || []);
+    const groups = d.groups || [];
+    h += '<p class="sect">Guruhlar</p>' + (groups.length ? groups.map(groupCardHtml).join('') : '<p class="empty">Hali guruh yoʻq. Birinchi guruhni yarating.</p>');
+    h += '<button class="pill primary t-wide" type="button" data-t="gnew">+ Yangi guruh</button>';
+    h += `<p class="t-foot">${owner ? '<button class="link" type="button" data-t="practice">Mashq rejimi</button>' : ''}<button class="link" type="button" data-t="sheet">Texnik maʼlumot</button></p>`;
+    return h;
+  }
+  function teachersHtml(list) {
+    const me = myId(), who = (t) => `${esc(t.name || 'Ismsiz')}${t.username ? ` <small>@${esc(t.username)}</small>` : ''}`;
+    const pending = list.filter((t) => t.status === 'pending'), active = list.filter((t) => t.status === 'active' && t.telegramId !== me);
+    let h = '';
+    if (pending.length) {
+      h += '<p class="sect">Oʻqituvchi boʻlish soʻrovlari</p>' + pending.map((t) => `<div class="t-row"><span class="t-name">${who(t)}</span>`
+        + `<button class="t-btn go" type="button" data-t="tapprove" data-id="${t.telegramId}">Tasdiqlash</button><button class="t-btn" type="button" data-t="treject" data-id="${t.telegramId}">Rad etish</button></div>`).join('');
+    }
+    if (active.length) {
+      h += '<p class="sect">Oʻqituvchilar</p>' + active.map((t) => `<div class="t-row"><span class="t-name">${who(t)}</span>`
+        + `<button class="t-btn" type="button" data-t="tremove" data-id="${t.telegramId}">Oʻchirish</button></div>`).join('');
+    }
+    return h;
+  }
+  function groupCardHtml(g) {
+    const l = g.lesson, done = g.students.filter((s) => finished(g, s)).length;
+    const line = l.status === 'open' ? `Dars ochiq · ${done}/${g.students.length} tugatdi` : l.status === 'no_module' ? 'Bu hafta uchun modul tanlanmagan'
+      : l.next ? `Keyingi dars: ${dayLabel(l.next)}` : 'Dars kunlari tanlanmagan';
+    return `<button class="mod" type="button" data-t="group" data-id="${esc(g.id)}"><span class="badge">${esc((g.name || '?').slice(0, 1).toUpperCase())}</span>`
+      + `<span class="mod-body"><span class="mt">${esc(g.name)}</span><span class="ms">${esc(daysLabel(g.days))}${g.teacherName && !g.mine ? ` · ${esc(g.teacherName)}` : ''}</span>`
+      + `<span class="ms t-line${l.status === 'no_module' ? ' warn' : ''}">${esc(line)}</span></span>${ICON.chev}</button>`;
+  }
+  function groupHtml() {
+    const g = groupById(teach.groupId);
+    if (!g) return homeHtml();
+    const l = g.lesson, mods = teach.data.modules || [];
+    let h = topHtml(g.name, 'home', `<button class="ico" type="button" data-t="gedit" aria-label="Guruhni tahrirlash">${ICON.edit}</button>`);
+    h += `<p class="t-sub">${esc(daysLabel(g.days))}${g.teacherName && !g.mine ? ` · ${esc(g.teacherName)}` : ''}</p>${msgHtml()}<div class="t-card">`;
+    if (l.status === 'open') {
+      h += `<p class="t-k">Dars ochiq · ${esc(dayLabel(l.key))}${l.early ? ' · oldinroq ochilgan' : ''}</p><p class="t-big">${esc(modTitle(l.moduleId))}</p>`
+        + `<ol class="t-list">${l.ids.map((id) => `<li>${esc(twText(id))}</li>`).join('')}</ol>`
+        + (l.homework.length ? `<p class="t-hw">Uyga: ${esc(l.homework.map(twText).join(' · '))}</p>` : '');
+    } else if (l.status === 'no_module') {
+      h += `<p class="t-k">${esc(dayLabel(l.key))}</p><p class="t-big warn">Bu hafta uchun modul tanlang</p><p class="t-sub">Modul tanlanmaguncha dars ochilmaydi.</p>`;
+    } else {
+      h += `<p class="t-k">Keyingi dars</p><p class="t-big">${l.next ? `${esc(dayLabel(l.next))}, 00:00` : 'Dars kunlarini tanlang'}</p>`;
+    }
+    if (l.next) h += `<button class="t-link" type="button" data-t="opennow">Keyingi darsni hozir ochish (${esc(dayLabel(l.next))})</button>`;
+    h += `</div><div class="t-weeks">${weekSelect('Bu hafta', g.weeks.thisStart, g.weeks.thisModule, mods)}${weekSelect('Keyingi hafta', g.weeks.nextStart, g.weeks.nextModule, mods)}</div>`;
+    h += `<p class="sect">Oʻquvchilar · ${g.students.length}</p>` + (g.students.length ? g.students.map((s) => studentRowHtml(g, s)).join('') : '<p class="empty">Hali oʻquvchi yoʻq.</p>');
+    h += '<button class="pill primary t-wide" type="button" data-t="snew">+ Oʻquvchi qoʻshish</button><button class="pill t-wide" type="button" data-t="report">Natijalar va hisobot</button>';
+    return h;
+  }
+  function weekSelect(label, ws, cur, mods) {
+    return `<label class="t-week"><span>${esc(label)} <small>${esc(dateShort(ws))}dan</small></span><select data-week="${esc(ws)}"><option value="">Tanlanmagan</option>`
+      + `${mods.map((m) => `<option value="${esc(m.id)}"${m.id === cur ? ' selected' : ''}>${esc(m.title)}</option>`).join('')}</select></label>`;
+  }
+  function studentRowHtml(g, s) {
+    const l = g.lesson, n = l.ids.length;
+    let right;
+    if (!s.consent) right = '<span class="t-chip warn">Rozilik yoʻq</span>';
+    else if (l.status !== 'open') right = '<span class="t-chip">—</span>';
+    else if (s.done.length >= n) right = `<span class="t-chip ok">✓ ${starSum(s)} ⭐</span>`;
+    else right = `<button class="t-start" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? `Davom ${s.done.length}/${n}` : 'Boshlash'}</button>`;
+    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${right}</div>`;
+  }
+  function studentHtml() {
+    const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === teach.studentId);
+    if (!s) return groupHtml();
+    const l = g.lesson, n = l.ids.length;
+    let h = topHtml(sname(s), 'group', `<button class="ico" type="button" data-t="sedit" aria-label="Oʻquvchini tahrirlash">${ICON.edit}</button>`);
+    h += `<p class="t-sub">${s.age ? `${s.age} yosh · ` : ''}${s.parentPhone ? `<a href="tel:${esc(s.parentPhone)}">${esc(s.parentPhone)}</a>` : 'telefon yozilmagan'}</p>`;
+    h += `<p class="t-sub">${s.consent ? '✓ Ota-onasi ovozli tekshiruvga rozi' : 'Ota-ona roziligi belgilanmagan: dars boshlanmaydi'}</p>${msgHtml()}`;
+    if (l.status === 'open') {
+      h += `<div class="t-card"><p class="t-k">Dars · ${esc(dayLabel(l.key))}</p>`
+        + (s.done.length >= n ? `<p class="t-big ok">Tugadi · ${starSum(s)} / ${n * 3} ⭐</p>` : `<p class="t-big">${s.done.length}/${n} tez aytish</p>`)
+        + (s.consent && s.done.length < n ? `<button class="pill primary t-wide" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? 'Darsni davom ettirish' : 'Darsni boshlash'}</button>` : '')
+        + '</div>';
+    }
+    const rep = teach.report && teach.report.groupId === g.id ? teach.report : null, r = rep && rep.students.find((x) => x.id === s.id);
+    return h + (r ? studentReportHtml(r) : '<p class="empty">Natijalar yuklanmoqda…</p>');
+  }
+  function studentReportHtml(r) {
+    const rows = r.weeks.filter((w) => w.lessons > 0 || w.stars > 0).reverse();
+    let h = '<p class="sect">Haftalar</p>' + (rows.length ? rows.map((w) => `<div class="t-wrow"><span>${esc(dateShort(w.start))}dan</span><span>${w.done}/${w.lessons} dars</span><b>${w.stars} / ${w.max} ⭐</b></div>`).join('')
+      : '<p class="t-sub">Hali dars boʻlmagan.</p>');
+    h += `<p class="sect">Qoldirgan darslari · ${r.missed.count}</p>${r.missed.dates.length ? `<p class="t-sub">${r.missed.dates.map((k) => esc(dayLabel(k))).join(' · ')}</p>` : ''}`;
+    h += '<p class="sect">Qiyin tovushlar</p>' + (r.sounds.length ? `<div>${r.sounds.map((x) => `<span class="chip">${esc(x.s)} · ${x.n}</span>`).join('')}</div>` : '<p class="t-sub">Hozircha xato yoʻq.</p>');
+    return h;
+  }
+  function reportHtml() {
+    const g = groupById(teach.groupId), rep = teach.report;
+    if (!g) return homeHtml();
+    let h = topHtml('Natijalar', 'group') + `<p class="t-sub">${esc(g.name)}</p>${msgHtml()}`;
+    if (!rep || rep.groupId !== g.id) return h + '<p class="empty">Yuklanmoqda…</p>';
+    const sm = rep.summary;
+    h += '<p class="sect">Bu hafta</p><div class="t-card">';
+    h += sm.lessons.length ? sm.lessons.map((x) => `<div class="t-wrow"><span>${esc(dayLabel(x.key))}</span><b>${x.finished}/${x.students} tugatdi</b></div>`).join('') : '<p class="t-sub">Bu hafta hali dars boʻlmagan.</p>';
+    if (sm.avgStars !== null) h += `<p class="t-sub">Oʻrtacha: ${String(sm.avgStars).replace('.', ',')} ⭐ har bir tez aytishga</p>`;
+    if (sm.hardest.length) h += `<p class="t-k" style="margin-top:12px">Eng qiyin tez aytishlar</p><ol class="t-list">${sm.hardest.map((x) => `<li>${esc(twText(x.id))} <small>${x.errors} xato</small></li>`).join('')}</ol>`;
+    h += '</div><p class="sect">Oʻquvchilar</p>';
+    const byId = new Map(g.students.map((s) => [s.id, s]));
+    h += rep.students.map((r) => {
+      const s = byId.get(r.id), w = r.weeks[r.weeks.length - 1];
+      return s ? `<button class="t-rep" type="button" data-t="student" data-id="${esc(r.id)}"><span class="t-name">${esc(sname(s))}</span>`
+        + `<span class="t-rs">Bu hafta: ${w.stars}/${w.max} ⭐ · qoldirgan: ${r.missed.count}${r.sounds.length ? ` · ${esc(r.sounds.map((x) => x.s).join(', '))}` : ''}</span></button>` : '';
+    }).join('');
+    return h;
+  }
+  function groupFormHtml() {
+    const g = teach.form && teach.form.id ? groupById(teach.form.id) : null, days = new Set(g ? g.days : []);
+    const me = myId(), teachers = teach.data.role === 'owner' ? (teach.data.teachers || []).filter((t) => t.status === 'active' && t.telegramId !== me) : [];
+    return topHtml(g ? 'Guruhni tahrirlash' : 'Yangi guruh', g ? 'group' : 'home') + `<form class="t-form" data-form="group">`
+      + `<label>Guruh nomi<input name="name" maxlength="60" required value="${g ? esc(g.name) : ''}" placeholder="Masalan: Shanba 10:00"></label>`
+      + `<p class="t-lab">Dars kunlari</p><div class="t-days">${DAYS_SHORT.map((d, i) => `<label class="t-day"><input type="checkbox" name="day" value="${i + 1}"${days.has(i + 1) ? ' checked' : ''}><span>${d}</span></label>`).join('')}</div>`
+      + (teachers.length ? `<label>Oʻqituvchi<select name="teacher"><option value="">Oʻzim</option>${teachers.map((t) => `<option value="${t.telegramId}"${g && g.teacherId === t.telegramId ? ' selected' : ''}>${esc(t.name || t.username || String(t.telegramId))}</option>`).join('')}</select></label>` : '')
+      + `${msgHtml()}<button class="pill primary t-wide" type="submit">Saqlash</button>`
+      + (g ? '<button class="pill t-wide" type="button" data-t="garchive">Guruhni oʻchirish</button>' : '') + '</form>';
+  }
+  function studentFormHtml() {
+    const g = groupById(teach.groupId), s = teach.form && teach.form.id && g ? g.students.find((x) => x.id === teach.form.id) : null;
+    const groups = teach.data.groups || [];
+    return topHtml(s ? 'Oʻquvchini tahrirlash' : 'Yangi oʻquvchi', s ? 'student' : 'group') + `<form class="t-form" data-form="student">`
+      + `<label>Ismi<input name="firstName" maxlength="40" required value="${s ? esc(s.firstName) : ''}"></label>`
+      + `<label>Familiyasi<input name="lastName" maxlength="40" value="${s ? esc(s.lastName) : ''}"></label>`
+      + `<label>Yoshi<input name="age" type="number" inputmode="numeric" min="3" max="18" value="${s && s.age ? s.age : ''}"></label>`
+      + `<label>Ota-onasining telefoni<input name="parentPhone" type="tel" inputmode="tel" maxlength="20" placeholder="+998" value="${s && s.parentPhone ? esc(s.parentPhone) : ''}"></label>`
+      + (groups.length > 1 ? `<label>Guruh<select name="groupId">${groups.map((x) => `<option value="${esc(x.id)}"${x.id === teach.groupId ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label>` : '')
+      + `<label class="t-check"><input type="checkbox" name="consent"${s && s.consent ? ' checked' : ''}><span>Ota-onasi bolaning ovozi tekshirish uchun VoiceLab xizmatiga yuborilishiga rozi (yozuv u yerda darhol oʻchiriladi)</span></label>`
+      + `${msgHtml()}<button class="pill primary t-wide" type="submit">Saqlash</button>`
+      + (s ? '<button class="pill t-wide" type="button" data-t="sremove">Oʻquvchini oʻchirish</button>' : '') + '</form>';
+  }
+  async function ensureReport(force) {
+    const gid = teach.groupId;
+    if (!gid || (!force && teach.report && teach.report.groupId === gid)) return;
+    try { teach.report = await tapi('report', { groupId: gid }); } catch (e) { teach.msg = tErr(e); }
+    if (teach.groupId === gid && (teach.view === 'report' || teach.view === 'student')) renderTeach();
+  }
+
+  // A student's lesson runs in the Reels feed: the lesson's cards the student has not done yet, then back to the group.
+  function startLesson(groupId, studentId) {
+    const g = groupById(groupId), s = g && g.students.find((x) => x.id === studentId);
+    if (!g || !s || g.lesson.status !== 'open') return;
+    if (!s.consent) { teach.msg = 'Avval ota-ona roziligini belgilang.'; return renderTeach(); }
+    const doneIds = new Set(s.done.map((d) => d.id)), at = new Map(state.twisters.map((t, i) => [t.id, i]));
+    const list = g.lesson.ids.filter((id) => !doneIds.has(id) && at.has(id)).map((id) => at.get(id));
+    if (!list.length) { teach.msg = 'Bu oʻquvchi darsni tugatgan.'; return renderTeach(); }
+    state.lesson = { groupId, studentId, key: g.lesson.key, name: sname(s) };
+    state.sttReady = !!teach.data.sttReady;
+    newSession(list, { id: 'lesson', title: sname(s) });
+    showTeach(false);
+    state.welcomeEl.classList.add('hide');
+    begin();
+  }
+  function clearFeed() {
+    stopVoice();
+    clearTimeout(state.nextTimer);
+    for (const c of state.cards) if (c.el) { io.unobserve(c.el); c.el.remove(); }
+    if (state.summaryEl) { io.unobserve(state.summaryEl); state.summaryEl.remove(); state.summaryEl = null; }
+    state.cards = []; state.mod = null;
+  }
+  async function enterTeach() {
+    if (state.recording || state.busy) return;
+    const back = state.lesson ? 'group' : 'home';
+    clearFeed();
+    state.lesson = null;
+    state.welcomeEl.classList.add('hide');
+    showTeach(true);
+    teach.report = null;
+    openView(back);
+    try { await loadTeach(); renderTeach(); } catch (e) { teach.msg = tErr(e); renderTeach(); }
+  }
+  function enterPractice() {
+    showTeach(false);
+    state.welcomeEl.classList.remove('hide');
+    state.sttReady = state.sessionStt;
+    if (!state.cards.length) newSession(dailyList(state.progress.idx));
+    welcome('ready');
+    go(state.welcomeEl, true);
+  }
+  // The welcome card's last link: «Oʻqituvchilar uchun» asks to become a teacher, «Oʻqituvchi rejimi» goes back to it.
+  function setTeachLink() {
+    const b = state.welcomeEl && state.welcomeEl.querySelector('[data-r="tmode"]');
+    if (!b) return;
+    b.textContent = teach.role === 'owner' || teach.role === 'teacher' ? 'Oʻqituvchi rejimi' : 'Oʻqituvchilar uchun';
+    b.classList.toggle('hide', !inTelegram && !mock);
+  }
+  async function teachRequest() {
+    if (teach.role === 'owner' || teach.role === 'teacher') return enterTeach();
+    try {
+      const r = await tapi('request');
+      welcome('info', r.status === 'removed' ? 'Oʻqituvchi huquqingiz oʻchirilgan. Egasiga murojaat qiling.'
+        : r.status === 'active' ? 'Siz oʻqituvchisiz: Mini Appʼni yopib, qayta oching.'
+          : 'Soʻrov yuborildi. Egasi tasdiqlagach, Mini Appʼni qayta oching: oʻqituvchi rejimi ochiladi.');
+    } catch (e) { welcome('info', tErr(e)); }
+  }
+
+  // Local preview only: an in-memory teacher back end (?mock=1&role=owner|teacher|none).
+  const MOCKT = { role: query.get('role') || 'owner', teachers: [{ telegramId: 77, name: 'Feruza', username: 'feruza', status: 'pending' }], groups: [], results: [], early: [], weeks: {} };
+  const tday = (ms) => new Date(ms + 5 * 3600e3).toISOString().slice(0, 10);
+  const addD = (key, n) => { const d = new Date(`${key}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const wdOf = (key) => new Date(`${key}T00:00:00Z`).getUTCDay() || 7;
+  const wsOf = (key) => addD(key, 1 - wdOf(key));
+  if (mock && MOCKT.role !== 'none') {
+    const today = tday(Date.now());
+    MOCKT.groups.push({ id: 'g1', name: 'Shanba guruhi', days: [wdOf(today)], created: addD(today, -30), students: [
+      { id: 's1', firstName: 'Ali', lastName: 'Valiyev', age: 9, parentPhone: '+998901234567', consent: true, active: true },
+      { id: 's2', firstName: 'Madina', lastName: '', age: 8, parentPhone: null, consent: false, active: true }] });
+    MOCKT.weeks[`g1|${wsOf(today)}`] = 'g';
+  }
+  function mockFail(code) { const e = new Error(code); e.code = code; throw e; }
+  function mockLesson(g, today) {
+    const after = (from) => { for (let i = 1; i <= 7; i++) { const k = addD(from, i); if (g.days.includes(wdOf(k))) return k; } return null; };
+    let key = null;
+    for (let i = 0; i < 7 && !key; i++) { const k = addD(today, -i); if (g.days.includes(wdOf(k))) key = k; }
+    let next = after(today), early = false;
+    if (next && MOCKT.early.includes(`${g.id}|${next}`)) { key = next; next = after(key); early = true; }
+    if (key && !early && key < g.created) key = null;
+    const mid = key ? MOCKT.weeks[`${g.id}|${wsOf(key)}`] : null, m = MODULES.find((x) => x.id === mid);
+    return { key, early, status: !key ? 'none' : m ? 'open' : 'no_module', moduleId: m ? mid : null, ids: m ? m.ids.slice(0, 4) : [], homework: m ? m.ids.slice(4) : [],
+      next, nextOpensAt: null, nextModuleId: next ? MOCKT.weeks[`${g.id}|${wsOf(next)}`] || null : null };
+  }
+  function mockTeacher(action, b) {
+    return new Promise((resolve, reject) => setTimeout(() => { try { resolve(mockTeacherNow(action, b)); } catch (e) { reject(e); } }, 120));
+  }
+  function mockTeacherNow(action, b) {
+    const today = tday(Date.now()), staff = MOCKT.role !== 'none', ws = wsOf(today);
+    const findG = (id) => { const g = MOCKT.groups.find((x) => x.id === id && !x.archived); if (!g) mockFail('group_not_found'); return g; };
+    const result = (s, key, id) => MOCKT.results.find((r) => r.studentId === s.id && r.key === key && r.id === id);
+    if (action === 'state') {
+      const base = { ok: true, role: MOCKT.role, status: staff ? 'active' : null, name: 'Mock', sttReady: true, today, classSize: 4, modules: MODULES.map((m) => ({ id: m.id, title: m.title, badge: m.badge, ids: m.ids })) };
+      if (!staff) return base;
+      return { ...base, teachers: MOCKT.role === 'owner' ? MOCKT.teachers : null, groups: MOCKT.groups.filter((g) => !g.archived).map((g) => {
+        const l = mockLesson(g, today);
+        return { id: g.id, name: g.name, days: g.days, teacherId: 1, teacherName: null, mine: true, lesson: l,
+          weeks: { thisStart: ws, thisModule: MOCKT.weeks[`${g.id}|${ws}`] || null, nextStart: addD(ws, 7), nextModule: MOCKT.weeks[`${g.id}|${addD(ws, 7)}`] || null },
+          students: g.students.filter((s) => s.active).map((s) => ({ ...s, done: l.key ? l.ids.filter((id) => result(s, l.key, id)).map((id) => ({ id, stars: result(s, l.key, id).stars })) : [] })) };
+      }) };
+    }
+    if (action === 'request') return { ok: true, status: 'pending' };
+    if (!staff) mockFail('not_a_teacher');
+    if (action === 'teacher') { const t = MOCKT.teachers.find((x) => x.telegramId === b.telegramId); if (!t) mockFail('teacher_not_found'); t.status = b.status; return { ok: true }; }
+    if (action === 'group') {
+      if (b.id && b.archive) { findG(b.id).archived = true; return { ok: true, id: b.id, archived: true }; }
+      const name = String(b.name || '').trim(), days = [...new Set((b.days || []).map(Number).filter((d) => d >= 1 && d <= 7))].sort();
+      if (!name) mockFail('name_required');
+      if (!days.length) mockFail('days_required');
+      if (b.id) { const g = findG(b.id); Object.assign(g, { name, days }); return { ok: true, id: g.id }; }
+      const g = { id: `g${Date.now()}`, name, days, created: today, students: [] };
+      MOCKT.groups.push(g);
+      return { ok: true, id: g.id };
+    }
+    if (action === 'week') { findG(b.groupId); if (b.moduleId) MOCKT.weeks[`${b.groupId}|${b.weekStart}`] = b.moduleId; else delete MOCKT.weeks[`${b.groupId}|${b.weekStart}`]; return { ok: true }; }
+    if (action === 'open') { const l = mockLesson(findG(b.groupId), today); if (!l.next) mockFail('days_required'); MOCKT.early.push(`${b.groupId}|${l.next}`); return { ok: true, lessonDate: l.next }; }
+    if (action === 'student') {
+      const all = MOCKT.groups.flatMap((g) => g.students);
+      if (b.id && b.remove) { all.find((s) => s.id === b.id).active = false; return { ok: true, id: b.id, removed: true }; }
+      const firstName = String(b.firstName || '').trim();
+      if (!firstName) mockFail('first_name_required');
+      if (b.age !== null && b.age !== undefined && (b.age < 3 || b.age > 18)) mockFail('bad_age');
+      const g = findG(b.groupId);
+      const row = { firstName, lastName: String(b.lastName || '').trim(), age: b.age || null, parentPhone: String(b.parentPhone || '').replace(/[^\d+]/g, '') || null, consent: b.consent === true };
+      if (b.id) { const s = all.find((x) => x.id === b.id); MOCKT.groups.forEach((x) => { x.students = x.students.filter((y) => y !== s); }); Object.assign(s, row); g.students.push(s); return { ok: true, id: s.id }; }
+      const s = { id: `s${Date.now()}`, active: true, ...row };
+      g.students.push(s);
+      return { ok: true, id: s.id };
+    }
+    if (action === 'report') {
+      const g = findG(b.groupId), weeks = Array.from({ length: 6 }, (_, i) => addD(ws, -7 * (5 - i)));
+      const rs = MOCKT.results.filter((r) => g.students.some((s) => s.id === r.studentId));
+      return { ok: true, groupId: g.id, today, current: mockLesson(g, today).key, weeks,
+        students: g.students.filter((s) => s.active).map((s) => {
+          const mine = rs.filter((r) => r.studentId === s.id);
+          return { id: s.id, missed: { count: 0, dates: [] }, sounds: mine.some((r) => r.stars === 0) ? [{ s: 'gʻ', n: 2 }] : [],
+            weeks: weeks.map((w) => { const inW = mine.filter((r) => wsOf(r.key) === w); return { start: w, stars: inW.reduce((a, r) => a + r.stars, 0), max: w === ws ? 12 : 0, lessons: w === ws ? 1 : 0, done: new Set(inW.map((r) => r.key)).size }; }) };
+        }),
+        summary: { weekStart: ws, lessons: [...new Set(rs.map((r) => r.key))].map((k) => ({ key: k, finished: 0, started: 1, students: g.students.length })),
+          avgStars: rs.length ? Math.round((rs.reduce((a, r) => a + r.stars, 0) / rs.length) * 10) / 10 : null, hardest: [] } };
+    }
+    return mockFail('not_found');
+  }
+
   // ---------- start ----------
   async function init() {
     buildWelcome();
@@ -1272,9 +1713,12 @@ body.tabs-on .card{padding-top:8px}
     renderDiag();
     if (!inTelegram && !mock) return welcome('info', 'Bu trenajyor Telegram ichida ishlaydi. Uni botdagi tugma orqali och.');
     try {
-      const s = await api('session');
+      // Who is asking in teacher mode comes from tez-aytish-teacher; if that fails, the page works as before.
+      const [s, t] = await Promise.all([api('session'), tapi('state').catch((e) => { state.teachError = e.message; return null; })]);
       state.isAdmin = !!s.isAdmin; state.sttReady = !!(s.sttReady ?? s.speechReady); state.provider = s.sttProvider || '';
+      state.sessionStt = state.sttReady;
       state.twisters = Array.isArray(s.twisters) ? s.twisters : [];
+      if (t) { teach.data = t; teach.role = t.role || 'none'; }
       state.server = 'ok';
     } catch (e) {
       state.server = `xato: ${e.message}`;
@@ -1283,6 +1727,17 @@ body.tabs-on .card{padding-top:8px}
     }
     document.body.classList.toggle('is-admin', state.isAdmin);
     $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
+    setTeachLink();
+    // A teacher (or the owner) starts in teacher mode: groups, students and the lessons.
+    if (teach.role === 'owner' || teach.role === 'teacher') {
+      if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
+      if (state.isAdmin) fillPicker();
+      state.welcomeEl.classList.add('hide');
+      showTeach(true);
+      openView('home');
+      renderDiag();
+      return;
+    }
     // While the trainer is closed for children they get a friendly 'coming soon' instead of a mic that cannot check.
     if (!state.sttReady && !state.isAdmin) return welcome('soon');
     if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
@@ -1304,6 +1759,8 @@ body.tabs-on .card{padding-top:8px}
     if (act === 'sheet') return openSheet();
     if (state.recording) { if (act === 'mic') stop('manual'); return; }
     if (state.busy) return;
+    if (act === 'tmode') return teachRequest();
+    if (act === 'toteach') return enterTeach();
     if (act === 'begin') return begin();
     if (act === 'consent') return acceptConsent();
     if (act === 'reload') return location.reload();
@@ -1328,6 +1785,49 @@ body.tabs-on .card{padding-top:8px}
     if (dy > -60 || !card || card.done || state.recording || state.busy) return;
     if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2) nudge(card);
   }, { passive: true });
+  // Teacher mode: taps, the forms and the module of a week.
+  $('teach').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-t]');
+    if (!b || b.disabled || teach.busy) return;
+    ensureContext();
+    const a = b.dataset.t, id = b.dataset.id;
+    if (a === 'home') return openView('home');
+    if (a === 'group') return openView('group', { groupId: id || teach.groupId });
+    if (a === 'student') { openView('student', { studentId: id || teach.studentId }); return ensureReport(); }
+    if (a === 'report') { openView('report'); return ensureReport(true); }
+    if (a === 'gnew') return openView('gform', { form: {} });
+    if (a === 'gedit') return openView('gform', { form: { id: teach.groupId } });
+    if (a === 'snew') return openView('sform', { form: {} });
+    if (a === 'sedit') return openView('sform', { form: { id: teach.studentId } });
+    if (a === 'garchive') return armed(b, () => teachAct(() => tapi('group', { id: teach.form.id, archive: true }), () => openView('home')));
+    if (a === 'sremove') return armed(b, () => teachAct(() => tapi('student', { id: teach.form.id, remove: true }), () => openView('group')));
+    if (a === 'opennow') return armed(b, () => teachAct(() => tapi('open', { groupId: teach.groupId })));
+    if (a === 'tapprove' || a === 'treject' || a === 'tremove') return teachAct(() => tapi('teacher', { telegramId: Number(id), status: a === 'tapprove' ? 'active' : 'removed' }));
+    if (a === 'lesson') return startLesson(teach.groupId, id);
+    if (a === 'practice') return enterPractice();
+    if (a === 'sheet') return openSheet();
+  });
+  $('teach').addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-week]');
+    if (sel) teachAct(() => tapi('week', { groupId: teach.groupId, weekStart: sel.dataset.week, moduleId: sel.value || null }));
+  });
+  $('teach').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = e.target, fd = new FormData(f), editing = teach.form && teach.form.id;
+    if (f.dataset.form === 'group') {
+      const body = { name: String(fd.get('name') || ''), days: fd.getAll('day').map(Number) };
+      if (editing) body.id = teach.form.id;
+      if (fd.get('teacher')) body.teacherId = Number(fd.get('teacher'));
+      return teachAct(() => tapi('group', body), (r) => openView('group', { groupId: r.id }));
+    }
+    if (f.dataset.form === 'student') {
+      const age = String(fd.get('age') || '').trim();
+      const body = { firstName: String(fd.get('firstName') || ''), lastName: String(fd.get('lastName') || ''), age: age ? Number(age) : null,
+        parentPhone: String(fd.get('parentPhone') || ''), consent: fd.get('consent') === 'on', groupId: String(fd.get('groupId') || teach.groupId) };
+      if (editing) body.id = teach.form.id;
+      return teachAct(() => tapi('student', body), (r) => openView(editing ? 'student' : 'group', { groupId: body.groupId, studentId: r.id }));
+    }
+  });
   $('tabReels').addEventListener('click', () => setView('reels'));
   $('tabMods').addEventListener('click', () => setView('mods'));
   $('modList').addEventListener('click', (e) => {
@@ -1369,7 +1869,7 @@ body.tabs-on .card{padding-top:8px}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach }; // local preview tests only
   init();
 })();
 </script>
