@@ -254,11 +254,12 @@ body.tabs-on .card{padding-top:8px}
   // One sample recording per tongue twister at a normal tempo; the player slows it down for the warm-ups.
   const RATE = { sekin: 0.7, orta: 0.85, tez: 1 }, SLOW_RATE = 0.55;
   const TYPES = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/mp4;codecs=mp4a.40.2', 'audio/aac', 'audio/ogg;codecs=opus', 'audio/webm'];
-  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, MAX_ATTEMPTS = 3, SESSION_SIZE = 5;
+  // One voice check per tongue twister; after it the feed moves to the next card by itself after AUTO_NEXT_MS.
+  const MAX_MS = 15000, SILENCE_STOP_MS = 1300, NO_SPEECH_MS = 6000, SESSION_SIZE = 5, AUTO_NEXT_MS = 2600;
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v9';
+  const PAGE_VERSION = 'v10';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -438,7 +439,7 @@ body.tabs-on .card{padding-top:8px}
   async function mockApi(path) {
     await new Promise((r) => setTimeout(r, 300));
     if (path === 'session') {
-      const list = [[6, 2, 'Gʻani gʻildirakni gʻizillatib gʻiltiratdi.'], [1, 1, 'Togʻdan tosh tushdi.'], [4, 1, 'Raʼno rasmlariga rang-barang rang tanladi.'],
+      const list = [[6, 2, 'Gʻani gʻildirakni gʻizillatib gʻildiratdi.'], [1, 1, 'Togʻdan tosh tushdi.'], [4, 1, 'Raʼno rasmlariga rang-barang rang tanladi.'],
         [10, 2, 'Oq choynakka koʻk qopqoq, koʻk choynakka oq qopqoq.'], [13, 3, 'Bahodir bayroqni Botirga berdimi, Botir Bahodirga bayroqni berdimi?'],
         [12, 3, 'Shokir shifokorlarning shart-sharoitini shoshilmasdan sharhladi.'], [3, 1, 'Qora-qura qoʻzilar qirda quvonib oʻtlar.'],
         [2, 1, 'Soat soatiga soatlab qaradi.'], [5, 1, 'Kitob kitobxonlarga kerak, kitobxonlarga kitob kerak.'],
@@ -505,7 +506,6 @@ body.tabs-on .card{padding-top:8px}
           <button class="mic" type="button" data-act="mic" data-r="mic" aria-label="Gapirish">${ICON.mic}${ICON.stop}${ICON.dots}</button>
         </div>
         <button class="pill primary" type="button" data-act="next" data-r="next">Keyingisi</button>
-        <button class="pill small" type="button" data-act="retry" data-r="retry">Yaxshilash</button>
       </div>
       <p class="foot" data-r="foot"></p>`;
     card.el = el;
@@ -567,11 +567,9 @@ body.tabs-on .card{padding-top:8px}
     part(card, 'said').classList.toggle('hide', !run || tez);
     part(card, 'micbox').classList.toggle('hide', !tez);
     part(card, 'mic').disabled = !state.sttReady;
-    const next = part(card, 'next'), retry = part(card, 'retry');
+    const next = part(card, 'next');
     next.classList.toggle('hide', run);
     next.textContent = last ? 'Natijalar' : 'Keyingisi';
-    retry.classList.toggle('hide', run || card.stars >= 3 || !state.sttReady);
-    retry.textContent = card.stars ? 'Yaxshilash' : 'Yana urinish';
 
     const foot = part(card, 'foot');
     foot.className = run ? 'foot' : 'foot up';
@@ -687,6 +685,7 @@ body.tabs-on .card{padding-top:8px}
   // the swipe forward locked until the child has spoken.
   function newSession(list, mod) {
     stopVoice();
+    clearTimeout(state.nextTimer);
     for (const c of state.cards) if (c.el) { io.unobserve(c.el); c.el.remove(); }
     if (state.summaryEl) { io.unobserve(state.summaryEl); state.summaryEl.remove(); state.summaryEl = null; }
     state.mod = mod || null;
@@ -747,11 +746,13 @@ body.tabs-on .card{padding-top:8px}
     const next = state.cards[card.n + 1];
     go(next && next.el ? next.el : state.summaryEl);
   }
-  // A finished card with fewer than three stars can be tried again to earn more.
-  function improve(card) {
-    if (running(card) || !state.sttReady) return;
-    card.again = true; card.stage = 'tez'; card.attempt = 1; card.result = null; card.msg = null;
-    paint(card);
+  // After its one check a card moves on by itself, once the child has had a moment to see the result. Nothing
+  // happens if the child has already swiped away, opened the modules or started something else.
+  function autoNext(card) {
+    clearTimeout(state.nextTimer);
+    state.nextTimer = setTimeout(() => {
+      if (state.view === 'reels' && state.activeEl === card.el && !state.recording && !state.busy) goNext(card);
+    }, AUTO_NEXT_MS);
   }
   function restart() {
     if (state.mod) newSession(state.mod.list, state.mod); else newSession(dailyList(state.progress.idx));
@@ -1178,35 +1179,32 @@ body.tabs-on .card{padding-top:8px}
     renderDiag();
   }
 
-  // The result is shown in the tongue twister itself: right words turn green, a slip gets a soft yellow marker
-  // with what was heard below it. Stars: first try 3, second 2, third 1.
+  // One check per tongue twister. The result is shown in the tongue twister itself (right words turn green, a slip
+  // gets a soft yellow marker with what was heard below it), then the feed moves on by itself. Stars: every word
+  // right in time 3, right with a word only nearly right 2, right but slower than the target 1, otherwise none and
+  // the tongue twister comes back later. Unclear audio or a failed request does not use up the check.
   function showCheck(card, r, speechMs) {
     if (r.status && r.status !== 'Success') { haptic('warning'); return say(card, 'warn', 'Ovozing aniq eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.'); }
     card.result = Array.isArray(r.words) ? r.words : [];
     for (const w of card.result) if (w.v === 'wrong' || w.v === 'missing') card.hard.add(w.d || w.t);
     const target = targetSeconds(card);
+    const near = card.result.some((w) => w.v === 'near');
     const tooSlow = !!r.passed && speechMs / 1000 > target;
-    if (r.passed && !tooSlow) {
-      const stars = Math.max(1, MAX_ATTEMPTS + 1 - card.attempt);
-      const near = card.result.some((w) => w.v === 'near');
-      complete(card, stars);
-      say(card, 'ok', near ? 'Toʻgʻri! Tagiga chizilgan soʻzni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.');
+    const stars = !r.passed ? 0 : tooSlow ? 1 : near ? 2 : 3;
+    complete(card, stars, !stars);
+    if (stars) {
+      say(card, 'ok', tooSlow ? `Soʻzlar toʻgʻri! Keyingi safar tezroq ayt: ${fmt(speechMs / 1000)} s, maqsad ${fmt(target)} s.`
+        : near ? 'Toʻgʻri! Tagiga chizilgan soʻzni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.');
       mood(card, 'happy', 2600);
       sfx('win', stars);
       haptic('success');
-      return;
+    } else {
+      say(card, 'warn', 'Sariq soʻzlarga eʼtibor ber. Bu tez aytishga keyinroq qaytamiz.');
+      mood(card, 'wink', 2600);
+      sfx('soft');
+      haptic('warning');
     }
-    card.attempt += 1;
-    const left = MAX_ATTEMPTS + 1 - card.attempt;
-    mood(card, 'wink', 2600);
-    sfx('soft');
-    haptic('warning');
-    if (left <= 0) {
-      if (card.again) { card.again = false; return say(card, 'warn', 'Hozircha shu natija qoladi. Keyinroq yana urinib koʻr.'); }
-      complete(card, 0, true);
-      return say(card, 'warn', 'Bu tez aytishga keyinroq qaytamiz. Keyingisiga oʻt!');
-    }
-    say(card, 'warn', tooSlow ? `Soʻzlar toʻgʻri! Endi tezroq ayt: ${fmt(speechMs / 1000)} s, maqsad ${fmt(target)} s.` : `Deyarli! Sariq soʻzlarga eʼtibor ber. Yana ${left} ta urinish bor.`);
+    autoNext(card);
   }
 
   // ---------- sheet, diagnostics ----------
@@ -1317,8 +1315,7 @@ body.tabs-on .card{padding-top:8px}
     if (act === 'stage') return jumpStage(card, b.dataset.stage);
     if (act === 'said') return said(card);
     if (act === 'mic') return start(card);
-    if (act === 'next') return goNext(card);
-    if (act === 'retry') return improve(card);
+    if (act === 'next') { clearTimeout(state.nextTimer); return goNext(card); }
   });
   // A swipe up on a card that is not finished yet cannot go anywhere: nudge the hint instead.
   let touchY = null;
