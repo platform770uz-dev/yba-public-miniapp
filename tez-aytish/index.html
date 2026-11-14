@@ -248,6 +248,12 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
 .t-wrow span:first-child{flex:1}
 .t-rep{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
 .t-rs{font-size:13px;font-weight:600;color:var(--sub)}
+.t-keldi{flex:none;min-height:36px;padding:0 10px;border-radius:18px;border:1.5px solid var(--line);background:var(--bg);font-size:13px;font-weight:800;color:var(--sub)}
+.t-keldi.on{background:#e6f4ea;border-color:#e6f4ea;color:var(--ok)}
+.t-url{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:14px;font-weight:700;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
+.t-btns{display:flex;gap:8px;margin-top:10px}
+.t-btns .pill{flex:1;width:auto;min-height:44px;padding:0 12px;font-size:14px}
+.t-card .t-btn,.t-btns .pill:not(.primary){background:var(--bg)}
 .t-ok{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:#e6f4ea;color:var(--ok);font-size:14px;font-weight:700}
 .t-who{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 0}
 .t-who b,.t-who small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -321,7 +327,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v13';
+  const PAGE_VERSION = 'v14';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -749,9 +755,11 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
           <p class="lead">${state.cards.length} ta tez aytishda ${got} ta yulduz.</p>
           <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
           ${hard.length ? `<div class="hard"><p>Yana mashq qilish uchun soʻzlar</p>${hard.map((w) => `<span class="chip">${esc(w)}</span>`).join('')}</div>` : ''}
+          <p class="lead" data-r="fam"></p>
         </div>
         <div class="act"><button class="pill primary" type="button" data-act="toteach">Guruhga qaytish</button></div>
         <p class="foot"></p>`;
+      sendLessonResult(el);
       return;
     }
     el.innerHTML = `${metaHtml('<span class="brand">Natijalar</span>')}
@@ -1396,7 +1404,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     teacher_not_found: 'Oʻqituvchi topilmadi.', invalid_or_expired_init_data: 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.',
     timeout: 'Server javob bermadi. Internetni tekshirib, qayta urinib koʻring.',
   };
-  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, form: null, busy: false, msg: '', notice: '', approveId: null };
+  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, link: null, form: null, busy: false, msg: '', notice: '', approveId: null };
   const myId = () => { try { return Number(tg.initDataUnsafe.user.id) || 0; } catch (e) { return 0; } };
 
   async function tapi(action, body) {
@@ -1513,7 +1521,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     if (!g) return homeHtml();
     const l = g.lesson, mods = teach.data.modules || [];
     let h = topHtml(g.name, 'home', `<button class="ico" type="button" data-t="gedit" aria-label="Guruhni tahrirlash">${ICON.edit}</button>`);
-    h += `<p class="t-sub">${esc(daysLabel(g.days))}${g.teacherName && !g.mine ? ` · ${esc(g.teacherName)}` : ''}</p>${msgHtml()}<div class="t-card">`;
+    h += `<p class="t-sub">${esc(daysLabel(g.days))}${g.teacherName && !g.mine ? ` · ${esc(g.teacherName)}` : ''}</p>${msgHtml()}${noticeHtml()}<div class="t-card">`;
     if (l.status === 'open') {
       h += `<p class="t-k">Dars ochiq · ${esc(dayLabel(l.key))}${l.early ? ' · oldinroq ochilgan' : ''}</p><p class="t-big">${esc(modTitle(l.moduleId))}</p>`
         + `<ol class="t-list">${l.ids.map((id) => `<li>${esc(twText(id))}</li>`).join('')}</ol>`
@@ -1540,7 +1548,9 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     else if (l.status !== 'open') right = '<span class="t-chip">—</span>';
     else if (s.done.length >= n) right = `<span class="t-chip ok">✓ ${starSum(s)} ⭐</span>`;
     else right = `<button class="t-start" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? `Davom ${s.done.length}/${n}` : 'Boshlash'}</button>`;
-    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${right}</div>`;
+    // «Keldi» for today's lesson: the family hears it at once through @kidscast_bot.
+    const keldi = l.key ? `<button class="t-keldi${s.attended ? ' on' : ''}" type="button" data-t="attend" data-id="${esc(s.id)}" aria-pressed="${s.attended ? 'true' : 'false'}">${s.attended ? '✓ Keldi' : 'Keldi'}</button>` : '';
+    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${keldi}${right}</div>`;
   }
   function studentHtml() {
     const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === teach.studentId);
@@ -1548,15 +1558,66 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     const l = g.lesson, n = l.ids.length;
     let h = topHtml(sname(s), 'group', `<button class="ico" type="button" data-t="sedit" aria-label="Oʻquvchini tahrirlash">${ICON.edit}</button>`);
     h += `<p class="t-sub">${s.age ? `${s.age} yosh · ` : ''}${s.parentPhone ? `<a href="tel:${esc(s.parentPhone)}">${esc(s.parentPhone)}</a>` : 'telefon yozilmagan'}</p>`;
-    h += `<p class="t-sub">${s.consent ? '✓ Ota-onasi ovozli tekshiruvga rozi' : 'Ota-ona roziligi belgilanmagan: dars boshlanmaydi'}</p>${msgHtml()}`;
+    h += `<p class="t-sub">${s.consent ? '✓ Ota-onasi ovozli tekshiruvga rozi' : 'Ota-ona roziligi belgilanmagan: dars boshlanmaydi'}</p>${msgHtml()}${noticeHtml()}`;
     if (l.status === 'open') {
-      h += `<div class="t-card"><p class="t-k">Dars · ${esc(dayLabel(l.key))}</p>`
+      h += `<div class="t-card"><p class="t-k">Dars · ${esc(dayLabel(l.key))}${s.attended ? ' · ✓ keldi' : ''}</p>`
         + (s.done.length >= n ? `<p class="t-big ok">Tugadi · ${starSum(s)} / ${n * 3} ⭐</p>` : `<p class="t-big">${s.done.length}/${n} tez aytish</p>`)
         + (s.consent && s.done.length < n ? `<button class="pill primary t-wide" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? 'Darsni davom ettirish' : 'Darsni boshlash'}</button>` : '')
         + '</div>';
     }
+    h += familyHtml(s);
     const rep = teach.report && teach.report.groupId === g.id ? teach.report : null, r = rep && rep.students.find((x) => x.id === s.id);
     return h + (r ? studentReportHtml(r) : '<p class="empty">Natijalar yuklanmoqda…</p>');
+  }
+  // The family bot @kidscast_bot: the student's personal link (send in Telegram, copy, replace) and who is linked.
+  function familyHtml(s) {
+    const k = teach.link && teach.link.studentId === s.id ? teach.link : null;
+    const h = '<p class="sect">Ota-ona boti</p><div class="t-card">';
+    if (!k) return `${h}<p class="t-sub">Yuklanmoqda…</p></div>`;
+    const who = k.family.length
+      ? k.family.map((f) => `<div class="t-row"><span class="t-who"><b>${esc(f.name || 'Ismsiz')}</b><small>${f.username ? `@${esc(f.username)} · ` : ''}${f.ack ? 'tushunarli ✓' : 'hali tasdiqlamagan'}</small></span>`
+        + `<button class="t-btn" type="button" data-t="lunlink" data-id="${f.telegramId}">Uzish</button></div>`).join('')
+      : '<p class="t-sub" style="margin-top:10px">Hali hech kim ulanmagan.</p>';
+    return `${h}<p class="t-sub">Shu havolani ota-onaga yuboring. Ochishganda farzand darsga kelgani, dars natijasi va uyga vazifa @kidscast_bot orqali keladi.</p>`
+      + `<p class="t-url">${esc(k.url)}</p><div class="t-btns"><button class="pill primary" type="button" data-t="lshare">Yuborish</button><button class="pill" type="button" data-t="lcopy">Nusxa olish</button></div>`
+      + `${who}<button class="t-link" type="button" data-t="lrotate">Yangi havola (eskisi ishlamay qoladi)</button>`
+      + (k.botReady ? '' : '<p class="t-sub">Bot hali sozlanmagan: xabarlar keyinroq ketadi.</p>') + '</div>';
+  }
+  async function ensureLink(force) {
+    const sid = teach.studentId;
+    if (!sid || (!force && teach.link && teach.link.studentId === sid)) return;
+    try { teach.link = await tapi('link', { studentId: sid }); } catch (e) { teach.msg = tErr(e); }
+    if (teach.studentId === sid && teach.view === 'student') renderTeach();
+  }
+  function shareLink() {
+    const k = teach.link, g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === teach.studentId);
+    if (!k) return;
+    const text = `${s ? sname(s) : 'Farzandingiz'}: «Tez aytish» darslari haqidagi xabarlar shu bot orqali keladi. Havolani oching va «Tushunarli» tugmasini bosing.`;
+    const url = `https://t.me/share/url?url=${encodeURIComponent(k.url)}&text=${encodeURIComponent(text)}`;
+    try { if (inTelegram && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) { /* the plain link below */ }
+    window.open(url, '_blank');
+  }
+  async function copyLink(b) {
+    const k = teach.link;
+    if (!k) return;
+    let ok = false;
+    try { await navigator.clipboard.writeText(k.url); ok = true; } catch (e) {
+      const ta = document.createElement('textarea'); ta.value = k.url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e2) { /* stays false */ } ta.remove();
+    }
+    b.textContent = ok ? 'Nusxa olindi ✓' : 'Nusxa olinmadi';
+    setTimeout(() => { b.textContent = 'Nusxa olish'; }, 2500);
+  }
+  // The student's last lesson card is done: the family gets the result and the homework (once per lesson).
+  async function sendLessonResult(el) {
+    const line = el.querySelector('[data-r="fam"]'), sid = state.lesson && state.lesson.studentId;
+    if (!sid || !line) return;
+    line.textContent = 'Ota-onaga natija yuborilmoqda…';
+    try {
+      const r = await tapi('lesson-done', { studentId: sid });
+      line.textContent = !r.complete ? '' : r.sent ? '📨 Natija va uyga vazifa ota-onaga yuborildi.' : r.already ? '📨 Natija ota-onaga avval yuborilgan.'
+        : r.recipients ? 'Natijani yuborib boʻlmadi.' : 'Ota-ona hali botga ulanmagan: oʻquvchi kartasidagi havolani yuboring.';
+    } catch (e) { line.textContent = 'Natijani ota-onaga yuborib boʻlmadi.'; }
   }
   function studentReportHtml(r) {
     const rows = r.weeks.filter((w) => w.lessons > 0 || w.stars > 0).reverse();
@@ -1625,6 +1686,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     if (!list.length) { teach.msg = 'Bu oʻquvchi darsni tugatgan.'; return renderTeach(); }
     state.lesson = { groupId, studentId, key: g.lesson.key, name: sname(s) };
     state.sttReady = !!teach.data.sttReady;
+    // Starting the lesson marks «Keldi» if the teacher did not (the family hears it once).
+    if (!s.attended) tapi('attend', { studentId, present: true, auto: true }).catch(() => {});
     newSession(list, { id: 'lesson', title: sname(s) });
     showTeach(false);
     state.welcomeEl.classList.add('hide');
@@ -1684,7 +1747,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   }
 
   // Local preview only: an in-memory teacher back end (?mock=1&role=owner|teacher|none).
-  const MOCKT = { role: query.get('role') || 'owner', teachers: [{ telegramId: 77, name: 'Feruza', username: 'feruza', status: 'pending', requestedAt: new Date(Date.now() - 6e5).toISOString() }], groups: [], results: [], early: [], weeks: {} };
+  const MOCKT = { role: query.get('role') || 'owner', teachers: [{ telegramId: 77, name: 'Feruza', username: 'feruza', status: 'pending', requestedAt: new Date(Date.now() - 6e5).toISOString() }], groups: [], results: [], early: [], weeks: {},
+    attendance: {}, sent: {}, links: { s1: { code: 'AbCdEfGh1234', family: [{ telegramId: 501, name: 'Dilnoza Valiyeva', username: 'dilnoza', ack: true }] } } };
   const tday = (ms) => new Date(ms + 5 * 3600e3).toISOString().slice(0, 10);
   const addD = (key, n) => { const d = new Date(`${key}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const wdOf = (key) => new Date(`${key}T00:00:00Z`).getUTCDay() || 7;
@@ -1722,7 +1786,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
         const l = mockLesson(g, today);
         return { id: g.id, name: g.name, days: g.days, teacherId: 1, teacherName: null, mine: true, lesson: l,
           weeks: { thisStart: ws, thisModule: MOCKT.weeks[`${g.id}|${ws}`] || null, nextStart: addD(ws, 7), nextModule: MOCKT.weeks[`${g.id}|${addD(ws, 7)}`] || null },
-          students: g.students.filter((s) => s.active).map((s) => ({ ...s, done: l.key ? l.ids.filter((id) => result(s, l.key, id)).map((id) => ({ id, stars: result(s, l.key, id).stars })) : [] })) };
+          students: g.students.filter((s) => s.active).map((s) => ({ ...s, attended: (l.key && MOCKT.attendance[`${s.id}|${l.key}`]) || null, family: (MOCKT.links[s.id] || { family: [] }).family.length,
+            done: l.key ? l.ids.filter((id) => result(s, l.key, id)).map((id) => ({ id, stars: result(s, l.key, id).stars })) : [] })) };
       }) };
     }
     if (action === 'request') { if (MOCKT.role === 'none') MOCKT.role = 'pending'; return { ok: true, status: staff ? 'active' : 'pending', notified: staff ? 0 : 1 }; }
@@ -1752,6 +1817,33 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       const s = { id: `s${Date.now()}`, active: true, ...row };
       g.students.push(s);
       return { ok: true, id: s.id };
+    }
+    // The family bot: a link per student, the accounts linked to it, «Keldi» and the lesson's result (sent once each).
+    const findS = (sid) => { for (const g of MOCKT.groups) { const s = g.students.find((x) => x.id === sid && x.active); if (s) return { g, s }; } return mockFail('student_not_found'); };
+    const linkOf = (sid) => MOCKT.links[sid] || (MOCKT.links[sid] = { code: Math.random().toString(36).slice(2, 14).padEnd(12, 'x'), family: [] });
+    const once = (key, n) => { if (!n) return { sent: 0, recipients: 0 }; if (MOCKT.sent[key]) return { sent: 0, recipients: n, already: true }; MOCKT.sent[key] = 1; return { sent: n, recipients: n }; };
+    if (action === 'link') {
+      const { s } = findS(b.studentId), k = linkOf(s.id);
+      if (b.rotate) k.code = Math.random().toString(36).slice(2, 14).padEnd(12, 'y');
+      return { ok: true, studentId: s.id, url: `https://t.me/kidscast_bot?start=${k.code}`, family: k.family, botReady: true };
+    }
+    if (action === 'unlink') {
+      const { s } = findS(b.studentId), k = linkOf(s.id), before = k.family.length;
+      k.family = k.family.filter((f) => f.telegramId !== b.telegramId);
+      if (k.family.length === before) mockFail('family_not_found');
+      return { ok: true, family: k.family };
+    }
+    if (action === 'attend') {
+      const { g, s } = findS(b.studentId), l = mockLesson(g, today), key = `${s.id}|${l.key}`;
+      if (!l.key) mockFail('no_lesson');
+      if (b.present === false) { delete MOCKT.attendance[key]; return { ok: true, attended: false, sent: 0, recipients: 0 }; }
+      if (!(b.auto && MOCKT.attendance[key])) MOCKT.attendance[key] = 'keldi';
+      return { ok: true, attended: true, ...once(`${key}|keldi`, linkOf(s.id).family.length) };
+    }
+    if (action === 'lesson-done') {
+      const { g, s } = findS(b.studentId), l = mockLesson(g, today);
+      if (l.status !== 'open' || l.ids.some((id) => !result(s, l.key, id))) return { ok: true, complete: false, sent: 0, recipients: 0 };
+      return { ok: true, complete: true, ...once(`${s.id}|${l.key}|lesson`, linkOf(s.id).family.length) };
     }
     if (action === 'report') {
       const g = findG(b.groupId), weeks = Array.from({ length: 6 }, (_, i) => addD(ws, -7 * (5 - i)));
@@ -1871,7 +1963,28 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     const a = b.dataset.t, id = b.dataset.id;
     if (a === 'home') return openView('home');
     if (a === 'group') return openView('group', { groupId: id || teach.groupId });
-    if (a === 'student') { openView('student', { studentId: id || teach.studentId }); return ensureReport(); }
+    if (a === 'student') { openView('student', { studentId: id || teach.studentId }); ensureLink(); return ensureReport(); }
+    if (a === 'attend') {
+      const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === id);
+      if (!s) return;
+      return teachAct(() => tapi('attend', { studentId: id, present: !s.attended }), (r) => {
+        teach.notice = r.attended ? `✓ ${sname(s)} keldi${r.sent ? ' · ota-onaga xabar ketdi' : r.recipients ? '' : ' · ota-ona botga ulanmagan'}` : '';
+        renderTeach();
+      });
+    }
+    if (a === 'lshare') return shareLink();
+    if (a === 'lcopy') return copyLink(b);
+    if (a === 'lrotate') {
+      return armed(b, () => teachAct(() => tapi('link', { studentId: teach.studentId, rotate: true }), (r) => {
+        teach.link = r; teach.notice = 'Yangi havola tayyor: eskisi endi ishlamaydi.'; renderTeach(); ensureReport();
+      }), 'Ha, almashtirish');
+    }
+    if (a === 'lunlink') {
+      return armed(b, () => teachAct(() => tapi('unlink', { studentId: teach.studentId, telegramId: Number(id) }), (r) => {
+        if (teach.link) teach.link.family = r.family;
+        teach.notice = 'Uzildi: bu akkauntga endi xabar bormaydi.'; renderTeach(); ensureReport();
+      }), 'Ha, uzish');
+    }
     if (a === 'report') { openView('report'); return ensureReport(true); }
     if (a === 'gnew') return openView('gform', { form: {} });
     if (a === 'gedit') return openView('gform', { form: { id: teach.groupId } });
@@ -1959,7 +2072,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary }; // local preview tests only
   init().catch(fatal);
 })();
 </script>
