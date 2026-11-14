@@ -314,7 +314,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v11';
+  const PAGE_VERSION = 'v12';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -483,14 +483,26 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   }
 
   // ---------- API ----------
+  // A request that gets no answer in time fails with a message (code 'timeout') instead of leaving the screen waiting.
+  async function callJson(url, opts, ms) {
+    const ac = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = ac ? setTimeout(() => ac.abort(), ms) : 0;
+    try {
+      const res = await fetch(url, ac ? { ...opts, signal: ac.signal } : opts);
+      let data = {};
+      try { data = (await res.json()) || {}; } catch (e) { if (ac && ac.signal.aborted) throw e; }
+      if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.code = data.error || `http_${res.status}`; throw e; }
+      return data;
+    } catch (e) {
+      if (ac && ac.signal.aborted) { const t = new Error('javob kelmadi'); t.code = 'timeout'; throw t; }
+      throw e;
+    } finally { clearTimeout(timer); }
+  }
   async function api(path, body, isForm) {
     if (mock) return mockApi(path, body);
     const headers = { 'x-telegram-init-data': tg.initData };
     if (!isForm) headers['content-type'] = 'application/json';
-    const res = await fetch(`${API}/${path}`, { method: 'POST', headers, body: isForm ? body : JSON.stringify(body || {}) });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.code = data.error || `http_${res.status}`; throw e; }
-    return data;
+    return callJson(`${API}/${path}`, { method: 'POST', headers, body: isForm ? body : JSON.stringify(body || {}) }, path === 'check' ? 45000 : 20000);
   }
 
   // Local preview only (?mock=1 outside Telegram; ?mock=noaudio hides the narrator): no server.
@@ -507,8 +519,9 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
         [16, 2, 'Oʻroq oʻxshar soʻroqqa, soʻroq oʻxshar oʻroqqa.'], [17, 2, 'Koʻm-koʻk kurtak, koʻkatlar koʻklamga koʻrk koʻrsatar.'],
         [18, 3, 'Uchuvchi suzuvchini uchratdimi, suzuvchi uchuvchini uchratdimi?'],
         [19, 3, 'Temur bilan Yoʻlchi — temiryoʻlchi, temiryoʻlchiga aytib koʻr-chi.'], [20, 2, 'Darsda Nasim rasm soldi, Nasim rasmga razm soldi.']];
-      const audio = query.get('mock') !== 'noaudio';
-      return { ok: true, isAdmin: query.get('as') !== 'child', sttReady: true, sttProvider: 'VoiceLab (Aisha)',
+      // &as=child: a child (consent first); &as=soon: a child while the speech check is closed for children.
+      const audio = query.get('mock') !== 'noaudio', as = query.get('as');
+      return { ok: true, isAdmin: !as, sttReady: as !== 'soon', sttProvider: 'VoiceLab (Aisha)',
         twisters: list.map(([id, level, text]) => ({ id, level, text, audio: audio ? mockVoice(text) : null })) };
     }
     if (path === 'check') {
@@ -669,7 +682,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     el.className = 'card welcome';
     el.innerHTML = `${metaHtml('<span class="brand">Tez aytish</span>')}
       <div class="hero"><div class="bars xl" data-r="bars" data-mood="idle">${BARS}</div><h1 data-r="h1">Tez aytish</h1><p class="lead" data-r="lead">Yuklanmoqda…</p></div>
-      <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button></div>
+      <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button><button class="pill small hide" type="button" data-r="go2"></button></div>
       <p class="foot"><button class="link" type="button" data-act="sheet">Texnik maʼlumot</button><button class="link hide" type="button" data-act="tmode" data-r="tmode">Oʻqituvchilar uchun</button></p>`;
     feed.appendChild(el);
     state.welcomeEl = el;
@@ -677,14 +690,18 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     io.observe(el);
   }
   function welcome(kind, text) {
-    const el = state.welcomeEl, q = (r) => el.querySelector(`[data-r="${r}"]`), go = q('go'), name = userName();
-    const set = (h1, lead, btn, act, m) => {
+    const el = state.welcomeEl, q = (r) => el.querySelector(`[data-r="${r}"]`), go = q('go'), go2 = q('go2'), name = userName();
+    const set = (h1, lead, btn, act, m, btn2, act2) => {
       q('h1').textContent = h1;
       q('lead').textContent = lead;
       go.classList.toggle('hide', !btn);
       if (btn) { go.textContent = btn; go.dataset.act = act; }
+      go2.classList.toggle('hide', !btn2);
+      if (btn2) { go2.textContent = btn2; go2.dataset.act = act2; }
       q('bars').dataset.mood = m || 'idle';
     };
+    // Someone who is not a teacher yet can ask to become one: the owner approves it in teacher mode.
+    const asTeacher = (inTelegram || mock) && teach.role !== 'owner' && teach.role !== 'teacher';
     el.classList.toggle('consent', kind === 'consent');
     showTabs(kind === 'ready');
     if (kind === 'ready') {
@@ -692,10 +709,20 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       set(name ? `Salom, ${name}!` : 'Salom!', state.sttReady ? `${plan} Tingla, takrorla va tez ayt!`
         : 'Ovozli tekshiruv hali ulanmagan: mashq ishlaydi, lekin natija chiqmaydi.', 'Boshlash', 'begin');
     } else if (kind === 'consent') set('Ota-onalar uchun', consentText(), 'Roziman, boshlaymiz', 'consent');
-    else if (kind === 'soon') set('Tez orada!', 'Tez aytish trenajyori hozircha tayyorlanmoqda. Tez orada ochiladi!', '', '', 'wink');
+    else if (kind === 'soon') {
+      set('Tez orada!', asTeacher ? 'Bolalar uchun trenajyor tez orada ochiladi. Oʻqituvchimisiz? Pastdagi tugmani bosing.'
+        : 'Tez aytish trenajyori hozircha tayyorlanmoqda. Tez orada ochiladi!', '', '', 'wink', asTeacher ? 'Men oʻqituvchiman' : '', 'tmode');
+    } else if (kind === 'tconfirm') {
+      set('Oʻqituvchi rejimi', 'Egasiga soʻrov yuboriladi. U tasdiqlagach, botdan xabar keladi: shunda trenajyorni qayta oching.', 'Soʻrov yuborish', 'treq', 'happy', 'Orqaga', 'tback');
+    } else if (kind === 'tsent') set('Soʻrov yuborildi ✓', 'Egasi tasdiqlashini kuting. Tasdiqlangach, botdan xabar keladi: shunda trenajyorni qayta oching.', '', '', 'happy');
+    else if (kind === 'tpending') set('Soʻrovingiz koʻrib chiqilmoqda', 'Egasi hali tasdiqlamadi. Tasdiqlangach, botdan xabar keladi: shunda trenajyorni qayta oching.', 'Yangilash', 'reload', 'wink');
     else if (kind === 'error') set('Ulanib boʻlmadi', text, 'Qayta urinish', 'reload', 'wink');
+    else if (kind === 'fatal') set('Xatolik yuz berdi', text, 'Qayta urinish', 'reload', 'wink');
     else set('Tez aytish', text || 'Yuklanmoqda…', '', '');
+    setTeachLink(kind);
   }
+  // The card a non-teacher comes back to from the teacher request («Orqaga»).
+  function home(kind) { state.home = kind; welcome(kind); }
   function mountSummary() {
     let el = state.summaryEl;
     if (!el) {
@@ -797,7 +824,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     state.consent = true;
     store.set(CONSENT_KEY, true);
     newSession(dailyList(state.progress.idx));
-    welcome('ready');
+    home('ready');
     begin();
     reportMic('opened');
   }
@@ -1335,8 +1362,9 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       mic.sampleRate || mic.ctxRate ? `Mikrofon: ${mic.sampleRate || '?'} Hz, EC ${flag(mic.echoCancellation)}, NS ${flag(mic.noiseSuppression)}, AGC ${flag(mic.autoGainControl)}, AudioContext ${mic.ctxRate || '?'} Hz` : 'Mikrofon: hali ochilmagan',
       L ? `Oxirgi yozuv: ${L.totalMs} ms, nutq ${L.speechMs} ms, peak ${L.peakDb} dB, ${L.bytes} bayt, toʻxtash: ${L.stop}` : 'Oxirgi yozuv: yoʻq',
       C ? `Tekshiruv: ${C.error ? 'xato ' + C.error : `${C.status}, passed=${C.passed}, ishonch ${C.confidence}, WAV ${C.wavBytes} bayt`}` : 'Tekshiruv: yoʻq',
-      state.error ? `Xato: ${state.error.name}: ${state.error.message}` : 'Xato: yoʻq',
+      state.error ? `Xato: ${state.error.name}: ${state.error.message}` : state.jsError ? `Xato: ${state.jsError}` : 'Xato: yoʻq',
       `Server: ${state.server || '—'} · aniqlash: ${state.sttReady ? state.provider || 'ulangan' : 'ulanmagan'} · diktor: ${d.samples} ta yozuv, ovoz ${d.sound ? 'yoqilgan' : 'oʻchirilgan'}${d.voiceLocked ? ', avto-ovoz bloklangan' : ''}`,
+      `Rol: ${teach.role}${teach.data && teach.data.status ? ` (${teach.data.status})` : ''}${state.teachError ? ` · oʻqituvchi serveri: xato ${state.teachError}` : ''}`,
     ].join('\n');
   }
   function reportMic(outcome) {
@@ -1359,16 +1387,14 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     bad_age: 'Yosh 3 dan 18 gacha boʻlsin.', not_a_teacher: 'Siz hali oʻqituvchi emassiz.', owner_only: 'Buni faqat egasi qila oladi.',
     group_not_found: 'Guruh topilmadi.', student_not_found: 'Oʻquvchi topilmadi.', past_week: 'Oʻtgan hafta uchun modul tanlab boʻlmaydi.',
     teacher_not_found: 'Oʻqituvchi topilmadi.', invalid_or_expired_init_data: 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.',
+    timeout: 'Server javob bermadi. Internetni tekshirib, qayta urinib koʻring.',
   };
   const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, form: null, busy: false, msg: '' };
   const myId = () => { try { return Number(tg.initDataUnsafe.user.id) || 0; } catch (e) { return 0; } };
 
   async function tapi(action, body) {
     if (mock) return mockTeacher(action, body || {});
-    const res = await fetch(`${TEACHER_API}/${action}`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData, 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) { const e = new Error(data.error || `HTTP ${res.status}`); e.code = data.error || `http_${res.status}`; throw e; }
-    return data;
+    return callJson(`${TEACHER_API}/${action}`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData, 'content-type': 'application/json' }, body: JSON.stringify(body || {}) }, 20000);
   }
   const tErr = (e) => T_ERR[e.code] || `Xato: ${e.message}`;
   const dateShort = (key) => { const d = new Date(`${key}T00:00:00Z`); return `${d.getUTCDate()}-${MONTHS[d.getUTCMonth()]}`; };
@@ -1604,21 +1630,31 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     welcome('ready');
     go(state.welcomeEl, true);
   }
-  // The welcome card's last link: «Oʻqituvchilar uchun» asks to become a teacher, «Oʻqituvchi rejimi» goes back to it.
-  function setTeachLink() {
+  // The welcome card's small last link, on the practice cards only: «Oʻqituvchi rejimi» takes the owner or a teacher
+  // back to teacher mode; anyone else gets «Oʻqituvchilar uchun» (on «Tez orada!» the big «Men oʻqituvchiman» does it).
+  function setTeachLink(kind) {
     const b = state.welcomeEl && state.welcomeEl.querySelector('[data-r="tmode"]');
     if (!b) return;
     b.textContent = teach.role === 'owner' || teach.role === 'teacher' ? 'Oʻqituvchi rejimi' : 'Oʻqituvchilar uchun';
-    b.classList.toggle('hide', !inTelegram && !mock);
+    b.classList.toggle('hide', (!inTelegram && !mock) || (kind !== 'ready' && kind !== 'consent'));
   }
-  async function teachRequest() {
+  // «Men oʻqituvchiman» / «Oʻqituvchilar uchun»: the owner or a teacher goes to teacher mode; anyone else confirms first.
+  function teachRequest() {
     if (teach.role === 'owner' || teach.role === 'teacher') return enterTeach();
+    welcome('tconfirm');
+  }
+  async function sendTeachRequest() {
+    const go = state.welcomeEl.querySelector('[data-r="go"]');
+    if (go.disabled) return;
+    go.disabled = true;
     try {
       const r = await tapi('request');
-      welcome('info', r.status === 'removed' ? 'Oʻqituvchi huquqingiz oʻchirilgan. Egasiga murojaat qiling.'
-        : r.status === 'active' ? 'Siz oʻqituvchisiz: Mini Appʼni yopib, qayta oching.'
-          : 'Soʻrov yuborildi. Egasi tasdiqlagach, Mini Appʼni qayta oching: oʻqituvchi rejimi ochiladi.');
-    } catch (e) { welcome('info', tErr(e)); }
+      if (teach.data) teach.data.status = r.status;
+      if (r.status === 'pending') { state.home = 'tpending'; return welcome('tsent'); }
+      welcome('info', r.status === 'removed' ? 'Oʻqituvchi huquqingiz oʻchirilgan. Egasiga murojaat qiling.' : 'Siz oʻqituvchisiz: Mini Appʼni yopib, qayta oching.');
+    } catch (e) {
+      welcome('error', `Soʻrov yuborilmadi. ${tErr(e)}`);
+    } finally { go.disabled = false; }
   }
 
   // Local preview only: an in-memory teacher back end (?mock=1&role=owner|teacher|none).
@@ -1627,7 +1663,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   const addD = (key, n) => { const d = new Date(`${key}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const wdOf = (key) => new Date(`${key}T00:00:00Z`).getUTCDay() || 7;
   const wsOf = (key) => addD(key, 1 - wdOf(key));
-  if (mock && MOCKT.role !== 'none') {
+  if (mock && (MOCKT.role === 'owner' || MOCKT.role === 'teacher')) {
     const today = tday(Date.now());
     MOCKT.groups.push({ id: 'g1', name: 'Shanba guruhi', days: [wdOf(today)], created: addD(today, -30), students: [
       { id: 's1', firstName: 'Ali', lastName: 'Valiyev', age: 9, parentPhone: '+998901234567', consent: true, active: true },
@@ -1650,11 +1686,11 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     return new Promise((resolve, reject) => setTimeout(() => { try { resolve(mockTeacherNow(action, b)); } catch (e) { reject(e); } }, 120));
   }
   function mockTeacherNow(action, b) {
-    const today = tday(Date.now()), staff = MOCKT.role !== 'none', ws = wsOf(today);
+    const today = tday(Date.now()), staff = MOCKT.role === 'owner' || MOCKT.role === 'teacher', ws = wsOf(today);
     const findG = (id) => { const g = MOCKT.groups.find((x) => x.id === id && !x.archived); if (!g) mockFail('group_not_found'); return g; };
     const result = (s, key, id) => MOCKT.results.find((r) => r.studentId === s.id && r.key === key && r.id === id);
     if (action === 'state') {
-      const base = { ok: true, role: MOCKT.role, status: staff ? 'active' : null, name: 'Mock', sttReady: true, today, classSize: 4, modules: MODULES.map((m) => ({ id: m.id, title: m.title, badge: m.badge, ids: m.ids })) };
+      const base = { ok: true, role: staff ? MOCKT.role : 'none', status: staff ? 'active' : MOCKT.role === 'pending' ? 'pending' : null, name: 'Mock', sttReady: true, today, classSize: 4, modules: MODULES.map((m) => ({ id: m.id, title: m.title, badge: m.badge, ids: m.ids })) };
       if (!staff) return base;
       return { ...base, teachers: MOCKT.role === 'owner' ? MOCKT.teachers : null, groups: MOCKT.groups.filter((g) => !g.archived).map((g) => {
         const l = mockLesson(g, today);
@@ -1663,7 +1699,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
           students: g.students.filter((s) => s.active).map((s) => ({ ...s, done: l.key ? l.ids.filter((id) => result(s, l.key, id)).map((id) => ({ id, stars: result(s, l.key, id).stars })) : [] })) };
       }) };
     }
-    if (action === 'request') return { ok: true, status: 'pending' };
+    if (action === 'request') { if (MOCKT.role === 'none') MOCKT.role = 'pending'; return { ok: true, status: staff ? 'active' : 'pending', notified: staff ? 0 : 1 }; }
     if (!staff) mockFail('not_a_teacher');
     if (action === 'teacher') { const t = MOCKT.teachers.find((x) => x.telegramId === b.telegramId); if (!t) mockFail('teacher_not_found'); t.status = b.status; return { ok: true }; }
     if (action === 'group') {
@@ -1712,6 +1748,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     paintTotals();
     renderDiag();
     if (!inTelegram && !mock) return welcome('info', 'Bu trenajyor Telegram ichida ishlaydi. Uni botdagi tugma orqali och.');
+    // On a slow connection say so instead of a silent «Yuklanmoqda…».
+    const slow = setTimeout(() => { if (!state.server) welcome('info', 'Yuklanmoqda… Internet sekin boʻlsa, biroz kuting.'); }, 7000);
     try {
       // Who is asking in teacher mode comes from tez-aytish-teacher; if that fails, the page works as before.
       const [s, t] = await Promise.all([api('session'), tapi('state').catch((e) => { state.teachError = e.message; return null; })]);
@@ -1724,10 +1762,9 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       state.server = `xato: ${e.message}`;
       renderDiag();
       return welcome('error', e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.' : `Serverga ulanib boʻlmadi (${e.message}). Internetni tekshirib, qayta urinib koʻr.`);
-    }
+    } finally { clearTimeout(slow); }
     document.body.classList.toggle('is-admin', state.isAdmin);
     $('note').textContent = state.isAdmin ? 'Admin rejimi: yozuvlar sozlash uchun saqlanadi.' : 'Ovoz yozuvi saqlanmaydi, faqat natija yoziladi.';
-    setTeachLink();
     // A teacher (or the owner) starts in teacher mode: groups, students and the lessons.
     if (teach.role === 'owner' || teach.role === 'teacher') {
       if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
@@ -1738,16 +1775,26 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       renderDiag();
       return;
     }
+    // Someone who asked to become a teacher waits for the owner's approval.
+    if (teach.data && teach.data.status === 'pending') return home('tpending');
     // While the trainer is closed for children they get a friendly 'coming soon' instead of a mic that cannot check.
-    if (!state.sttReady && !state.isAdmin) return welcome('soon');
+    if (!state.sttReady && !state.isAdmin) return home('soon');
     if (!state.twisters.length) return welcome('info', 'Tez aytishlar roʻyxati boʻsh.');
     if (state.isAdmin) fillPicker();
-    if (!state.isAdmin && !state.consent) return welcome('consent');
+    if (!state.isAdmin && !state.consent) return home('consent');
     newSession(dailyList(state.progress.idx));
-    welcome('ready');
+    home('ready');
     reportMic('opened');
     renderDiag();
   }
+  // Anything that breaks the start shows on the screen (and in «Texnik maʼlumot») instead of an endless «Yuklanmoqda…».
+  function fatal(e) {
+    state.jsError = `${(e && e.name) || 'Error'}: ${(e && e.message) || e}`;
+    try { renderDiag(); } catch (x) { /* the message below still shows */ }
+    try { welcome('fatal', `${state.jsError}. Mini Appʼni yopib, qayta oching.`); } catch (x) { /* nothing more to do */ }
+  }
+  window.addEventListener('error', (e) => { state.jsError = String(e.message || 'error'); });
+  window.addEventListener('unhandledrejection', (e) => { const r = e.reason; state.jsError = String((r && r.message) || r || 'unhandled rejection'); });
 
   // ---------- events ----------
   feed.addEventListener('click', (e) => {
@@ -1760,6 +1807,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     if (state.recording) { if (act === 'mic') stop('manual'); return; }
     if (state.busy) return;
     if (act === 'tmode') return teachRequest();
+    if (act === 'treq') return sendTeachRequest();
+    if (act === 'tback') return welcome(state.home || 'soon');
     if (act === 'toteach') return enterTeach();
     if (act === 'begin') return begin();
     if (act === 'consent') return acceptConsent();
@@ -1869,8 +1918,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach }; // local preview tests only
-  init();
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson }; // local preview tests only
+  init().catch(fatal);
 })();
 </script>
 </body>
