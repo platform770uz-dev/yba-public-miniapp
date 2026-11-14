@@ -248,6 +248,13 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
 .t-wrow span:first-child{flex:1}
 .t-rep{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
 .t-rs{font-size:13px;font-weight:600;color:var(--sub)}
+.t-ok{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:#e6f4ea;color:var(--ok);font-size:14px;font-weight:700}
+.t-who{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 0}
+.t-who b,.t-who small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-who b{font-size:16px;font-weight:700}
+.t-who small{font-size:13px;font-weight:600;color:var(--sub)}
+.t-card .t-chip{display:inline-block;margin-top:10px}
+.t-big{overflow-wrap:anywhere}
 
 @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
@@ -314,7 +321,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v12';
+  const PAGE_VERSION = 'v13';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -1389,7 +1396,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     teacher_not_found: 'Oʻqituvchi topilmadi.', invalid_or_expired_init_data: 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.',
     timeout: 'Server javob bermadi. Internetni tekshirib, qayta urinib koʻring.',
   };
-  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, form: null, busy: false, msg: '' };
+  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, form: null, busy: false, msg: '', notice: '', approveId: null };
   const myId = () => { try { return Number(tg.initDataUnsafe.user.id) || 0; } catch (e) { return 0; } };
 
   async function tapi(action, body) {
@@ -1422,13 +1429,14 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   function openView(view, extra) {
     Object.assign(teach, extra || {}, { view });
     teach.msg = '';
+    teach.notice = '';
     renderTeach();
     $('teach').scrollTop = 0;
   }
   function renderTeach() {
     const v = teach.view;
     $('teachIn').innerHTML = !teach.data ? '<p class="empty">Yuklanmoqda…</p>' : v === 'group' ? groupHtml() : v === 'student' ? studentHtml()
-      : v === 'report' ? reportHtml() : v === 'gform' ? groupFormHtml() : v === 'sform' ? studentFormHtml() : homeHtml();
+      : v === 'report' ? reportHtml() : v === 'gform' ? groupFormHtml() : v === 'sform' ? studentFormHtml() : v === 'approve' ? approveHtml() : homeHtml();
   }
   // Run a change, reload the teacher's data and go on; a refusal stays on the screen as a message.
   async function teachAct(run, after) {
@@ -1442,17 +1450,17 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       if (after) after(r); else { teach.msg = ''; renderTeach(); }
     } catch (e) { teach.msg = tErr(e); renderTeach(); } finally { teach.busy = false; document.body.classList.remove('t-busy'); }
   }
-  // A step that is hard to undo needs a second tap within 4 seconds.
-  function armed(b, fn) {
+  // A step that is hard to undo needs a second tap within 4 seconds (the button says so meanwhile).
+  function armed(b, fn, label) {
     if (b.dataset.armed) { delete b.dataset.armed; clearTimeout(Number(b.dataset.timer)); return fn(); }
-    b.dataset.armed = '1'; b.dataset.label = b.textContent; b.textContent = 'Tasdiqlash uchun yana bosing';
+    b.dataset.armed = '1'; b.dataset.label = b.textContent; b.textContent = label || 'Tasdiqlash uchun yana bosing';
     b.dataset.timer = String(setTimeout(() => { delete b.dataset.armed; b.textContent = b.dataset.label; }, 4000));
   }
 
   function homeHtml() {
     const d = teach.data, owner = d.role === 'owner', name = userName();
     let h = `<div class="t-head"><div class="bars sm" data-mood="happy">${BARS}</div><div><h1 class="t-title">${esc(name ? `Salom, ${name}!` : 'Salom!')}</h1>`
-      + `<p class="t-sub">${owner ? 'Egasi · barcha guruhlar' : 'Oʻqituvchi'}</p></div></div>${msgHtml()}`;
+      + `<p class="t-sub">${owner ? 'Egasi · barcha guruhlar' : 'Oʻqituvchi'}</p></div></div>${msgHtml()}${noticeHtml()}`;
     if (owner) h += teachersHtml(d.teachers || []);
     const groups = d.groups || [];
     h += '<p class="sect">Guruhlar</p>' + (groups.length ? groups.map(groupCardHtml).join('') : '<p class="empty">Hali guruh yoʻq. Birinchi guruhni yarating.</p>');
@@ -1460,19 +1468,37 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     h += `<p class="t-foot">${owner ? '<button class="link" type="button" data-t="practice">Mashq rejimi</button>' : ''}<button class="link" type="button" data-t="sheet">Texnik maʼlumot</button></p>`;
     return h;
   }
+  // The name on one line and @username under it, so a long or decorated Telegram name never hides who it is.
   function teachersHtml(list) {
-    const me = myId(), who = (t) => `${esc(t.name || 'Ismsiz')}${t.username ? ` <small>@${esc(t.username)}</small>` : ''}`;
+    const me = myId(), who = (t) => `<span class="t-who"><b>${esc(t.name || 'Ismsiz')}</b>${t.username ? `<small>@${esc(t.username)}</small>` : ''}</span>`;
     const pending = list.filter((t) => t.status === 'pending'), active = list.filter((t) => t.status === 'active' && t.telegramId !== me);
     let h = '';
     if (pending.length) {
-      h += '<p class="sect">Oʻqituvchi boʻlish soʻrovlari</p>' + pending.map((t) => `<div class="t-row"><span class="t-name">${who(t)}</span>`
+      h += '<p class="sect">Oʻqituvchi boʻlish soʻrovlari</p>' + pending.map((t) => `<div class="t-row">${who(t)}`
         + `<button class="t-btn go" type="button" data-t="tapprove" data-id="${t.telegramId}">Tasdiqlash</button><button class="t-btn" type="button" data-t="treject" data-id="${t.telegramId}">Rad etish</button></div>`).join('');
     }
     if (active.length) {
-      h += '<p class="sect">Oʻqituvchilar</p>' + active.map((t) => `<div class="t-row"><span class="t-name">${who(t)}</span>`
+      h += '<p class="sect">Oʻqituvchilar</p>' + active.map((t) => `<div class="t-row">${who(t)}`
         + `<button class="t-btn" type="button" data-t="tremove" data-id="${t.telegramId}">Oʻchirish</button></div>`).join('');
     }
     return h;
+  }
+  // When a request came, in Tashkent time: «14-noyabr, 13:22».
+  const whenLabel = (iso) => {
+    const d = new Date(Date.parse(iso) + 5 * 3600e3), two = (n) => String(n).padStart(2, '0');
+    return `${d.getUTCDate()}-${MONTHS[d.getUTCMonth()]}, ${two(d.getUTCHours())}:${two(d.getUTCMinutes())}`;
+  };
+  const noticeHtml = () => (teach.notice ? `<p class="t-ok">${esc(teach.notice)}</p>` : '');
+  // One teacher request, opened from the owner's bot message (?approve=<telegram id>): who asks and the owner's answer.
+  function approveHtml() {
+    const t = (teach.data.teachers || []).find((x) => x.telegramId === teach.approveId);
+    const h = topHtml('Oʻqituvchi soʻrovi', 'home') + msgHtml() + noticeHtml(), home = '<button class="pill t-wide" type="button" data-t="home">Bosh sahifa</button>';
+    if (!t) return `${h}<p class="empty">Bu soʻrov topilmadi.</p>${home}`;
+    const chip = t.status === 'active' ? '<span class="t-chip ok">Oʻqituvchi</span>' : t.status === 'removed' ? '<span class="t-chip warn">Rad etilgan</span>' : '<span class="t-chip warn">Tasdiqlash kutilmoqda</span>';
+    return `${h}<div class="t-card"><p class="t-big">${esc(t.name || 'Ismsiz')}</p>${t.username ? `<p class="t-sub">@${esc(t.username)}</p>` : ''}`
+      + `${t.requestedAt ? `<p class="t-sub">Soʻrov: ${esc(whenLabel(t.requestedAt))}</p>` : ''}${chip}</div>`
+      + (t.status !== 'active' ? `<button class="pill primary t-wide" type="button" data-t="tapprove" data-id="${t.telegramId}">Tasdiqlash</button>` : '')
+      + (t.status === 'pending' ? `<button class="pill t-wide" type="button" data-t="treject" data-id="${t.telegramId}">Rad etish</button>` : '') + home;
   }
   function groupCardHtml(g) {
     const l = g.lesson, done = g.students.filter((s) => finished(g, s)).length;
@@ -1658,7 +1684,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   }
 
   // Local preview only: an in-memory teacher back end (?mock=1&role=owner|teacher|none).
-  const MOCKT = { role: query.get('role') || 'owner', teachers: [{ telegramId: 77, name: 'Feruza', username: 'feruza', status: 'pending' }], groups: [], results: [], early: [], weeks: {} };
+  const MOCKT = { role: query.get('role') || 'owner', teachers: [{ telegramId: 77, name: 'Feruza', username: 'feruza', status: 'pending', requestedAt: new Date(Date.now() - 6e5).toISOString() }], groups: [], results: [], early: [], weeks: {} };
   const tday = (ms) => new Date(ms + 5 * 3600e3).toISOString().slice(0, 10);
   const addD = (key, n) => { const d = new Date(`${key}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const wdOf = (key) => new Date(`${key}T00:00:00Z`).getUTCDay() || 7;
@@ -1701,7 +1727,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     }
     if (action === 'request') { if (MOCKT.role === 'none') MOCKT.role = 'pending'; return { ok: true, status: staff ? 'active' : 'pending', notified: staff ? 0 : 1 }; }
     if (!staff) mockFail('not_a_teacher');
-    if (action === 'teacher') { const t = MOCKT.teachers.find((x) => x.telegramId === b.telegramId); if (!t) mockFail('teacher_not_found'); t.status = b.status; return { ok: true }; }
+    if (action === 'teacher') { const t = MOCKT.teachers.find((x) => x.telegramId === b.telegramId); if (!t) mockFail('teacher_not_found'); const was = t.status; t.status = b.status; return { ok: true, status: b.status, notified: b.status === 'active' && was !== 'active' }; }
     if (action === 'group') {
       if (b.id && b.archive) { findG(b.id).archived = true; return { ok: true, id: b.id, archived: true }; }
       const name = String(b.name || '').trim(), days = [...new Set((b.days || []).map(Number).filter((d) => d >= 1 && d <= 7))].sort();
@@ -1771,7 +1797,10 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       if (state.isAdmin) fillPicker();
       state.welcomeEl.classList.add('hide');
       showTeach(true);
-      openView('home');
+      // The owner's bot message about a teacher request opens the trainer straight on it (?approve=<telegram id>).
+      const ask = Number(query.get('approve'));
+      if (teach.role === 'owner' && Number.isSafeInteger(ask) && ask > 0) openView('approve', { approveId: ask });
+      else openView('home');
       renderDiag();
       return;
     }
@@ -1851,7 +1880,19 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     if (a === 'garchive') return armed(b, () => teachAct(() => tapi('group', { id: teach.form.id, archive: true }), () => openView('home')));
     if (a === 'sremove') return armed(b, () => teachAct(() => tapi('student', { id: teach.form.id, remove: true }), () => openView('group')));
     if (a === 'opennow') return armed(b, () => teachAct(() => tapi('open', { groupId: teach.groupId })));
-    if (a === 'tapprove' || a === 'treject' || a === 'tremove') return teachAct(() => tapi('teacher', { telegramId: Number(id), status: a === 'tapprove' ? 'active' : 'removed' }));
+    if (a === 'tapprove') {
+      return teachAct(() => tapi('teacher', { telegramId: Number(id), status: 'active' }), (r) => {
+        teach.notice = r.notified ? '✅ Tasdiqlandi. Unga botdan xabar bordi: trenajyorni qayta ochsa, oʻqituvchi rejimi ochiladi.'
+          : '✅ Tasdiqlandi. Botdan xabar yuborib boʻlmadi: unga trenajyorni qayta ochishni ayting.';
+        renderTeach();
+      });
+    }
+    if (a === 'treject' || a === 'tremove') {
+      return armed(b, () => teachAct(() => tapi('teacher', { telegramId: Number(id), status: 'removed' }), () => {
+        teach.notice = a === 'treject' ? 'Soʻrov rad etildi.' : 'Oʻqituvchi oʻchirildi.';
+        renderTeach();
+      }), a === 'treject' ? 'Ha, rad etish' : 'Ha, oʻchirish');
+    }
     if (a === 'lesson') return startLesson(teach.groupId, id);
     if (a === 'practice') return enterPractice();
     if (a === 'sheet') return openSheet();
