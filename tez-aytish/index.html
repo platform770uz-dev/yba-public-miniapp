@@ -94,7 +94,7 @@ body.tabs-on .card{padding-top:8px}
 .stars path,.st path{fill:var(--line);stroke:var(--line);stroke-width:1.6;stroke-linejoin:round}
 .stars .f path,.st .f path{fill:var(--star);stroke:var(--star)}
 .stars .a{animation:pop .4s var(--ease) both}
-.msg{font-size:15px;line-height:1.35;font-weight:700;color:var(--sub);max-width:310px}
+.msg{font-size:15px;line-height:1.35;font-weight:700;color:var(--sub);max-width:310px;text-wrap:balance}
 .msg.ok{color:var(--ok)}
 .msg.warn{color:var(--warn)}
 .act{min-height:134px;margin-top:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
@@ -327,7 +327,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v14';
+  const PAGE_VERSION = 'v15';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -556,7 +556,9 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   const cur = () => state.cards.find((c) => c.el === state.activeEl) || null;
   const part = (card, r) => card.el.querySelector(`[data-r="${r}"]`);
   const totalStars = () => Object.values(state.progress.stars).reduce((a, b) => a + (Number(b) || 0), 0);
-  const targetSeconds = (card) => Math.max(1.5, Math.round(words(card.t.text) * 0.6 * 10) / 10);
+  // The time a fast reading may take comes from the server (the teacher's own sample plus a fifth); the earlier
+  // rule of 0.6 s a word is used only when an older server does not send it.
+  const targetSeconds = (card) => card.t.targetMs > 0 ? card.t.targetMs / 1000 : Math.max(1.5, Math.round(words(card.t.text) * 0.6 * 10) / 10);
   const starHtml = (filled, anim, i) => `<svg class="${filled ? 'f' : ''}${anim ? ' a' : ''}" viewBox="0 0 24 24" aria-hidden="true"${anim ? ` style="animation-delay:${i * 130}ms"` : ''}>${STAR_PATH}</svg>`;
   // In a student's lesson (teacher mode) the device's own stars are not shown and the corner button leads back to the group.
   const metaHtml = (left) => `<div class="meta">${left}<span class="sp"></span>${state.lesson ? '' : `<span class="total">${ICON.star}<b data-total>0</b></span>`}`
@@ -620,7 +622,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   }
   function defaultMsg(card) {
     if (!running(card)) return card.gaveUp && !card.stars ? { kind: 'warn', text: 'Bu tez aytishga keyinroq qaytamiz.' } : { kind: 'ok', text: 'Barakalla!' };
-    if (card.stage === 'tez') return { text: state.sttReady ? `Mikrofonni bos va ${fmt(targetSeconds(card))} soniyada ayt.` : 'Ovozli tekshiruv hali ulanmagan.' };
+    if (card.stage === 'tez') return { text: state.sttReady ? `Mikrofonni bos va ${fmt(targetSeconds(card))} soniyada bir marta ayt.` : 'Ovozli tekshiruv hali ulanmagan.' };
     return { text: card.t.audio ? 'Tingla va ovoz chiqarib takrorla.' : 'Ovoz chiqarib oʻqi.' };
   }
 
@@ -1305,19 +1307,23 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // One check per tongue twister. The result is shown in the tongue twister itself (right words turn green, a slip
   // gets a soft yellow marker with what was heard below it), then the feed moves on by itself. Stars: every word
   // right in time 3, right with a word only nearly right 2, right but slower than the target 1, otherwise none and
-  // the tongue twister comes back later. Unclear audio or a failed request does not use up the check.
+  // the tongue twister comes back later. Unclear audio or a failed request does not use up the check. The server
+  // judges one reading out of everything it heard and sends its stars, the time of that reading and the target;
+  // the same rule is worked out here only for an older server. Said more than once: a hint that once is enough.
   function showCheck(card, r, speechMs) {
     if (r.status && r.status !== 'Success') { haptic('warning'); return say(card, 'warn', 'Ovozing aniq eshitilmadi. Telefonni yaqinroq ushlab, yana ayt.'); }
     card.result = Array.isArray(r.words) ? r.words : [];
     for (const w of card.result) if (w.v === 'wrong' || w.v === 'missing') card.hard.add(w.d || w.t);
-    const target = targetSeconds(card);
+    const target = r.targetMs > 0 ? r.targetMs / 1000 : targetSeconds(card);
+    const took = (typeof r.readMs === 'number' ? r.readMs : speechMs) / 1000;
     const near = card.result.some((w) => w.v === 'near');
-    const tooSlow = !!r.passed && speechMs / 1000 > target;
-    const stars = !r.passed ? 0 : tooSlow ? 1 : near ? 2 : 3;
+    const stars = Number.isInteger(r.stars) ? r.stars : !r.passed ? 0 : took > target ? 1 : near ? 2 : 3;
+    const tooSlow = stars === 1;
+    const once = (Number(r.before) || 0) + (Number(r.after) || 0) >= 3 ? ' Bir marta aytish kifoya.' : '';
     complete(card, stars, !stars);
     if (stars) {
-      say(card, 'ok', tooSlow ? `Soʻzlar toʻgʻri! Keyingi safar tezroq ayt: ${fmt(speechMs / 1000)} s, maqsad ${fmt(target)} s.`
-        : near ? 'Toʻgʻri! Tagiga chizilgan soʻzni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.');
+      say(card, 'ok', (tooSlow ? `Soʻzlar toʻgʻri! Keyingi safar tezroq ayt: ${fmt(took)} s, maqsad ${fmt(target)} s.`
+        : near ? 'Toʻgʻri! Tagiga chizilgan soʻzni yana aniqroq ayt.' : 'Barakalla! Hammasi toʻgʻri.') + once);
       mood(card, 'happy', 2600);
       sfx('win', stars);
       haptic('success');
@@ -2072,7 +2078,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary, showCheck, targetSeconds }; // local preview tests only
   init().catch(fatal);
 })();
 </script>
