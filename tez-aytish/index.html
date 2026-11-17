@@ -284,6 +284,15 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
 .p-act:empty{display:none}
 .p-claim{animation:ask 1.6s infinite}
 .p-note{margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--surface);font-size:14px;font-weight:600;color:var(--sub)}
+.p-hw{margin-top:14px;padding:14px 16px;border-radius:18px;background:var(--surface)}
+.p-hw b{display:block;font-size:16px;font-weight:800}
+.p-hw p{margin-top:4px;font-size:14px;font-weight:600;color:var(--sub)}
+.p-hw .pill{width:100%;margin-top:12px;min-height:50px}
+.p-hw.open{background:var(--accent-tint)}
+.p-hw.open b{color:var(--accent)}
+.p-hw.done{background:#e6f4ea}
+.p-hw.done b{color:var(--ok)}
+.t-chip.hw{background:var(--accent-tint);color:var(--accent)}
 .p-set{display:flex;align-items:center;gap:10px}
 .p-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface)}
 .p-seg button{min-height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:800;color:var(--sub)}
@@ -985,7 +994,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v16';
+  const PAGE_VERSION = 'v17';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -1014,7 +1023,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     welcomeEl: null, summaryEl: null, activeEl: null,
     consent: !!store.get(CONSENT_KEY, false), sound: store.get(SOUND_KEY, true) !== false,
     progress: store.get(PROGRESS_KEY, { idx: 0, stars: {}, later: [] }),
-    voiceCard: null, voiceRate: 1, voiceLocked: false, vraf: 0, vdraw: null,
+    hw: null, voiceCard: null, voiceRate: 1, voiceLocked: false, vraf: 0, vdraw: null,
     ctx: null, stream: null, source: null, analyser: null, rec: null, recCard: null, chunks: [], frames: [],
     t0: 0, raf: 0, recording: false, busy: false, stopReason: '', mime: '', last: null, error: null, server: '', lastCheck: null,
   };
@@ -1200,7 +1209,9 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       const toks = t.text.split(/[\s\-–—]+/).map((w) => w.replace(/[.,!?;:«»"()]/g, '')).filter(Boolean);
       const fail = card.attempt === 1 && (t.id === 6 || t.id === 10);
       const heard = t.id === 6 ? 'gildirakni' : 'shoynakka';
-      if (state.lesson) MOCKT.results.push({ studentId: state.lesson.studentId, key: state.lesson.key, id: t.id, stars: fail ? 0 : t.id === 4 ? 2 : 3 });
+      const stars = fail ? 0 : t.id === 4 ? 2 : 3;
+      if (state.lesson) MOCKT.results.push({ studentId: state.lesson.studentId, key: state.lesson.key, id: t.id, stars });
+      if (state.hw) MOCKP.home[`${state.hw.studentId}|${state.hw.lessonKey}|${t.id}`] = stars;
       return { ok: true, status: 'Success', passed: !fail, confidence: 0.91, recognized: fail ? `${toks[0]} ${heard}` : t.text, extras: [],
         words: toks.map((d, i) => ({ d, t: d.toLowerCase(), h: fail && i === 1 ? heard : d.toLowerCase(),
           v: fail ? (i === 1 ? 'wrong' : i === toks.length - 1 ? 'missing' : 'ok') : (t.id === 4 && i === 2 ? 'near' : 'ok') })) };
@@ -1414,6 +1425,10 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     }
     const got = state.cards.reduce((a, c) => a + c.stars, 0);
     const hard = [...new Set(state.cards.flatMap((c) => [...c.hard]))].slice(0, 6);
+    if (state.hw) {
+      el.innerHTML = homeworkSummaryHtml(got);
+      return;
+    }
     if (state.lesson) {
       el.innerHTML = `${metaHtml('<span class="brand">Dars tugadi</span>')}
         <div class="hero">
@@ -1453,6 +1468,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     state.activeEl = el;
     // The lesson's summary has come into view: the student watches the wrestler gain the lesson's mass (once).
     if (el === state.summaryEl && state.lesson && !state.lesson.gainShown) { state.lesson.gainShown = true; openProfile(state.lesson.studentId, { back: 'summary', lessonKey: state.lesson.key }); }
+    if (el === state.summaryEl && state.hw && !state.hw.gainShown) { state.hw.gainShown = true; openProfile(state.hw.studentId, { back: 'summary', lessonKey: state.hw.lessonKey, gain: 'home' }); }
     const card = state.cards.find((c) => c.el === el);
     if (card && state.voiceCard === card) return; // a tap already started this card's sample
     stopVoice();
@@ -1953,8 +1969,9 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       const wav = await toWav16k(blob, trim);
       const fd = new FormData();
       // A teacher's lesson names the student and the lesson date; the server checks the student's consent itself.
-      const lesson = state.lesson ? { studentId: state.lesson.studentId, lessonKey: state.lesson.key } : {};
-      fd.append('meta', JSON.stringify({ twisterId: card.t.id, stage: card.stage, attempt: card.attempt, consent: state.consent || state.isAdmin || !!state.lesson, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser', ...lesson }));
+      const lesson = state.lesson ? { studentId: state.lesson.studentId, lessonKey: state.lesson.key }
+        : state.hw ? { studentId: state.hw.studentId, lessonKey: state.hw.lessonKey, home: true } : {};
+      fd.append('meta', JSON.stringify({ twisterId: card.t.id, stage: card.stage, attempt: card.attempt, consent: state.consent || state.isAdmin || !!state.lesson || !!state.hw, speechMs: Math.round(speechMs), durationMs: totalMs, platform: tg ? tg.platform : 'browser', ...lesson }));
       fd.append('audio', wav, 'attempt.wav');
       r = await api('check', fd, true);
       state.lastCheck = { status: r.status, passed: r.passed, recognized: r.recognized, confidence: r.confidence, wavBytes: wav.size };
@@ -1966,7 +1983,10 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     else if (err.code === 'speech_not_configured') say(card, 'warn', 'Ovozli tekshiruv hali ulanmagan. Birozdan keyin urinib koʻr.');
     else if (err.code === 'invalid_or_expired_init_data') say(card, 'warn', 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.');
     else if (err.code === 'student_consent_missing') say(card, 'warn', 'Ota-ona roziligi belgilanmagan: oʻquvchi kartasida belgilang.');
-    else if (err.code === 'student_not_allowed') say(card, 'warn', 'Bu oʻquvchi sizning guruhingizda emas.');
+    else if (err.code === 'student_not_allowed') say(card, 'warn', state.hw ? 'Bu profil sizga ulanmagan. Oʻqituvchidan yangi havola soʻrang.' : 'Bu oʻquvchi sizning guruhingizda emas.');
+    else if (err.code === 'already_checked') say(card, 'warn', 'Bu tez aytish uyda allaqachon tekshirilgan.');
+    else if (err.code === 'homework_closed') say(card, 'warn', 'Uyga vazifa muddati tugadi: keyingi dars boshlandi.');
+    else if (err.code === 'not_in_homework') say(card, 'warn', 'Bu tez aytish bu haftagi vazifada yoʻq.');
     else if (err.code === 'consent_required') { state.consent = false; store.set(CONSENT_KEY, false); paint(card); welcome('consent'); go(state.welcomeEl); }
     else say(card, 'warn', `Tekshirib boʻlmadi (${err.message}). Yana urinib koʻr.`);
     renderDiag();
@@ -2226,9 +2246,10 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     else if (l.status !== 'open') right = '<span class="t-chip">—</span>';
     else if (s.done.length >= n) right = `<span class="t-chip ok">✓ ${starSum(s)} ⭐</span>`;
     else right = `<button class="t-start" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? `Davom ${s.done.length}/${n}` : 'Boshlash'}</button>`;
+    const m = massOf(s.id), hw = m && m.homework && m.homework.state === 'open' ? `<span class="t-chip hw">🏠 ${m.homework.left}</span>` : '';
     // «Keldi» for today's lesson: the family hears it at once through @kidscast_bot.
     const keldi = l.key ? `<button class="t-keldi${s.attended ? ' on' : ''}" type="button" data-t="attend" data-id="${esc(s.id)}" aria-pressed="${s.attended ? 'true' : 'false'}">${s.attended ? '✓ Keldi' : 'Keldi'}</button>` : '';
-    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${keldi}${right}</div>`;
+    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${hw}${keldi}${right}</div>`;
   }
   function studentHtml() {
     const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === teach.studentId);
@@ -2571,23 +2592,25 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   async function openProfile(id, opts) {
     const o = opts || {};
     dropHolo();
-    Object.assign(prof, { id, back: o.back || '', lessonKey: o.lessonKey || null, data: null, from: null, state: 'load', msg: '' });
+    Object.assign(prof, { id, back: o.back || '', lessonKey: o.lessonKey || null, gain: o.gain || 'lesson', data: null, from: null, state: 'load', msg: '' });
     const show = () => { stopVoice(); $('prof').classList.remove('hide'); $('prof').scrollTop = 0; };
     // After a lesson the screen comes up only once the lesson's gain is known: the summary is not hidden by a wait.
     if (!o.lessonKey) { show(); renderProfile(); }
     try {
       const d = await papi('get', o.lessonKey ? { studentId: id, lessonKey: o.lessonKey } : { studentId: id }, o.lessonKey ? 8000 : 0);
       if (prof.id !== id || prof.state !== 'load') return;
+      const gain = o.lessonKey ? (o.gain === 'home' ? d.home : d.lesson) : null;
       if (o.lessonKey) {
-        // Only the lesson's own gain is shown; without one, or if the teacher has moved on, there is nothing to watch.
-        const here = state.lesson && state.lesson.studentId === id && state.summaryEl && state.activeEl === state.summaryEl;
+        // Only that gain is shown; without one, or if the child has moved on, there is nothing to watch.
+        const owner = o.gain === 'home' ? state.hw : state.lesson;
+        const here = owner && owner.studentId === id && state.summaryEl && state.activeEl === state.summaryEl;
         const line = here && state.summaryEl.querySelector('[data-r="mass"]');
-        if (line && d.lesson) line.textContent = `💪 Massa: +${kgText(d.lesson.kg)} kg · jami ${kgText(d.kg)} kg (${d.student.titleName})`;
-        if (!here || !d.lesson || !(d.lesson.kg > 0)) return closeProfile();
+        if (line && gain) line.textContent = `💪 Massa: +${kgText(gain.kg)} kg · jami ${kgText(d.kg)} kg (${d.student.titleName})`;
+        if (!here || !gain || !(gain.kg > 0)) return closeProfile();
         show();
       }
-      // What this viewer has not watched yet: the lesson just finished, or everything since the last visit.
-      const from = o.lessonKey ? d.lesson.before : d.seenKg === null ? d.startKg : d.seenKg;
+      // What this viewer has not watched yet: the work just finished, or everything since the last visit.
+      const from = o.lessonKey ? gain.before : d.seenKg === null ? d.startKg : d.seenKg;
       prof.data = d;
       prof.from = d.kg > from ? from : null;
       prof.state = prof.from === null ? 'idle' : 'ready';
@@ -2702,6 +2725,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       + '<div class="p-mass"><span class="p-kg" id="pKg"></span><span class="p-unit">kg</span><span class="p-plus hide" id="pPlus"></span></div>'
       + '<p class="p-title" id="pTitle"></p><div class="p-act" id="pAct"></div>';
     if (!lesson) {
+      h += homeworkHtml(d);
       if (s.dim) h += '<p class="p-note">Oxirgi darsga kelinmadi, shuning uchun gologramma xiralashdi. Keyingi darsda yana yonadi!</p>';
       h += `<p class="sect">Qahramon</p><div class="p-set" id="pSet">${lookHtml(s)}</div><p class="sect">Bu oy</p>${historyHtml(d)}`;
       if (d.medals.length) h += `<p class="sect">Mavsumlar</p>${d.medals.map(medalHtml).join('')}`;
@@ -2734,6 +2758,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     if (a === 'back') return closeProfile();
     if (a === 'retry') return openProfile(prof.id, { back: prof.back });
     if (a === 'claim') return claimGain();
+    if (a === 'hw') return startHomework();
     if (a === 'tap') { if (prof.holo) prof.holo.tap(); return haptic('light'); }
     if (a === 'kid') return b.dataset.id === prof.id ? null : openProfile(b.dataset.id, { back: prof.back });
     if (a === 'fig') return setLook({ figure: b.dataset.v });
@@ -2800,8 +2825,15 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   // The family bot opens the page with its own initData, which the trainer's other functions do not accept: only the profile.
   async function initFamily() {
     try {
-      const me = await papi('me');
+      // The profile needs only the mass; the homework also needs the tongue twisters and the narrator samples.
+      const [me, s] = await Promise.all([papi('me'), api('session').catch((e) => { state.teachError = e.message; return null; })]);
       prof.kids = Array.isArray(me.kids) ? me.kids : [];
+      if (s) {
+        state.isAdmin = !!s.isAdmin;
+        state.sttReady = !!(s.sttReady ?? s.speechReady);
+        state.provider = s.sttProvider || '';
+        state.twisters = Array.isArray(s.twisters) ? s.twisters : [];
+      }
       state.server = 'ok';
     } catch (e) {
       state.server = `xato: ${e.message}`;
@@ -2812,12 +2844,13 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     if (!prof.kids.length) return welcome('info', 'Bu yerda farzandingizning «Tez aytish» profili chiqadi. Avval oʻqituvchidan shaxsiy havolani oling va uni @kidscast_bot ichida oching.');
     welcome('info', 'Profil ochilmoqda…');
     const want = query.get('s'), kid = prof.kids.find((k) => k.id === want) || prof.kids[0];
+    if (query.has('hw') && state.twisters.length) return startHomework(kid.id);
     openProfile(kid.id, {});
   }
 
   // Local preview only: the profile back end over the mock teacher data (?mock=1; with &kc=1 the family view, with
   // &kids=1 a practice user who has linked children).
-  const MOCKP = { base: { s1: 41.5 }, look: { s1: { figure: 'm', figureSet: true, color: 'moviy' } }, seen: { s1: 38.5 } };
+  const MOCKP = { base: { s1: 41.5 }, look: { s1: { figure: 'm', figureSet: true, color: 'moviy' } }, seen: { s1: 38.5 }, home: {} };
   const P_TITLES = [{ from: 30, name: 'Yangi kurashchi' }, { from: 35, name: 'Havaskor' }, { from: 45, name: 'Sportchi' }, { from: 60, name: 'Polvon' }, { from: 80, name: 'Chempion' }, { from: 100, name: 'Afsona' }];
   function mockProfile(action, b) {
     return new Promise((resolve, reject) => setTimeout(() => { try { resolve(mockProfileNow(action, b)); } catch (e) { reject(e); } }, 150));
@@ -2831,14 +2864,21 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     };
     const lookOf = (id) => MOCKP.look[id] || (MOCKP.look[id] = { figure: 'm', figureSet: false, color: 'moviy' });
     const brief = ({ g, s }) => {
-      const kg = (MOCKP.base[s.id] || 30) + lessons(s).reduce((a, l) => a + l.kg, 0);
+      const hwKg = mockHwKg({ g, s });
+      const kg = (MOCKP.base[s.id] || 30) + lessons(s).reduce((a, l) => a + l.kg, 0) + (hwKg ? hwKg.kg : 0);
       let i = 0;
       P_TITLES.forEach((t, k) => { if (kg >= t.from) i = k; });
       return { id: s.id, kg, title: i, titleName: P_TITLES[i].name, dim: false, ...lookOf(s.id), name: sname(s), firstName: s.firstName, group: g.name };
     };
     const find = (id) => all.find((x) => x.s.id === id) || mockFail('student_not_found');
+    if (action === 'homework') { const x = find(b.studentId); return { ok: true, staff: !family, today, studentId: x.s.id, name: sname(x.s), firstName: x.s.firstName, group: x.g.name, ...mockHwOf(x) }; }
     if (action === 'me') return { ok: true, role: MOCKT.role, via: 'mock', season, today, titles: P_TITLES, kids: family || query.has('kids') ? all.map(brief) : [] };
-    if (action === 'group') return { ok: true, groupId: b.groupId, season, today, titles: P_TITLES, students: all.filter((x) => x.g.id === b.groupId).map(brief) };
+    if (action === 'group') {
+      return { ok: true, groupId: b.groupId, season, today, titles: P_TITLES, students: all.filter((x) => x.g.id === b.groupId).map((x) => {
+        const h = mockHwOf(x);
+        return { ...brief(x), homework: { state: h.state, left: h.left, total: h.total } };
+      }) };
+    }
     if (action === 'seen') { find(b.studentId); MOCKP.seen[b.studentId] = b.kg; return { ok: true }; }
     if (action === 'set') {
       find(b.studentId);
@@ -2852,13 +2892,95 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       const history = ls.map((l) => ({ type: 'lesson', day: l.key, kg: l.kg, said: l.said, stars: l.stars })).reverse();
       if (base > 30) history.push({ type: 'week', day: ws, kg: 3 }, { type: 'lesson', day: addD(ws, -1), kg: base - 33, said: 4, stars: 9 }, { type: 'missed', day: addD(ws, -2), kg: 0 });
       const lesson = b.lessonKey ? ls.find((l) => l.key === b.lessonKey) || null : null, seen = MOCKP.seen[x.s.id];
+      const hw = mockHwOf(x), hwGain = mockHwKg(x);
       return { ok: true, staff: !family, today, student: st, season: { start: season, end: season, daysLeft: 10 }, kg: st.kg, startKg: 30, stars: 0, titles: P_TITLES, colors: Object.keys(COLOR_NAME),
-        seenKg: seen === undefined ? null : seen, lesson: lesson ? { key: lesson.key, kg: lesson.kg, before: st.kg - lesson.kg, said: lesson.said, stars: lesson.stars } : null, history,
+        seenKg: seen === undefined ? null : seen, lesson: lesson ? { key: lesson.key, kg: lesson.kg, before: st.kg - lesson.kg, said: lesson.said, stars: lesson.stars } : null,
+        home: b.lessonKey && hwGain && hwGain.key === b.lessonKey ? { ...hwGain, before: st.kg - hwGain.kg } : null,
+        homework: { state: hw.state, left: hw.left, total: hw.total, due: hw.due, dueLabel: hw.dueLabel, missed: hw.missed }, history,
         medals: base > 30 ? [{ season: `${addD(season, -1).slice(0, 7)}-01`, kg: 62.5, title: 3, titleName: 'Polvon', lessons: 8, stars: 41 }] : [] };
     }
     return mockFail('not_found');
   }
 
+  // ---------- homework at home ----------
+  // The child opens the trainer from @kidscast_bot and says the tongue twisters the lesson left over. The list and
+  // the deadline come from tez-aytish-profile, the checks go to tez-aytish-api /check with home: true (one per
+  // tongue twister), and when the last one is done the wrestler gains the mass of the homework.
+  function homeworkHtml(d) {
+    const h = d.homework;
+    if (!h || h.state === 'none') return '';
+    if (h.state === 'waiting') return '<div class="p-hw"><b>🏠 Uyga vazifa</b><p>Dars tugagach shu yerda chiqadi.</p></div>';
+    if (h.state === 'done') return `<div class="p-hw done"><b>✅ Uyga vazifa bajarildi</b><p>${h.total} ta tez aytish aytildi. Barakalla!</p></div>`;
+    const what = h.missed ? 'Darsga kelmading, shuning uchun butun modul uyda' : 'Darsda qiynalgan tez aytishlar';
+    return `<div class="p-hw open"><b>🏠 Uyga vazifa: ${h.left} ta tez aytish</b><p>${esc(what)}.${h.dueLabel ? ` ${esc(capFirst(h.dueLabel))}gacha vaqt bor.` : ''}</p>`
+      // While a gain is waiting to be watched, the homework button steps back so the two do not shout at once.
+      + `<button class="pill${prof.state === 'ready' ? '' : ' primary'}" type="button" data-p="hw">Boshlash</button></div>`;
+  }
+  // The homework becomes an ordinary session of cards in the feed: the same mic, the same stars.
+  async function startHomework(id) {
+    const sid = id || prof.id;
+    if (!sid || state.recording || state.busy) return;
+    const btn = $('profIn') && $('profIn').querySelector('[data-p="hw"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Yuklanmoqda…'; }
+    let d = null;
+    try { d = await papi('homework', { studentId: sid }); } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Boshlash'; }
+      prof.msg = pErr(e);
+      return renderProfile();
+    }
+    const left = (d.twisters || []).filter((t) => !t.done).map((t) => t.id);
+    const at = new Map(state.twisters.map((t, i) => [t.id, i]));
+    const list = left.filter((x) => at.has(x)).map((x) => at.get(x));
+    if (d.state !== 'open' || !list.length) { prof.msg = 'Uyga vazifa hozir yoʻq.'; return openProfile(sid, { back: prof.back }); }
+    state.hw = { studentId: sid, lessonKey: d.lessonKey, name: d.firstName || d.name, total: d.total, due: d.dueLabel, missed: d.missed };
+    state.sttReady = true;
+    dropHolo();
+    $('prof').classList.add('hide');
+    showTeach(false);
+    state.welcomeEl.classList.add('hide');
+    newSession(list, { id: 'home', title: 'Uyga vazifa' });
+    begin();
+  }
+  // The summary of the homework, and the figure growing right after it (the same screen as after a lesson).
+  function homeworkSummaryHtml(got) {
+    const n = state.cards.length;
+    return `${metaHtml('<span class="brand">Uyga vazifa</span>')}
+      <div class="hero">
+        <div class="bars lg" data-mood="${got ? 'happy' : 'wink'}">${BARS}</div>
+        <h1>${got ? 'Barakalla!' : 'Yaxshi urinish!'}</h1>
+        <p class="lead">${n} ta tez aytishda ${got} ta yulduz.</p>
+        <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
+        <p class="lead" data-r="mass"></p>
+      </div>
+      <div class="act"><button class="pill primary" type="button" data-act="toprof">💪 Profil</button></div>
+      <p class="foot"></p>`;
+  }
+  // The homework of the local preview: the module of the mock lesson, what the lesson gave and what was said at home.
+  function mockHwOf(x) {
+    const today = tday(Date.now()), l = mockLesson(x.g, today);
+    const base = { state: 'none', lessonKey: null, due: null, dueLabel: null, missed: false, total: 0, left: 0, twisters: [] };
+    if (!l.key || l.status !== 'open') return base;
+    const lessonStars = (id) => { const r = MOCKT.results.find((y) => y.studentId === x.s.id && y.key === l.key && y.id === id); return r ? r.stars : null; };
+    const said = l.ids.filter((id) => lessonStars(id) !== null).length;
+    const dueLabel = l.next ? `${['dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba', 'yakshanba'][wdOf(l.next) - 1]}, ${Number(l.next.slice(8))}-${MONTHS[Number(l.next.slice(5, 7)) - 1]}` : null;
+    const open = { ...base, lessonKey: l.key, due: l.next, dueLabel, missed: said === 0 };
+    if (said < l.ids.length) return { ...open, state: 'waiting' };
+    const ids = [...l.ids, ...l.homework].filter((id) => l.homework.includes(id) || (lessonStars(id) ?? 0) <= 1);
+    const home = (id) => MOCKP.home[`${x.s.id}|${l.key}|${id}`];
+    const twisters = ids.map((id) => ({ id, lessonStars: lessonStars(id), stars: home(id) === undefined ? null : home(id), done: home(id) !== undefined }));
+    const left = twisters.filter((t) => !t.done).length;
+    return { ...open, state: left ? 'open' : 'done', total: twisters.length, left, twisters };
+  }
+  // What the homework has given the wrestler so far: 0.5 per tongue twister, 0.5 per star above the lesson, 1 for all.
+  function mockHwKg(x) {
+    const hw = mockHwOf(x);
+    if (!hw.twisters.length) return null;
+    const done = hw.twisters.filter((t) => t.done);
+    if (!done.length) return null;
+    const stars = done.reduce((a, t) => a + Math.max(0, t.stars - (t.lessonStars || 0)), 0);
+    const whole = done.length >= hw.twisters.length;
+    return { key: hw.lessonKey, kg: done.length * 0.5 + stars * 0.5 + (whole ? 1 : 0), said: done.length, of: hw.twisters.length, stars, whole };
+  }
   // ---------- start ----------
   async function init() {
     buildWelcome();
@@ -2934,6 +3056,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     if (act === 'treq') return sendTeachRequest();
     if (act === 'tback') return welcome(state.home || 'soon');
     if (act === 'toteach') return enterTeach();
+    if (act === 'toprof') return openProfile(state.hw ? state.hw.studentId : prof.kids.length ? prof.kids[0].id : null, { back: family ? '' : 'welcome' });
     if (act === 'profile') return prof.kids.length ? openProfile(prof.kids[0].id, { back: 'welcome' }) : null;
     if (act === 'begin') return begin();
     if (act === 'consent') return acceptConsent();
@@ -3078,7 +3201,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary, showCheck, targetSeconds, prof, MOCKP, openProfile, closeProfile, claimGain, activate }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary, showCheck, targetSeconds, prof, MOCKP, openProfile, closeProfile, claimGain, activate, startHomework, mockHwOf }; // local preview tests only
   init().catch(fatal);
 })();
 </script>
