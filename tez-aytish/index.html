@@ -262,6 +262,57 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
 .t-card .t-chip{display:inline-block;margin-top:10px}
 .t-big{overflow-wrap:anywhere}
 
+/* Profil: the hologram wrestler that gains mass (the student, the family and the teacher see the same screen). */
+.prof{position:fixed;top:0;right:0;bottom:0;left:0;z-index:6;overflow-y:auto;overscroll-behavior:contain;background:var(--bg)}
+.prof-in{width:min(100%,480px);margin:0 auto;padding:calc(8px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom))}
+.p-top{display:flex;align-items:center;gap:4px;min-height:44px}
+.p-name{flex:1;min-width:0;font-size:22px;line-height:1.2;font-weight:800;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-sub{font-size:13px;font-weight:700;color:var(--sub)}
+.p-kids{display:flex;gap:6px;margin:8px 0 2px;overflow-x:auto;scrollbar-width:none}
+.p-kids::-webkit-scrollbar{display:none}
+.p-kid{flex:none;min-height:36px;padding:0 14px;border-radius:18px;background:var(--surface);font-size:14px;font-weight:800;color:var(--sub)}
+.p-kid.on{background:var(--ink);color:#fff}
+.p-stage{position:relative;margin-top:10px;height:min(54vh,430px);min-height:250px;border-radius:28px;overflow:hidden;background:#04060c}
+.p-stage canvas{display:block;width:100%;height:100%}
+.p-mass{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-top:14px;font-variant-numeric:tabular-nums}
+.p-kg{font-size:56px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.p-unit{font-size:22px;font-weight:800;color:var(--sub)}
+.p-plus{align-self:center;margin-left:6px;padding:4px 10px;border-radius:12px;background:var(--accent-tint);color:var(--accent);font-size:16px;font-weight:800}
+.p-title{margin-top:4px;text-align:center;font-size:18px;font-weight:800;color:var(--accent)}
+.p-title.pop{animation:pop .5s var(--ease)}
+.p-act{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px}
+.p-act:empty{display:none}
+.p-claim{animation:ask 1.6s infinite}
+.p-note{margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--surface);font-size:14px;font-weight:600;color:var(--sub)}
+.p-set{display:flex;align-items:center;gap:10px}
+.p-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface)}
+.p-seg button{min-height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:800;color:var(--sub)}
+.p-seg button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.p-dots{display:flex;gap:10px;margin-left:auto}
+.p-dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--bg);box-shadow:0 0 0 2px var(--line)}
+.p-dot.on{box-shadow:0 0 0 2.5px var(--ink)}
+.p-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.p-row>span{flex:1;min-width:0;display:flex;flex-direction:column}
+.p-row span b{font-size:15px;font-weight:700}
+.p-row small{font-size:13px;font-weight:600;color:var(--sub)}
+.p-row>b{flex:none;font-size:15px;font-weight:800;color:var(--ok);font-variant-numeric:tabular-nums}
+.p-row.miss>b,.p-row.medal>b{color:var(--sub)}
+.p-rules{margin-top:20px;font-size:13px;font-weight:600;line-height:1.5;color:var(--sub)}
+.p-rules b{color:var(--ink)}
+/* Teacher mode: the group's team of holograms and the figure in the student card. */
+.t-team{display:flex;gap:8px;margin:0 -20px 2px;padding:2px 20px 8px;overflow-x:auto;scrollbar-width:none}
+.t-team::-webkit-scrollbar{display:none}
+.t-fig{flex:none;width:64px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.t-mini{display:block;width:52px;height:64px;border-radius:12px;background:#04060c}
+.t-fig b{max-width:100%;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-fig small{font-size:12px;font-weight:800;color:var(--sub)}
+.t-figcard{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.t-figcard .t-mini{width:78px;height:96px;border-radius:16px}
+.t-figinfo{flex:1;min-width:0}
+.t-figcard .p-seg{display:inline-flex;margin-top:8px;background:var(--bg)}
+.t-figcard .p-seg button.on{background:var(--ink);color:#fff;box-shadow:none}
+.t-figcard .pill{margin-top:0;min-height:48px;background:var(--bg)}
+
 @keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes nudge{0%,100%{transform:translateY(2px)}50%{transform:translateY(-3px)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
@@ -296,6 +347,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   </div>
 </section>
 <section class="teach hide" id="teach" aria-label="Oʻqituvchi rejimi"><div class="teach-in" id="teachIn"></div></section>
+<section class="prof hide" id="prof" aria-label="Profil"><div class="prof-in" id="profIn"></div></section>
 <div class="sheet-wrap hide" id="sheetWrap">
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="grab" aria-hidden="true"></div>
@@ -310,6 +362,612 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   </section>
 </div>
 <audio id="voice" playsinline preload="auto"></audio>
+<script>
+/* holo:begin */
+/* TezHolo: hologram kurash wrestler. Plain script, no dependencies.
+   TezHolo.create(canvas, opts) -> holo { set, gain, tap, start, stop, resize, destroy, draw }
+   TezHolo.mini(canvas, opts) draws one static frame for a small tile.
+   Mass is in kg: 30 = the starting figure, 100 = the top form, growth goes on (slower) to 150. */
+(function(){
+'use strict';
+var PI=Math.PI,TAU=PI*2,KG_MIN=30,KG_TOP=100,KG_MAX=150;
+var COLORS={moviy:'#35e0ff',yashil:'#3dffa0',binafsha:'#b388ff',oltin:'#ffc84a'};
+var THRESH=[35,45,60,80,100];
+/* stage box in design units: width, room above the ground, room below it */
+var BW=330,TOPU=392,BOTU=30,GREY=[112,128,146],WHITE=[255,255,255],STAGE='#04070d';
+/* gain timeline, ms: growth starts, burst */
+var G0=700,G1=2050;
+/* the bitmap is never larger than this many pixels (about 460x500 CSS px at DPR 2) */
+var MAXPX=920000;
+
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+function lerp(a,b,t){return a+(b-a)*t;}
+function sstep(a,b,x){var t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);}
+function easeOut(u){u=clamp(u,0,1);return 1-Math.pow(1-u,3);}
+function easeInOut(u){u=clamp(u,0,1);return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+function hash(n){var x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x);}
+function hexRgb(h){var n=parseInt(String(h).replace('#',''),16);return [(n>>16)&255,(n>>8)&255,n&255];}
+function mix(a,b,f){return [Math.round(a[0]+(b[0]-a[0])*f),Math.round(a[1]+(b[1]-a[1])*f),Math.round(a[2]+(b[2]-a[2])*f)];}
+function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+(a<0?0:(a>1?1:a)).toFixed(3)+')';}
+function clampKg(v){v=+v;return v===v?clamp(v,KG_MIN,KG_MAX):KG_MIN;}
+function round1(v){return Math.round(v*10)/10;}
+function mk(){return document.createElement('canvas');}
+function now(){return (window.performance&&performance.now)?performance.now():Date.now();}
+function along(o,d,l){return [o[0]+d[0]*l,o[1]+d[1]*l];}
+
+/* monotone cubic through (x, y) keys */
+function makeProfile(keys){
+  var n=keys.length,d=[],tg=[],i;
+  for(i=0;i<n-1;i++)d[i]=(keys[i+1][1]-keys[i][1])/(keys[i+1][0]-keys[i][0]);
+  tg[0]=d[0];tg[n-1]=d[n-2];
+  for(i=1;i<n-1;i++)tg[i]=(d[i-1]*d[i]<=0)?0:2*d[i-1]*d[i]/(d[i-1]+d[i]);
+  return function(y){
+    if(y<=keys[0][0])return keys[0][1];
+    if(y>=keys[n-1][0])return keys[n-1][1];
+    var j=0;while(y>keys[j+1][0])j++;
+    var h=keys[j+1][0]-keys[j][0],t=(y-keys[j][0])/h,t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*keys[j][1]+(t3-2*t2+t)*h*tg[j]+(-2*t3+3*t2)*keys[j+1][1]+(t3-t2)*h*tg[j+1];
+  };
+}
+/* kg -> shape parameter m: every title threshold is a clear step, slower above 100 kg */
+var massCurve=makeProfile([[30,0],[35,0.12],[45,0.3],[60,0.52],[80,0.76],[100,1],[150,1.24]]);
+
+/* body proportions [m=0, m=1] for the boy; the girl multiplies by GF */
+var PR={
+  E:[33,86],deltR:[7,25],armR:[5.5,17],bicR:[5.9,20.5],elbR:[5,13.2],foreR:[5.3,17],wristR:[3.9,9.4],fistR:[6.4,14],
+  a1:[13,27],a2:[2,2],neckHW:[6.8,17],trapK:[0.38,0.6],
+  chestHW:[20.5,62],waistHW:[15,31],skirtHW:[19,40],
+  hipX:[10.5,20],kneeX:[16,33],footX:[24,46],
+  thighR:[9.4,24.5],kneeR:[7.4,16],calfR:[7,17.5],hemR:[7.4,14.5],ankR:[4.8,9.5],
+  footL:[12,19],footH:[4.4,7],headS:[1,1.14]
+};
+var GF={E:0.93,deltR:0.92,armR:0.9,bicR:0.9,elbR:0.92,foreR:0.9,wristR:0.92,fistR:0.93,neckHW:0.84,chestHW:0.92,waistHW:0.9,skirtHW:0.98,
+  thighR:0.95,kneeR:0.96,calfR:0.95,footL:0.93,headS:0.97};
+
+/* geometry in design units: x from the body axis, y down, the ground at y = 0 */
+function buildGeom(m,ch){
+  var f=ch==='f',g={m:m,ch:ch,caps:[],lines:[],mlines:[]},s,j;
+  function P(k){var p=PR[k],v=p[0]+(p[1]-p[0])*m;return f&&GF[k]?v*GF[k]:v;}
+  function cap(a,ra,b,rb,chain,flat){var c={ax:a[0],ay:a[1],ra:ra,bx:b[0],by:b[1],rb:rb,chain:chain,flatB:!!flat,hl:false};g.caps.push(c);return c;}
+  function seg(x0,y0,x1,y1,w,arr){(arr||g.lines).push({p:[[x0,y0],[x1,y1]],w:w||1});}
+  function qpt(p0,pc,p1,u){return [(1-u)*(1-u)*p0[0]+2*u*(1-u)*pc[0]+u*u*p1[0],(1-u)*(1-u)*p0[1]+2*u*(1-u)*pc[1]+u*u*p1[1]];}
+  function quad(p0,pc,p1,w,arr){var pts=[],i;for(i=0;i<=12;i++)pts.push(qpt(p0,pc,p1,i/12));(arr||g.lines).push({p:pts,w:w||1});}
+  var mu=sstep(0.15,0.8,m);g.mu=mu;
+  var hs=(0.9+0.1*m)*(f?0.985:1),hd=P('headS');g.hd=hd;
+  var shH=270*hs+5*m,nBH=shH+lerp(15,21,m),chinH=nBH+Math.max(3,lerp(11,4,m));
+  var r1=19.5*hd,r2=13*hd,jawH=chinH+r2,skH=jawH+13.5*hd;
+  g.head={x:0,y1:-skH,r1:r1,y2:-jawH,r2:r2,top:-(skH+r1),bottom:-chinH};
+  var nHW=P('neckHW'),E=P('E'),dR=P('deltR'),aR=P('armR'),bR=P('bicR'),eR=P('elbR'),fR=P('foreR'),wR=P('wristR'),fiR=P('fistR');
+  var Sx=E-dR,shW=Sx+dR*0.35,cHW=P('chestHW'),wHW=P('waistHW'),skHW=P('skirtHW');
+  var waistH=210*hs,skirtH=166*hs,armpitH=shH-lerp(17,26,m);
+  var keys=[[-(chinH+9),Math.min(nHW*0.94,11*hd)],[-nBH,nHW],[-lerp(nBH,shH,0.42),lerp(nHW,shW,P('trapK'))],[-shH,shW],[-armpitH,cHW],
+    [-(armpitH-10*hs),cHW*0.985],[-(waistH+10),wHW*1.12],[-waistH,wHW],[-(waistH-8),wHW*1.06],[-skirtH,skHW]];
+  var wf=makeProfile(keys);
+  g.torso={top:keys[0][0],bottom:-skirtH,w:wf};
+  g.lv={headTop:g.head.top,shY:-shH,armpitY:-armpitH,chestY:-(armpitH-8),waistY:-waistH,skirtY:-skirtH,E:E};
+
+  var a1=P('a1')*PI/180,a2=P('a2')*PI/180,UL=58*hs,FL=50*hs;
+  var hipH=174*hs,kneeH=92*hs,calfH=62*hs,hemH=27*hs,ankH=14*hs;
+  var hx=P('hipX'),kx=P('kneeX'),fx=P('footX'),tR=P('thighR'),kR=P('kneeR'),cR=P('calfR'),hR=P('hemR'),anR=P('ankR'),fL=P('footL'),fH=P('footH');
+  for(s=-1;s<=1;s+=2){
+    /* arm: shoulder ball, upper arm, biceps, elbow, forearm in a sleeve, bare wrist, fist */
+    var S=[s*Sx,-(shH-dR*0.55)],d1=[s*Math.sin(a1),Math.cos(a1)],d2=[s*Math.sin(a2),Math.cos(a2)];
+    var A1=along(S,d1,UL*0.36),M=along(S,d1,UL*0.6),El=along(S,d1,UL),F1=along(El,d2,FL*0.27),Cf=along(El,d2,FL*0.62),Wr=along(El,d2,FL),Fi=along(Wr,d2,fiR*0.7);
+    var rC=lerp(fR,wR,0.5),rS=rC+2,chA='arm'+s;
+    cap(S,dR,A1,aR+0.8,chA);cap(A1,aR+0.8,M,bR+0.8,chA);cap(M,bR+0.8,El,eR+1,chA);cap(El,eR+1,F1,fR+1.2,chA);cap(F1,fR+1.2,Cf,rS,chA,true);
+    cap(Cf,rC,Wr,wR,chA);cap(Fi,fiR,Fi,fiR,'fist'+s);
+    seg(Cf[0]-d2[1]*rS,Cf[1]+d2[0]*rS,Cf[0]+d2[1]*rS,Cf[1]-d2[0]*rS,1.2);
+    var ang=Math.atan2(d1[1],d1[0]),pts=[];
+    for(j=-5;j<=5;j++){var an=ang+j*0.24;pts.push([S[0]+Math.cos(an)*dR*0.95,S[1]+Math.sin(an)*dR*0.95]);}
+    g.mlines.push({p:pts,w:1});
+    /* leg in loose trousers, bare foot turned out */
+    var Hp=[s*hx,-hipH],Tq=[s*(lerp(hx,kx,0.42)+1.5*m),-lerp(hipH,kneeH,0.42)],Kn=[s*kx,-kneeH],Cl=[s*lerp(kx,fx,0.4),-calfH],Hm=[s*lerp(kx,fx,0.86),-hemH],An=[s*fx,-ankH],chL='leg'+s;
+    cap(Hp,tR*0.82,Tq,tR,chL);cap(Tq,tR,Kn,kR,chL);cap(Kn,kR,Cl,cR,chL);cap(Cl,cR,Hm,hR,chL,true);cap(Hm,anR,An,anR,chL);
+    cap([An[0]-s,-fH],fH,[An[0]+s*fL,-fH*0.85],fH*0.85,'foot'+s);
+    var lx=Hm[0]-Cl[0],ly=Hm[1]-Cl[1],ll=Math.sqrt(lx*lx+ly*ly);lx/=ll;ly/=ll;
+    seg(Hm[0]-ly*hR,Hm[1]+lx*hR,Hm[0]+ly*hR,Hm[1]-lx*hR,1.2);
+    if(!f){
+      var pY=-armpitH+lerp(8,15,m);
+      quad([s*3,pY+1],[s*cHW*0.5,pY+7],[s*cHW*0.9,pY-7],1,g.mlines);
+    }
+  }
+  if(f){
+    /* ponytail with a tie */
+    var q=[[8,-21,7],[23,-18,7.8],[33,-4,7],[34,14,5.4],[30,30,2.8]],hy=-skH+4*hd;
+    for(j=0;j<q.length-1;j++)cap([q[j][0]*hd,hy+q[j][1]*hd],q[j][2]*hd,[q[j+1][0]*hd,hy+q[j+1][1]*hd],q[j+1][2]*hd,'hair').hl=j===0;
+  }
+  /* jacket: crossed lapels, belt with a knot and two ends, skirt split */
+  var beltH=lerp(7,12,m),wy=-waistH,bt=wy-beltH/2,bb=wy+beltH/2;
+  g.belt={y0:bt,y1:bb};
+  var lapY=-lerp(nBH,shH,0.24),lapX=wf(lapY)*0.97;
+  var Xb=[-lerp(2,6,m),bt],Lr=[lapX,lapY],Ll=[-lapX,lapY],bow=lerp(1,7,m);
+  var cA=[(Lr[0]+Xb[0])/2+bow,(Lr[1]+Xb[1])/2-bow*0.4];
+  quad(Lr,cA,Xb,1.4);
+  var Pm=qpt(Lr,cA,Xb,0.62);
+  quad(Ll,[(Ll[0]+Pm[0])/2-bow,(Ll[1]+Pm[1])/2-bow*0.4],Pm,1.4);
+  seg(-wf(bt),bt,wf(bt),bt,1.3);seg(-wf(bb),bb,wf(bb),bb,1.3);
+  g.lines.push({p:[[-2,bt-1.5],[8,bt-1.5],[8,bb+1.5],[-2,bb+1.5],[-2,bt-1.5]],w:1.3});
+  var tl=lerp(15,24,m);
+  seg(1,bb+1.5,-5,bb+tl,2);seg(5,bb+1.5,10,bb+tl+3,2);
+  seg(Xb[0],bb,Xb[0]-lerp(3,8,m),-skirtH,1.1);
+  var stY=lapY+lerp(9,13,m);
+  seg(1,stY,lerp(1,Pm[0],0.7),Pm[1]-7,1,g.mlines);
+  quad([1,stY],[lapX*0.45,stY-1],[lapX*0.86,lapY+3],1,g.mlines);
+  quad([1,stY],[-lapX*0.45,stY-1],[-lapX*0.86,lapY+3],1,g.mlines);
+  var hw=shW;
+  for(j=0;j<g.caps.length;j++){var c=g.caps[j];hw=Math.max(hw,Math.abs(c.ax)+c.ra,Math.abs(c.bx)+c.rb);}
+  g.hw=hw;
+  return g;
+}
+
+/* tapered capsule = convex hull of two circles; flatB cuts end B straight (cuff, trouser hem) */
+function capPath(c,p){
+  var dx=p.bx-p.ax,dy=p.by-p.ay,d=Math.sqrt(dx*dx+dy*dy);
+  if(d<0.01||d<=Math.abs(p.ra-p.rb)+0.01){var big=p.ra>=p.rb,x=big?p.ax:p.bx,y=big?p.ay:p.by,r=big?p.ra:p.rb;c.moveTo(x+r,y);c.arc(x,y,r,0,TAU);c.closePath();return;}
+  var th=Math.atan2(dy,dx),a=Math.acos(clamp((p.ra-p.rb)/d,-1,1));
+  c.moveTo(p.ax+p.ra*Math.cos(th+a),p.ay+p.ra*Math.sin(th+a));
+  c.arc(p.ax,p.ay,p.ra,th+a,th+TAU-a);
+  if(p.flatB){c.lineTo(p.bx+p.rb*Math.cos(th-a),p.by+p.rb*Math.sin(th-a));c.lineTo(p.bx+p.rb*Math.cos(th+a),p.by+p.rb*Math.sin(th+a));}
+  else c.arc(p.bx,p.by,p.rb,th-a,th+a);
+  c.closePath();
+}
+function torsoPath(c,g){
+  var T=g.torso,y,ys=[];
+  for(y=T.top;y<T.bottom;y+=2)ys.push(y);
+  ys.push(T.bottom);
+  c.moveTo(T.w(ys[0]),ys[0]);
+  for(y=1;y<ys.length;y++)c.lineTo(T.w(ys[y]),ys[y]);
+  for(y=ys.length-1;y>=0;y--)c.lineTo(-T.w(ys[y]),ys[y]);
+  c.closePath();
+}
+/* the silhouette as ONE path: every part is a closed subpath wound the same way, so a nonzero fill is their union */
+function bodyPath(c,g){
+  var h=g.head,i;
+  c.beginPath();
+  capPath(c,{ax:h.x,ay:h.y1,ra:h.r1,bx:h.x,by:h.y2,rb:h.r2});
+  torsoPath(c,g);
+  for(i=0;i<g.caps.length;i++)capPath(c,g.caps[i]);
+}
+function headW(h,y){
+  if(y<=h.top||y>=h.bottom)return 0;
+  var a=0,b=0,c=0,dy=y-h.y1;
+  if(Math.abs(dy)<h.r1)a=Math.sqrt(h.r1*h.r1-dy*dy);
+  dy=y-h.y2;
+  if(Math.abs(dy)<h.r2)b=Math.sqrt(h.r2*h.r2-dy*dy);
+  if(y>h.y1&&y<h.y2)c=lerp(h.r1,h.r2,(y-h.y1)/(h.y2-h.y1))*0.985;
+  return Math.max(a,b,c);
+}
+/* cross-section rings; the spacing grows with the radius so thick limbs do not turn into stacks of discs */
+function buildRings(g){
+  var R=[],grp=0,y,i,n,h=g.head,T=g.torso,last=null,w,ys=[];
+  function add(x,yy,rx,ry,rot,b){if(rx<0.7)return;R.push({x:x,y:yy,rx:rx,ry:Math.max(0.3,ry),rot:rot,cr:Math.cos(rot),sr:Math.sin(rot),g:grp,b:!!b});}
+  for(y=h.top+2.5;y<h.bottom-1;y+=5.2*g.hd){w=headW(h,y);add(0,y,w,w*0.3,0);}
+  grp++;
+  y=h.bottom+1.5;
+  while(y<T.bottom-3){if(y<g.belt.y0-2.6||y>g.belt.y1+2.6)ys.push(y);y+=clamp(T.w(y)*0.15,5.2,9);}
+  ys.push(g.belt.y0,g.belt.y1,T.bottom);
+  ys.sort(function(a,b){return a-b;});
+  for(i=0;i<ys.length;i++){y=ys[i];w=T.w(y);add(0,y,w,Math.min(w*0.2,10),0,y===g.belt.y0||y===g.belt.y1);}
+  g.caps.forEach(function(c){
+    if(!(c.chain&&c.chain===last))grp++;
+    last=c.chain;
+    var dx=c.bx-c.ax,dy=c.by-c.ay,d=Math.sqrt(dx*dx+dy*dy),r,u;
+    if(d<0.5){for(i=-1;i<=1;i++){u=i*0.55;r=c.ra*Math.sqrt(1-u*u);add(c.ax,c.ay+u*c.ra,r,r*0.3,0);}return;}
+    var rot=Math.atan2(dy,dx)-PI/2;
+    n=Math.max(1,Math.round(d/clamp((c.ra+c.rb)*0.3,5,11)));
+    for(i=0;i<n;i++){u=(i+0.5)/n;r=lerp(c.ra,c.rb,u);add(c.ax+dx*u,c.ay+dy*u,r,r*0.22,rot,(c.flatB||c.hl)&&i===n-1);}
+  });
+  return R;
+}
+function strokeLines(c,arr,style,mul){
+  c.strokeStyle=style;c.lineCap='round';c.lineJoin='round';
+  for(var i=0;i<arr.length;i++){var p=arr[i].p,j;c.lineWidth=arr[i].w*mul;c.beginPath();c.moveTo(p[0][0],p[0][1]);for(j=1;j<p.length;j++)c.lineTo(p[j][0],p[j][1]);c.stroke();}
+}
+function mkSprite(core,halo){
+  var n=32,cv=mk();cv.width=cv.height=n;
+  var x=cv.getContext('2d'),gr=x.createRadialGradient(n/2,n/2,0,n/2,n/2,n/2);
+  gr.addColorStop(0,rgba(core,1));gr.addColorStop(0.28,rgba(halo,0.8));gr.addColorStop(0.6,rgba(halo,0.22));gr.addColorStop(1,rgba(halo,0));
+  x.fillStyle=gr;x.fillRect(0,0,n,n);return cv;
+}
+
+function create(canvas,opts){
+  opts=opts||{};
+  var ctx=canvas.getContext('2d');
+  var st={kg:clampKg(opts.kg==null?KG_MIN:opts.kg),ch:opts.char==='f'?'f':'m',color:COLORS[opts.color]?opts.color:'moviy',dim:!!opts.dim};
+  var disp=st.kg,W=0,H=0,k=1,ox=0,oy=0,cssW=-1,cssH=-1;
+  var bgC=mk(),baseC=mk(),shellC=mk(),tmpC=mk();
+  var geom=null,rings=null,layersKey='',assetsKey='',box={x:0,y:0,w:0,h:0},clr={x:0,y:0,w:0,h:0};
+  var col=[0,0,0],tint=[0,0,0],sprite=null,spriteW=null,auraC=null,beamC=null,scanSp=3;
+  var anim=null,tapT=null,lit=st.dim?0:1,litQ=lit,spin=0,lastKg=null,lastT=null;
+  var raf=0,running=false,lastTs=0,frameNo=0,dead=false,api;
+
+  function emit(n,v){if(typeof opts.fx==='function'){try{opts.fx(n,v);}catch(e){}}}
+  function kgOut(v){v=round1(v);if(v!==lastKg){lastKg=v;if(typeof opts.onKg==='function'){try{opts.onKg(v);}catch(e){}}}}
+  function lw(w){return Math.max(w,1/k);}
+
+  function resize(){
+    var cw=canvas.clientWidth,chh=canvas.clientHeight;
+    if(!(cw>4&&chh>4)){var r=canvas.getBoundingClientRect();cw=Math.round(r.width);chh=Math.round(r.height);}
+    cssW=canvas.clientWidth;cssH=canvas.clientHeight;
+    if(!(cw>4&&chh>4)){W=0;return;}
+    var dpr=Math.min(2,window.devicePixelRatio||1);
+    if(cw*chh*dpr*dpr>MAXPX)dpr=Math.max(1,Math.sqrt(MAXPX/(cw*chh)));
+    var w=Math.round(cw*dpr),h=Math.round(chh*dpr);
+    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+    W=w;H=h;k=Math.min(W/BW,H/(TOPU+BOTU));ox=W/2;oy=Math.round((H-(TOPU+BOTU)*k)/2+TOPU*k);
+    layersKey='';assetsKey='';box.w=0;
+  }
+  /* scanline rows on a fixed grid, so the stage and the figure stay in step */
+  function scanRows(c,x,y,w,h){
+    var hh=Math.max(1,Math.round(scanSp*0.34)),yy=Math.ceil(y/scanSp)*scanSp;
+    for(;yy<y+h;yy+=scanSp)c.fillRect(x,yy,w,hh);
+  }
+  /* an offscreen layer of the canvas size; only the figure's box is cleared */
+  function layer(cv){
+    var c=cv.getContext('2d');
+    if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+    c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.globalAlpha=1;
+    c.clearRect(clr.x,clr.y,clr.w,clr.h);
+    return c;
+  }
+
+  function ensureAssets(lq){
+    var key=[W,H,st.color,lq].join('|');
+    if(key===assetsKey)return;
+    assetsKey=key;litQ=lq;
+    col=mix(GREY,hexRgb(COLORS[st.color]),0.2+0.8*lq);tint=mix(col,WHITE,0.62);
+    sprite=mkSprite(tint,col);spriteW=mkSprite(WHITE,tint);
+    var n=128,x,c,g1;
+    auraC=mk();auraC.width=auraC.height=n;x=auraC.getContext('2d');
+    g1=x.createRadialGradient(n/2,n/2,6,n/2,n/2,n/2);
+    g1.addColorStop(0,rgba(col,0.36));g1.addColorStop(0.6,rgba(col,0.12));g1.addColorStop(1,rgba(col,0));
+    x.fillStyle=g1;x.fillRect(0,0,n,n);
+    beamC=mk();beamC.width=64;beamC.height=1;x=beamC.getContext('2d');
+    g1=x.createLinearGradient(0,0,64,0);
+    g1.addColorStop(0,rgba(tint,0));g1.addColorStop(0.5,rgba(WHITE,0.95));g1.addColorStop(1,rgba(tint,0));
+    x.fillStyle=g1;x.fillRect(0,0,64,1);
+    scanSp=Math.max(3,Math.round(2.6*k));
+    /* light cone and the base disc */
+    if(baseC.width!==W||baseC.height!==H){baseC.width=W;baseC.height=H;}
+    c=baseC.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);c.setTransform(k,0,0,k,ox,oy);
+    var by=4;
+    g1=c.createLinearGradient(0,by,0,-345);
+    g1.addColorStop(0,rgba(col,0.2));g1.addColorStop(0.5,rgba(col,0.055));g1.addColorStop(1,rgba(col,0));
+    c.fillStyle=g1;c.beginPath();c.moveTo(-62,by);c.lineTo(62,by);c.lineTo(152,-345);c.lineTo(-152,-345);c.closePath();c.fill();
+    c.save();c.translate(0,by);c.scale(1,0.21);
+    g1=c.createRadialGradient(0,0,4,0,0,96);
+    g1.addColorStop(0,rgba(tint,0.6));g1.addColorStop(0.55,rgba(col,0.22));g1.addColorStop(1,rgba(col,0));
+    c.fillStyle=g1;c.beginPath();c.arc(0,0,96,0,TAU);c.fill();c.restore();
+    c.lineWidth=lw(1.4);c.strokeStyle=rgba(tint,0.85);c.beginPath();c.ellipse(0,by,78,16.2,0,0,TAU);c.stroke();
+    c.lineWidth=lw(1);c.strokeStyle=rgba(col,0.55);c.beginPath();c.ellipse(0,by,60,12.4,0,0,TAU);c.stroke();
+    c.beginPath();c.ellipse(0,by,36,7.4,0,0,TAU);c.stroke();
+    /* the dark stage with the cone and the disc baked in */
+    if(bgC.width!==W||bgC.height!==H){bgC.width=W;bgC.height=H;}
+    c=bgC.getContext('2d');c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;
+    c.fillStyle=STAGE;c.fillRect(0,0,W,H);
+    c.save();c.translate(ox,oy);c.scale(1,0.66);
+    var R=Math.max(W,H)*0.95;
+    g1=c.createRadialGradient(0,0,0,0,0,R);
+    g1.addColorStop(0,'#10263b');g1.addColorStop(0.45,'#08131f');g1.addColorStop(1,STAGE);
+    c.fillStyle=g1;c.fillRect(-W,-H*3,W*2,H*6);
+    g1=c.createRadialGradient(0,0,0,0,0,R*0.5);
+    g1.addColorStop(0,rgba(col,0.1));g1.addColorStop(1,rgba(col,0));
+    c.fillStyle=g1;c.fillRect(-W,-H*3,W*2,H*6);
+    c.restore();
+    c.globalAlpha=lerp(0.56,1,lq)*0.95;c.drawImage(baseC,0,0);
+    c.globalAlpha=lerp(0.42,0.3,lq);c.fillStyle=STAGE;scanRows(c,0,0,W,H);c.globalAlpha=1;
+  }
+
+  /* the cached shell: faint fill of the silhouette, one clean glowing outline, jacket and muscle lines, the rings and
+     the scanlines. lite = the cheap version used while the body is changing every frame. */
+  function ensureLayers(mq,lite){
+    var key=[mq,st.ch,lite?1:0,assetsKey].join('|');
+    if(key===layersKey)return;
+    layersKey=key;
+    geom=buildGeom(mq,st.ch);rings=buildRings(geom);
+    var hw=(geom.hw+12)*k,x0=Math.max(0,Math.floor(ox-hw)),y0=Math.max(0,Math.floor(oy+(geom.head.top-12)*k)),x1=Math.min(W,Math.ceil(ox+hw)),y1=Math.min(H,Math.ceil(oy+10*k));
+    if(x1-x0<1||y1-y0<1)return;
+    var ux0=box.w?Math.min(x0,box.x):x0,uy0=box.w?Math.min(y0,box.y):y0,ux1=box.w?Math.max(x1,box.x+box.w):x1,uy1=box.w?Math.max(y1,box.y+box.h):y1;
+    clr={x:ux0,y:uy0,w:ux1-ux0,h:uy1-uy0};box={x:x0,y:y0,w:x1-x0,h:y1-y0};
+    var c=layer(shellC),x,p,passes=lite?[[2.9,0.3,col],[1.3,0.96,tint]]:[[5.4,0.1,col],[2.9,0.24,col],[1.3,0.96,tint]];
+    c.setTransform(k,0,0,k,ox,oy);c.fillStyle=rgba(col,0.13);bodyPath(c,geom);c.fill();
+    for(p=0;p<passes.length;p++){
+      x=layer(tmpC);x.setTransform(k,0,0,k,ox,oy);
+      x.strokeStyle=rgba(passes[p][2],1);x.lineJoin='round';x.lineWidth=Math.max(passes[p][0],1.2/k)*2;
+      bodyPath(x,geom);x.stroke();
+      x.globalCompositeOperation='destination-out';x.fillStyle='#000';x.fill();
+      c.setTransform(1,0,0,1,0,0);c.globalAlpha=passes[p][1];c.drawImage(tmpC,box.x,box.y,box.w,box.h,box.x,box.y,box.w,box.h);
+    }
+    c.globalAlpha=1;c.setTransform(k,0,0,k,ox,oy);
+    strokeLines(c,geom.lines,rgba(tint,0.78),Math.max(1,1/k));
+    strokeLines(c,geom.mlines,rgba(mix(tint,WHITE,0.5),0.8*geom.mu),Math.max(1.3,1.3/k));
+    c.lineCap='round';c.lineJoin='round';c.globalCompositeOperation='lighter';
+    if(!lite){c.strokeStyle=rgba(col,0.085);c.lineWidth=lw(3.4);ringArcs(c,0,PI,0);c.stroke();}
+    c.strokeStyle=rgba(col,0.26);c.lineWidth=lw(0.8);ringArcs(c,PI,TAU,0);c.stroke();
+    c.strokeStyle=rgba(tint,0.8);c.lineWidth=lw(1.05);ringArcs(c,0,PI,0);c.stroke();
+    c.strokeStyle=rgba(WHITE,0.85);c.lineWidth=lw(1.7);ringArcs(c,0,PI,1);c.stroke();
+    c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='destination-out';c.globalAlpha=lerp(0.42,0.3,litQ);
+    c.fillStyle='#000';scanRows(c,box.x,box.y,box.w,box.h);
+    c.globalAlpha=1;c.globalCompositeOperation='source-over';
+  }
+
+  /* arcs of the rings as one path: test 1 = belt rings only, 2 = rings between two heights */
+  function ringArcs(c,a0,a1,test,p1,p2){
+    var R=rings,n=R.length,i,r,neg=a0===PI;
+    c.beginPath();
+    for(i=0;i<n;i++){
+      r=R[i];
+      if(test===1&&!r.b)continue;
+      if(test===2&&!(r.y>p1&&r.y<p2))continue;
+      if(neg)c.moveTo(r.x-r.rx*r.cr,r.y-r.rx*r.sr);else c.moveTo(r.x+r.rx*r.cr,r.y+r.rx*r.sr);
+      c.ellipse(r.x,r.y,r.rx,r.ry,r.rot,a0,a1);
+    }
+  }
+  /* what moves every frame: the turning meridians, the light band (sw), the energy wave of a gain (wy), running dots */
+  function drawLive(c,t,I,sw,wy){
+    var R=rings,n=R.length,i,j,p,r,phi=t*0.0009*(0.4+0.6*lit)+spin,a,ca,sa,x0,y0,px,py,prev,dr=lw(1.25);
+    c.lineCap='round';c.lineJoin='round';c.globalCompositeOperation='lighter';
+    for(p=0;p<2;p++){
+      c.strokeStyle=rgba(col,(p?0.14:0.5)*I);c.lineWidth=lw(p?0.7:0.9);c.beginPath();
+      for(j=0;j<6;j++){
+        a=phi+j*TAU/6;sa=Math.sin(a);
+        if((sa>0)===(p===1))continue;
+        ca=Math.cos(a);prev=-1;
+        for(i=0;i<n;i++){r=R[i];x0=r.rx*ca;y0=r.ry*sa;px=r.x+x0*r.cr-y0*r.sr;py=r.y+x0*r.sr+y0*r.cr;if(r.g!==prev){c.moveTo(px,py);prev=r.g;}else c.lineTo(px,py);}
+      }
+      c.stroke();
+    }
+    c.strokeStyle=rgba(WHITE,0.5*I);c.lineWidth=lw(1.3);ringArcs(c,0,PI,2,sw-11,sw+11);c.stroke();
+    if(wy!=null){
+      c.strokeStyle=rgba(WHITE,0.8);c.lineWidth=lw(1.5);ringArcs(c,0,TAU,2,wy-4,wy+24);c.stroke();
+      c.strokeStyle=rgba(WHITE,0.3);ringArcs(c,0,PI,2,wy+24,wy+70);c.stroke();
+    }
+    c.fillStyle=rgba(WHITE,0.95*I);c.beginPath();
+    for(i=0;i<n;i++){
+      r=R[i];a=phi*1.7+i*0.5;sa=Math.sin(a);
+      if(sa>-0.15){ca=Math.cos(a);x0=r.rx*ca;y0=r.ry*sa;px=r.x+x0*r.cr-y0*r.sr;py=r.y+x0*r.sr+y0*r.cr;c.moveTo(px+dr,py);c.arc(px,py,dr,0,TAU);}
+    }
+    c.fill();
+    c.globalCompositeOperation='source-over';
+  }
+
+  function mkParts(strong){
+    var rise=[],sparks=[],i,an,rr,n=strong?46:28;
+    for(i=0;i<40;i++){
+      an=Math.random()*TAU;rr=26+Math.random()*56;
+      rise.push({x0:Math.cos(an)*rr,y0:4+Math.sin(an)*rr*0.2,dx:(Math.random()-0.5)*30,h:130+Math.random()*230,dl:Math.random()*1100,du:520+Math.random()*380,sz:6+Math.random()*5});
+    }
+    for(i=0;i<n;i++){an=Math.random()*TAU;sparks.push({cs:Math.cos(an),sn:Math.sin(an)*0.9,sp:80+Math.random()*130,dl:Math.random()*140,sz:4+Math.random()*5});}
+    return {rise:rise,sparks:sparks};
+  }
+  /* gain effects above the hologram: rising energy, climbing rings, the burst */
+  function drawFx(c,e,a){
+    var i,j,u,uu,q,p,x,y,sz,rr,tau=e-G1,cy=geom.lv.chestY;
+    c.globalCompositeOperation='lighter';
+    for(i=0;i<a.fxp.rise.length;i++){
+      p=a.fxp.rise[i];u=(e-p.dl)/p.du;if(u<=0||u>=1)continue;
+      for(j=0;j<4;j++){
+        uu=u-j*0.045;if(uu<=0)continue;
+        q=Math.pow(uu,1.5);x=p.x0*(1-0.6*q)+p.dx*q;y=p.y0-p.h*q;sz=p.sz-j*1.1;
+        c.globalAlpha=(1-j*0.24)*Math.min(1,uu*5)*(1-uu*uu);c.drawImage(spriteW,x-sz/2,y-sz,sz,sz*2);
+      }
+    }
+    c.globalAlpha=1;
+    for(j=0;j<3;j++){
+      u=(e-120-j*230)/950;if(u<=0||u>=1)continue;
+      y=lerp(4,geom.head.top+8,easeInOut(u));rr=(geom.lv.E+28)*(0.72+0.28*Math.sin(PI*u));
+      c.strokeStyle=rgba(j?tint:WHITE,Math.sin(PI*u)*(j?0.6:0.9));c.lineWidth=lw(j?1.3:2);c.beginPath();c.ellipse(0,y,rr,rr*0.2,0,0,TAU);c.stroke();
+    }
+    if(tau>0){
+      var nr=a.strong?4:2;
+      for(j=0;j<nr;j++){
+        u=(tau-j*120)/850;if(u<=0||u>=1)continue;
+        rr=20+195*easeOut(u);
+        c.strokeStyle=rgba(tint,(1-u)*0.9);c.lineWidth=lw(3.2*(1-u)+0.7);c.beginPath();c.ellipse(0,cy,rr,rr*0.92,0,0,TAU);c.stroke();
+      }
+      for(i=0;i<a.fxp.sparks.length;i++){
+        p=a.fxp.sparks[i];u=(tau-p.dl)/700;if(u<=0||u>=1)continue;
+        for(j=0;j<3;j++){
+          uu=u-j*0.05;if(uu<=0)continue;
+          q=easeOut(uu)*p.sp;sz=p.sz-j*1.2;
+          c.globalAlpha=(1-u)*(1-j*0.3);c.drawImage(spriteW,p.cs*q-sz/2,cy+p.sn*q-sz/2,sz,sz);
+        }
+      }
+      c.globalAlpha=1;
+      if(a.strong){
+        u=tau/900;
+        if(u<1){rr=46+60*easeOut(u);c.globalAlpha=Math.pow(1-u,2)*0.75;c.drawImage(beamC,-rr/2,-TOPU,rr,TOPU+6);c.globalAlpha=1;}
+      }
+    }
+    c.globalCompositeOperation='source-over';
+  }
+
+  function endAnim(){
+    if(!anim)return;
+    var a=anim;anim=null;disp=st.kg;kgOut(st.kg);emit('done',st.kg);
+    if(a.done){try{a.done();}catch(e){}}
+  }
+
+  function draw(t){
+    if(dead)return;
+    if(!W){resize();if(!W)return;}
+    var a=anim,scl=1,flash=0,boost=0,wy=null,e=0,u,tau,dec,fin=false,dt=lastT==null?0:clamp(t-lastT,0,120),i;
+    lastT=t;
+    if(a){
+      if(a.t0==null){a.t0=t;emit('start');kgOut(a.from);}
+      e=t-a.t0;u=clamp((e-G0)/(G1-G0),0,1);tau=e-G1;
+      lit=Math.min(1,lit+dt/420);
+      var kgNow=a.from+(a.to-a.from)*easeInOut(u);
+      kgOut(u>=1?a.to:kgNow);
+      if(e>=G0&&u<1&&e-a.tick>=150){a.tick=e;emit('tick',round1(kgNow));}
+      dec=tau>0?Math.pow(1-clamp(tau/650,0,1),2):0;
+      disp=kgNow+a.pump*(0.55*Math.sin(PI*u)+0.5*dec);
+      scl=1+0.03*Math.sin(PI*u)+(a.strong?0.06:0.04)*dec;
+      if(tau>=0&&!a.burst){a.burst=true;emit('burst',a.strong?1:0);}
+      flash=dec*(a.strong?0.85:0.6);
+      boost=Math.sin(PI*clamp(e/1500,0,1))*1.2+dec*0.8;
+      if(e>=a.dur){fin=true;disp=st.kg;scl=1;flash=0;boost=0;}
+    }else{
+      var target=st.dim?0:1;
+      lit=lit>target?Math.max(target,lit-dt/900):target;
+    }
+    if(tapT!=null){
+      if(tapT<0)tapT=t;
+      u=(t-tapT)/520;
+      if(u>=1){tapT=null;spin+=1.4;}
+      else{scl*=1+0.05*Math.sin(PI*u)*(1-u*0.5);flash=Math.max(flash,0.3*Math.pow(1-u,2));}
+    }
+    ensureAssets(Math.round(lit*8)/8);
+    var lite=!!(a&&!fin&&e>G0-60&&e<G1+660),qm=lite?125:250;
+    ensureLayers(Math.round(massCurve(disp)*qm)/qm,lite);
+    if(a&&!fin){u=(e-120)/950;if(u>0&&u<1)wy=lerp(4,geom.head.top+8,easeInOut(u));}
+
+    var slow=lit<0.5,per=slow?3100:5300,gl=!a&&(t%per)<(slow?170:110);
+    var fl=slow?0.84+0.12*Math.sin(t*0.0046)*Math.sin(t*0.0019)-(gl?0.16:0):0.93+0.05*Math.sin(t*0.013)*Math.sin(t*0.0047)-(gl?0.2:0);
+    var I=fl*lerp(0.56,1,lit)*(a&&!fin&&e>G0?1.12:1),c=ctx;
+    c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.globalCompositeOperation='copy';
+    c.drawImage(bgC,0,0);
+    if(boost>0.03){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,boost*0.7);c.drawImage(baseC,0,0);c.globalAlpha=1;}
+    c.globalCompositeOperation='source-over';
+    c.setTransform(k,0,0,k,ox,oy);
+    /* rotating ticks on the base disc */
+    c.strokeStyle=rgba(tint,0.7*I);c.lineWidth=lw(1.2);c.beginPath();
+    for(i=0;i<28;i++){var ta=t*0.0006*(0.3+0.7*lit)+i*TAU/28,cs=Math.cos(ta),sn=Math.sin(ta),r0=(i%4===0)?64:71;c.moveTo(cs*r0,4+sn*r0*0.207);c.lineTo(cs*77,4+sn*77*0.207);}
+    c.stroke();
+    /* top titles: an aura behind the body and wisps rising along its sides */
+    var au=sstep(0.68,1,geom.m)*lit+boost*0.25;
+    if(au>0.01){
+      var E=geom.lv.E,pul=0.85+0.15*Math.sin(t*0.004),aw=(E+52)*2,ah=420;
+      c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,au*pul*I);
+      c.drawImage(auraC,-aw/2,-185-ah/2,aw,ah);
+      for(i=0;i<18;i++){
+        var side=i%2?1:-1,sp=0.05+hash(i*3.3)*0.05,f=((t*sp+hash(i*7.1)*300)%300)/300,y=-12-f*300;
+        var hw=(E+8)*Math.sqrt(Math.max(0,1-Math.pow((y+185)/195,2)))+6+Math.sin(t*0.004+i)*5,sz=4+hash(i*5.9)*5;
+        c.globalAlpha=Math.min(1,Math.sin(PI*f)*0.8*au*I);c.drawImage(spriteW,side*hw-sz/2,y-sz,sz,sz*2);
+      }
+      c.globalAlpha=1;c.globalCompositeOperation='source-over';
+    }
+    /* the figure breathes around the ground point */
+    var sx=scl*(1+0.003*Math.sin(t/950+1)),sy=scl*(1+0.006*Math.sin(t/950));
+    c.setTransform(sx,0,0,sy,ox*(1-sx),oy*(1-sy));
+    c.globalAlpha=Math.min(1,I);c.drawImage(shellC,box.x,box.y,box.w,box.h,box.x,box.y,box.w,box.h);
+    if(flash>0.005){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,flash*1.2);c.drawImage(shellC,box.x,box.y,box.w,box.h,box.x,box.y,box.w,box.h);}
+    c.globalAlpha=1;
+    c.setTransform(k*sx,0,0,k*sy,ox,oy);
+    if(flash>0.005){c.fillStyle=rgba(WHITE,flash*0.4);bodyPath(c,geom);c.fill();c.globalCompositeOperation='source-over';}
+    drawLive(c,t,I,30-((t*0.055*(0.5+0.5*lit))%(TOPU+90)),wy);
+    c.setTransform(k,0,0,k,ox,oy);c.globalCompositeOperation='lighter';
+    if(gl){
+      c.fillStyle=rgba(tint,0.5);
+      var gy=-320+hash(Math.floor(t/per))*260;c.fillRect(-100,gy,200,1.6);c.fillRect(-70,gy+22,150,1);
+    }
+    var nf=slow?7:16;
+    for(i=0;i<nf;i++){
+      var fxx=(hash(i*1.7+3)-0.5)*270+Math.sin(t*0.0007+i)*6,v=0.012+hash(i*2.3+9)*0.02,ff=((t*v+hash(i*4.1)*340)%340)/340,fs=3+hash(i*7.7)*3.5;
+      c.globalAlpha=Math.sin(PI*ff)*0.75*I;c.drawImage(sprite,fxx-fs/2,-ff*340-fs/2,fs,fs);
+    }
+    c.globalAlpha=1;
+    if(tapT!=null&&tapT>=0){
+      u=(t-tapT)/520;
+      if(u>0&&u<1){var tr=78+70*easeOut(u);c.strokeStyle=rgba(tint,(1-u)*0.8);c.lineWidth=lw(2.4*(1-u)+0.6);c.beginPath();c.ellipse(0,4,tr,tr*0.207,0,0,TAU);c.stroke();}
+    }
+    c.globalCompositeOperation='source-over';
+    if(a&&!fin)drawFx(c,e,a);
+    c.setTransform(1,0,0,1,0,0);
+    if(fin)endAnim();
+  }
+
+  function frame(ts){
+    if(!running)return;
+    raf=requestAnimationFrame(frame);
+    if(!anim&&tapT==null&&ts-lastTs<31)return;
+    lastTs=ts;
+    if((++frameNo%24)===0&&(canvas.clientWidth!==cssW||canvas.clientHeight!==cssH))resize();
+    draw(ts);
+  }
+  function start(){if(running||dead)return;running=true;lastTs=0;raf=requestAnimationFrame(frame);}
+  function stop(){running=false;if(raf)cancelAnimationFrame(raf);raf=0;lastT=null;}
+  function still(){if(!running&&!dead)draw(now());}
+
+  api={
+    manual:false,
+    set:function(o){
+      if(!o||dead)return;
+      if(o.kg!=null){endAnim();st.kg=clampKg(o.kg);disp=st.kg;lastKg=null;}
+      if(o.char!=null)st.ch=o.char==='f'?'f':'m';
+      if(o.color!=null&&COLORS[o.color])st.color=o.color;
+      if(o.dim!=null){st.dim=!!o.dim;if(!anim)lit=st.dim?0:1;}
+      still();
+    },
+    gain:function(from,to,done){
+      if(dead)return;
+      endAnim();
+      from=clampKg(from);to=clampKg(to);st.kg=to;lastKg=null;
+      var cb=typeof done==='function'?done:null,strong=false,i;
+      if(to-from<0.05){
+        disp=to;kgOut(to);tapT=-1;emit('done',to);
+        if(cb)setTimeout(cb,0);
+        if(!running&&!api.manual)start();
+        return;
+      }
+      for(i=0;i<THRESH.length;i++)if(from<THRESH[i]&&to>=THRESH[i])strong=true;
+      disp=from;
+      anim={t0:null,from:from,to:to,strong:strong,dur:strong?3500:3200,done:cb,pump:clamp(1.5+(to-from)*0.45,2,7),tick:-1e9,burst:false,fxp:mkParts(strong)};
+      if(!running&&!api.manual)start();
+    },
+    tap:function(){if(dead)return;tapT=-1;if(!running&&!api.manual)start();},
+    start:start,stop:stop,draw:draw,
+    resize:function(){resize();still();},
+    destroy:function(){
+      stop();dead=true;anim=null;
+      [bgC,baseC,shellC,tmpC].forEach(function(cv){cv.width=cv.height=0;});
+      geom=rings=null;
+    }
+  };
+  resize();
+  draw(now());
+  if(opts.autoStart!==false)start();
+  return api;
+}
+
+/* one static frame for a small tile: solid glowing silhouette with a crisp edge, no rings */
+var miniT=null;
+function mini(canvas,opts){
+  opts=opts||{};
+  var r=canvas.getBoundingClientRect(),cw=canvas.clientWidth||Math.round(r.width)||40,chh=canvas.clientHeight||Math.round(r.height)||48;
+  var dpr=Math.min(3,window.devicePixelRatio||1),W=Math.max(8,Math.round(cw*dpr)),H=Math.max(8,Math.round(chh*dpr));
+  if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
+  var dim=!!opts.dim,base=hexRgb(COLORS[opts.color]||COLORS.moviy),col=dim?mix(GREY,base,0.2):base,tint=mix(col,WHITE,0.55),I=dim?0.6:1;
+  var g=buildGeom(massCurve(clampKg(opts.kg==null?KG_MIN:opts.kg)),opts.char==='f'?'f':'m');
+  var MW=262,MT=374,MB=14,k=Math.min(W/MW,H/(MT+MB)),ox=W/2,oy=(H-(MT+MB)*k)/2+MT*k;
+  var c=canvas.getContext('2d'),b;
+  c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-over';c.globalAlpha=1;
+  c.fillStyle='#050a12';c.fillRect(0,0,W,H);
+  c.save();c.translate(ox,oy);c.scale(1,0.7);
+  var R=Math.max(W,H),gr=c.createRadialGradient(0,0,0,0,0,R);
+  gr.addColorStop(0,'#12293f');gr.addColorStop(0.55,'#08131f');gr.addColorStop(1,'#050a12');
+  c.fillStyle=gr;c.fillRect(-W,-H*3,W*2,H*6);c.restore();
+  c.setTransform(k,0,0,k,ox,oy);
+  c.strokeStyle=rgba(tint,0.7*I);c.lineWidth=Math.max(1/k,0.8*dpr/k);c.beginPath();c.ellipse(0,4,84,17,0,0,TAU);c.stroke();
+  if(!miniT)miniT=mk();
+  function band(px,color,alpha){
+    if(miniT.width!==W||miniT.height!==H){miniT.width=W;miniT.height=H;}
+    b=miniT.getContext('2d');b.setTransform(1,0,0,1,0,0);b.globalCompositeOperation='source-over';b.clearRect(0,0,W,H);
+    b.setTransform(k,0,0,k,ox,oy);b.strokeStyle=color;b.lineJoin='round';b.lineWidth=px*dpr/k*2;
+    bodyPath(b,g);b.stroke();
+    b.globalCompositeOperation='destination-out';b.fillStyle='#000';b.fill();
+    c.setTransform(1,0,0,1,0,0);c.globalAlpha=alpha;c.drawImage(miniT,0,0);c.globalAlpha=1;
+  }
+  band(1.6,rgba(col,1),0.22*I);
+  c.setTransform(k,0,0,k,ox,oy);c.fillStyle=rgba(col,0.5*I);bodyPath(c,g);c.fill();
+  band(0.55,rgba(tint,1),0.95*I);
+  c.setTransform(1,0,0,1,0,0);
+}
+
+window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:create,mini:mini};
+})();
+/* holo:end */
+</script>
 <script>
 (() => {
   'use strict';
@@ -327,7 +985,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v15';
+  const PAGE_VERSION = 'v16';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -697,7 +1355,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     el.className = 'card welcome';
     el.innerHTML = `${metaHtml('<span class="brand">Tez aytish</span>')}
       <div class="hero"><div class="bars xl" data-r="bars" data-mood="idle">${BARS}</div><h1 data-r="h1">Tez aytish</h1><p class="lead" data-r="lead">Yuklanmoqda…</p></div>
-      <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button><button class="pill small hide" type="button" data-r="go2"></button></div>
+      <div class="act"><button class="pill primary hide" type="button" data-r="go" data-act="begin">Boshlash</button><button class="pill small hide" type="button" data-r="go2"></button><button class="pill small hide" type="button" data-r="prof" data-act="profile">💪 Profil</button></div>
       <p class="foot"><button class="link" type="button" data-act="sheet">Texnik maʼlumot</button><button class="link hide" type="button" data-act="tmode" data-r="tmode">Oʻqituvchilar uchun</button></p>`;
     feed.appendChild(el);
     state.welcomeEl = el;
@@ -734,7 +1392,14 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     else if (kind === 'error') set('Ulanib boʻlmadi', text, 'Qayta urinish', 'reload', 'wink');
     else if (kind === 'fatal') set('Xatolik yuz berdi', text, 'Qayta urinish', 'reload', 'wink');
     else set('Tez aytish', text || 'Yuklanmoqda…', '', '');
+    state.wkind = kind;
+    paintProfPill();
     setTeachLink(kind);
+  }
+  // An account linked to a student in the family bot gets the student's profile on the welcome card too.
+  function paintProfPill() {
+    const b = state.welcomeEl && state.welcomeEl.querySelector('[data-r="prof"]');
+    if (b) b.classList.toggle('hide', !prof.kids.length || !['ready', 'soon', 'consent', 'tpending'].includes(state.wkind));
   }
   // The card a non-teacher comes back to from the teacher request («Orqaga»).
   function home(kind) { state.home = kind; welcome(kind); }
@@ -757,6 +1422,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
           <p class="lead">${state.cards.length} ta tez aytishda ${got} ta yulduz.</p>
           <ul class="sum">${state.cards.map((c) => `<li><span>${esc(c.t.text)}</span><span class="st">${[1, 2, 3].map((i) => starHtml(i <= c.stars)).join('')}</span></li>`).join('')}</ul>
           ${hard.length ? `<div class="hard"><p>Yana mashq qilish uchun soʻzlar</p>${hard.map((w) => `<span class="chip">${esc(w)}</span>`).join('')}</div>` : ''}
+          <p class="lead" data-r="mass"></p>
           <p class="lead" data-r="fam"></p>
         </div>
         <div class="act"><button class="pill primary" type="button" data-act="toteach">Guruhga qaytish</button></div>
@@ -785,6 +1451,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   function activate(el) {
     if (state.activeEl === el) return;
     state.activeEl = el;
+    // The lesson's summary has come into view: the student watches the wrestler gain the lesson's mass (once).
+    if (el === state.summaryEl && state.lesson && !state.lesson.gainShown) { state.lesson.gainShown = true; openProfile(state.lesson.studentId, { back: 'summary', lessonKey: state.lesson.key }); }
     const card = state.cards.find((c) => c.el === el);
     if (card && state.voiceCard === card) return; // a tap already started this card's sample
     stopVoice();
@@ -1386,6 +2054,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       state.error ? `Xato: ${state.error.name}: ${state.error.message}` : state.jsError ? `Xato: ${state.jsError}` : 'Xato: yoʻq',
       `Server: ${state.server || '—'} · aniqlash: ${state.sttReady ? state.provider || 'ulangan' : 'ulanmagan'} · diktor: ${d.samples} ta yozuv, ovoz ${d.sound ? 'yoqilgan' : 'oʻchirilgan'}${d.voiceLocked ? ', avto-ovoz bloklangan' : ''}`,
       `Rol: ${teach.role}${teach.data && teach.data.status ? ` (${teach.data.status})` : ''}${state.teachError ? ` · oʻqituvchi serveri: xato ${state.teachError}` : ''}`,
+      `Profil: ${family ? 'oila boti' : 'asosiy bot'} · farzandlar: ${prof.kids.length} · gologramma: ${window.TezHolo ? 'bor' : 'yoʻq'}`,
     ].join('\n');
   }
   function reportMic(outcome) {
@@ -1410,7 +2079,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     teacher_not_found: 'Oʻqituvchi topilmadi.', invalid_or_expired_init_data: 'Sessiya eskirdi: Mini Appʼni yopib, qayta och.',
     timeout: 'Server javob bermadi. Internetni tekshirib, qayta urinib koʻring.',
   };
-  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, link: null, form: null, busy: false, msg: '', notice: '', approveId: null };
+  const teach = { role: 'none', data: null, view: 'home', groupId: null, studentId: null, report: null, link: null, mass: null, form: null, busy: false, msg: '', notice: '', approveId: null };
   const myId = () => { try { return Number(tg.initDataUnsafe.user.id) || 0; } catch (e) { return 0; } };
 
   async function tapi(action, body) {
@@ -1446,11 +2115,13 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     teach.notice = '';
     renderTeach();
     $('teach').scrollTop = 0;
+    if (view === 'group' || view === 'student' || view === 'report') ensureMass();
   }
   function renderTeach() {
     const v = teach.view;
     $('teachIn').innerHTML = !teach.data ? '<p class="empty">Yuklanmoqda…</p>' : v === 'group' ? groupHtml() : v === 'student' ? studentHtml()
       : v === 'report' ? reportHtml() : v === 'gform' ? groupFormHtml() : v === 'sform' ? studentFormHtml() : v === 'approve' ? approveHtml() : homeHtml();
+    paintMinis($('teachIn'));
   }
   // Run a change, reload the teacher's data and go on; a refusal stays on the screen as a message.
   async function teachAct(run, after) {
@@ -1461,6 +2132,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
       const r = await run();
       await loadTeach();
       teach.report = null;
+      ensureMass(true);
       if (after) after(r); else { teach.msg = ''; renderTeach(); }
     } catch (e) { teach.msg = tErr(e); renderTeach(); } finally { teach.busy = false; document.body.classList.remove('t-busy'); }
   }
@@ -1539,7 +2211,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     }
     if (l.next) h += `<button class="t-link" type="button" data-t="opennow">Keyingi darsni hozir ochish (${esc(dayLabel(l.next))})</button>`;
     h += `</div><div class="t-weeks">${weekSelect('Bu hafta', g.weeks.thisStart, g.weeks.thisModule, mods)}${weekSelect('Keyingi hafta', g.weeks.nextStart, g.weeks.nextModule, mods)}</div>`;
-    h += `<p class="sect">Oʻquvchilar · ${g.students.length}</p>` + (g.students.length ? g.students.map((s) => studentRowHtml(g, s)).join('') : '<p class="empty">Hali oʻquvchi yoʻq.</p>');
+    h += `<p class="sect">Oʻquvchilar · ${g.students.length}</p>${teamHtml(g)}` + (g.students.length ? g.students.map((s) => studentRowHtml(g, s)).join('') : '<p class="empty">Hali oʻquvchi yoʻq.</p>');
     h += '<button class="pill primary t-wide" type="button" data-t="snew">+ Oʻquvchi qoʻshish</button><button class="pill t-wide" type="button" data-t="report">Natijalar va hisobot</button>';
     return h;
   }
@@ -1565,6 +2237,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     let h = topHtml(sname(s), 'group', `<button class="ico" type="button" data-t="sedit" aria-label="Oʻquvchini tahrirlash">${ICON.edit}</button>`);
     h += `<p class="t-sub">${s.age ? `${s.age} yosh · ` : ''}${s.parentPhone ? `<a href="tel:${esc(s.parentPhone)}">${esc(s.parentPhone)}</a>` : 'telefon yozilmagan'}</p>`;
     h += `<p class="t-sub">${s.consent ? '✓ Ota-onasi ovozli tekshiruvga rozi' : 'Ota-ona roziligi belgilanmagan: dars boshlanmaydi'}</p>${msgHtml()}${noticeHtml()}`;
+    h += figureCardHtml(s);
     if (l.status === 'open') {
       h += `<div class="t-card"><p class="t-k">Dars · ${esc(dayLabel(l.key))}${s.attended ? ' · ✓ keldi' : ''}</p>`
         + (s.done.length >= n ? `<p class="t-big ok">Tugadi · ${starSum(s)} / ${n * 3} ⭐</p>` : `<p class="t-big">${s.done.length}/${n} tez aytish</p>`)
@@ -1646,9 +2319,10 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     h += '</div><p class="sect">Oʻquvchilar</p>';
     const byId = new Map(g.students.map((s) => [s.id, s]));
     h += rep.students.map((r) => {
-      const s = byId.get(r.id), w = r.weeks[r.weeks.length - 1];
+      const s = byId.get(r.id), w = r.weeks[r.weeks.length - 1], m = massOf(r.id);
       return s ? `<button class="t-rep" type="button" data-t="student" data-id="${esc(r.id)}"><span class="t-name">${esc(sname(s))}</span>`
-        + `<span class="t-rs">Bu hafta: ${w.stars}/${w.max} ⭐ · qoldirgan: ${r.missed.count}${r.sounds.length ? ` · ${esc(r.sounds.map((x) => x.s).join(', '))}` : ''}</span></button>` : '';
+        + `<span class="t-rs">Bu hafta: ${w.stars}/${w.max} ⭐ · qoldirgan: ${r.missed.count}${r.sounds.length ? ` · ${esc(r.sounds.map((x) => x.s).join(', '))}` : ''}</span>`
+        + `${m ? `<span class="t-rs">💪 ${kgText(m.kg)} kg · ${esc(m.titleName)}</span>` : ''}</button>` : '';
     }).join('');
     return h;
   }
@@ -1715,7 +2389,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     showTeach(true);
     teach.report = null;
     openView(back);
-    try { await loadTeach(); renderTeach(); } catch (e) { teach.msg = tErr(e); renderTeach(); }
+    try { await loadTeach(); renderTeach(); ensureMass(true); } catch (e) { teach.msg = tErr(e); renderTeach(); }
   }
   function enterPractice() {
     showTeach(false);
@@ -1866,16 +2540,339 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     return mockFail('not_found');
   }
 
+  // ---------- profile: the hologram wrestler ----------
+  // One screen for the student, the family and the teacher: a kurash wrestler that gains mass (kg) from the lessons;
+  // a calendar month is a season. The numbers come from the function tez-aytish-profile, the figure is drawn by
+  // TezHolo (the script block above this one). Opened from the family bot @kidscast_bot (?kc=1) the page shows only
+  // this screen. A gain the viewer has not watched yet waits for a tap («Massani oshir»): the tap also lets the
+  // sound play.
+  const PROFILE_API = 'https://trxnsqpdekokqvtefxlt.supabase.co/functions/v1/tez-aytish-profile';
+  const family = query.has('kc');
+  const COLOR_NAME = { moviy: 'Moviy', yashil: 'Yashil', binafsha: 'Binafsha', oltin: 'Oltin' };
+  const holoColors = () => (window.TezHolo && window.TezHolo.COLORS) || { moviy: '#35c8ff', yashil: '#3ddc84', binafsha: '#b18cff', oltin: '#ffc53d' };
+  // state: load (waiting for the server), idle (nothing new), ready (a gain waits for the tap), play, done
+  const prof = { kids: [], data: null, id: null, holo: null, back: '', lessonKey: null, from: null, state: 'idle', msg: '', ticks: 0 };
+  const kgText = (n) => String(Math.round(Number(n) * 10) / 10).replace('.', ',');
+  const capFirst = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  async function papi(action, body, ms) {
+    if (mock) return mockProfile(action, body || {});
+    return callJson(`${PROFILE_API}/${action}`, { method: 'POST', headers: { 'x-telegram-init-data': tg.initData, 'content-type': 'application/json' }, body: JSON.stringify(body || {}) }, ms || 20000);
+  }
+  const pErr = (e) => (e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.' : e.code === 'student_not_found' ? 'Profil topilmadi. Oʻqituvchidan yangi havola soʻrang.'
+    : e.code === 'timeout' ? 'Server javob bermadi. Internetni tekshirib, qayta urinib koʻring.' : `Profilni ochib boʻlmadi (${e.message}).`);
+
+  function dropHolo() {
+    if (!prof.holo) return;
+    try { prof.holo.stop(); prof.holo.destroy(); } catch (e) { /* the canvas goes away anyway */ }
+    prof.holo = null;
+  }
+  // back: where «Orqaga» returns to ('welcome', 'student', 'summary'); none in the family bot, where this is the only screen.
+  async function openProfile(id, opts) {
+    const o = opts || {};
+    dropHolo();
+    Object.assign(prof, { id, back: o.back || '', lessonKey: o.lessonKey || null, data: null, from: null, state: 'load', msg: '' });
+    const show = () => { stopVoice(); $('prof').classList.remove('hide'); $('prof').scrollTop = 0; };
+    // After a lesson the screen comes up only once the lesson's gain is known: the summary is not hidden by a wait.
+    if (!o.lessonKey) { show(); renderProfile(); }
+    try {
+      const d = await papi('get', o.lessonKey ? { studentId: id, lessonKey: o.lessonKey } : { studentId: id }, o.lessonKey ? 8000 : 0);
+      if (prof.id !== id || prof.state !== 'load') return;
+      if (o.lessonKey) {
+        // Only the lesson's own gain is shown; without one, or if the teacher has moved on, there is nothing to watch.
+        const here = state.lesson && state.lesson.studentId === id && state.summaryEl && state.activeEl === state.summaryEl;
+        const line = here && state.summaryEl.querySelector('[data-r="mass"]');
+        if (line && d.lesson) line.textContent = `💪 Massa: +${kgText(d.lesson.kg)} kg · jami ${kgText(d.kg)} kg (${d.student.titleName})`;
+        if (!here || !d.lesson || !(d.lesson.kg > 0)) return closeProfile();
+        show();
+      }
+      // What this viewer has not watched yet: the lesson just finished, or everything since the last visit.
+      const from = o.lessonKey ? d.lesson.before : d.seenKg === null ? d.startKg : d.seenKg;
+      prof.data = d;
+      prof.from = d.kg > from ? from : null;
+      prof.state = prof.from === null ? 'idle' : 'ready';
+      renderProfile();
+      mountHolo();
+    } catch (e) {
+      if (prof.id !== id) return;
+      if (o.lessonKey) return closeProfile(); // the lesson's summary is still there
+      prof.msg = pErr(e);
+      prof.state = 'idle';
+      renderProfile();
+    }
+  }
+  function closeProfile() {
+    const back = prof.back;
+    if (!back) return;
+    dropHolo();
+    $('prof').classList.add('hide');
+    $('profIn').innerHTML = '';
+    Object.assign(prof, { id: null, data: null, from: null, state: 'idle', msg: '' });
+    if (back === 'student') ensureMass(true);
+  }
+  function mountHolo() {
+    const d = prof.data, cv = $('pCanvas');
+    dropHolo();
+    if (!d || !cv || !window.TezHolo) return;
+    try {
+      prof.holo = window.TezHolo.create(cv, { kg: prof.from !== null ? prof.from : d.kg, char: d.student.figure, color: d.student.color, dim: !!d.student.dim, onKg: showKg, fx: gainFx });
+      prof.holo.start();
+    } catch (e) { prof.holo = null; state.jsError = `holo: ${e.message}`; }
+  }
+  // The number under the figure and the title that belongs to it (while the figure grows the number runs in whole kg).
+  function showKg(kg) {
+    const d = prof.data, el = $('pKg'), tl = $('pTitle');
+    if (!d || !el || !tl) return;
+    el.textContent = kgText(prof.state === 'play' ? Math.max(Math.floor(kg), prof.from) : kg);
+    let i = 0;
+    d.titles.forEach((t, k) => { if (kg >= t.from) i = k; });
+    if (tl.dataset.i === String(i)) return;
+    const first = tl.dataset.i === undefined;
+    tl.dataset.i = String(i);
+    tl.textContent = d.titles[i].name;
+    if (first || prof.state !== 'play') return;
+    tl.classList.remove('pop'); void tl.offsetWidth; tl.classList.add('pop'); // a new title in the middle of the growth
+    haptic('success');
+  }
+  function gainFx(name) {
+    if (name === 'start') { prof.ticks = 0; haptic('impact'); if (state.sound) tone(196, 0, 0.5, 'sine', 0.07); }
+    else if (name === 'tick') { prof.ticks++; if (state.sound) tone(392 + Math.min(prof.ticks, 24) * 22, 0, 0.07, 'triangle', 0.05); if (prof.ticks % 2) haptic('light'); }
+    else if (name === 'burst') { sfx('win', 3); haptic('success'); }
+  }
+  function claimGain() {
+    const d = prof.data;
+    if (prof.state !== 'ready' || !d) return;
+    prof.state = 'play';
+    paintProfAct();
+    const id = prof.id;
+    let finished = false;
+    const done = () => {
+      clearTimeout(guard);
+      if (finished || prof.id !== id) return;
+      finished = true;
+      prof.state = 'done';
+      showKg(d.kg);
+      paintProfAct();
+      const kid = prof.kids.find((k) => k.id === id);
+      if (kid) Object.assign(kid, { kg: d.kg, title: d.student.title, titleName: d.student.titleName });
+      papi('seen', { studentId: id, kg: d.kg }).catch(() => {});
+    };
+    // The growth takes about 3.5 s. If the page cannot animate (it went to the background), the mass still arrives.
+    const guard = setTimeout(() => {
+      if (finished || prof.id !== id) return;
+      try { if (prof.holo) prof.holo.set({ kg: d.kg }); } catch (e) { /* the number below is set anyway */ }
+      done();
+    }, 8000);
+    if (prof.holo) { try { return prof.holo.gain(prof.from, d.kg, done); } catch (e) { state.jsError = `holo: ${e.message}`; } }
+    done();
+  }
+  function paintProfAct() {
+    const d = prof.data, box = $('pAct'), plus = $('pPlus');
+    if (!d || !box || !plus) return;
+    const gain = prof.from !== null ? Math.round((d.kg - prof.from) * 10) / 10 : 0;
+    plus.textContent = `+${kgText(gain)}`;
+    plus.classList.toggle('hide', !(gain > 0));
+    box.innerHTML = prof.state === 'ready' ? `<button class="pill primary p-claim" type="button" data-p="claim">💪 Massani oshir · +${kgText(gain)} kg</button>`
+      : prof.state === 'done' && prof.lessonKey ? '<button class="pill primary" type="button" data-p="back">Davom etish</button>' : '';
+  }
+  const lookHtml = (s) => `<div class="p-seg" role="group" aria-label="Qahramon">${[['m', 'Oʻgʻil'], ['f', 'Qiz']].map(([v, t]) => `<button type="button" data-p="fig" data-v="${v}" class="${s.figure === v ? 'on' : ''}" aria-pressed="${s.figure === v}">${t}</button>`).join('')}</div>`
+    + `<div class="p-dots" role="group" aria-label="Rang">${Object.keys(holoColors()).map((c) => `<button type="button" class="p-dot${s.color === c ? ' on' : ''}" data-p="color" data-v="${esc(c)}" style="background:${esc(holoColors()[c])}" aria-label="${esc(COLOR_NAME[c] || c)}" aria-pressed="${s.color === c}"></button>`).join('')}</div>`;
+  function historyHtml(d) {
+    if (!d.history.length) return '<p class="t-sub">Bu oy hali dars boʻlmagan.</p>';
+    return d.history.map((h) => (h.type === 'week' ? `<div class="p-row"><span><b>Toʻliq hafta</b><small>hech bir dars qoldirilmadi</small></span><b>+${kgText(h.kg)} kg</b></div>`
+      : h.type === 'missed' ? `<div class="p-row miss"><span><b>${esc(dayLabel(h.day))}</b><small>darsga kelinmadi</small></span><b>—</b></div>`
+        : `<div class="p-row"><span><b>${esc(dayLabel(h.day))}</b><small>dars · ${h.said} ta tez aytish · ${h.stars} ⭐</small></span><b>+${kgText(h.kg)} kg</b></div>`)).join('');
+  }
+  const medalHtml = (m) => `<div class="p-row medal"><span><b>🏅 ${esc(capFirst(MONTHS[Number(m.season.slice(5, 7)) - 1]))} ${esc(m.season.slice(0, 4))}</b><small>${esc(m.titleName)} · ${m.lessons} ta dars · ${m.stars} ⭐</small></span><b>${kgText(m.kg)} kg</b></div>`;
+  const rulesHtml = (d) => `<p class="p-rules"><b>Massa qanday oshadi?</b><br>Darsga kelish: +2 kg. Darsda aytilgan har bir tez aytish: +0,5 kg. Har bir yulduz: +0,5 kg. Hafta davomida hech bir dars qoldirilmasa: yana +3 kg.<br>`
+    + `<b>Unvonlar:</b> ${d.titles.map((t) => `${esc(t.name)} — ${t.from} kg`).join(', ')}.<br>Har oy yangi mavsum ${kgText(d.startKg)} kg dan boshlanadi, oldingi oyning natijasi medal boʻlib qoladi.</p>`;
+  function renderProfile() {
+    const d = prof.data, box = $('profIn'), lesson = !!prof.lessonKey;
+    const top = (name) => `<div class="p-top">${prof.back ? `<button class="t-back" type="button" data-p="back" aria-label="Orqaga">${ICON.back}</button>` : ''}<h1 class="p-name">${esc(name)}</h1>`
+      + `<button class="ico" type="button" data-p="sound" aria-label="Ovoz" aria-pressed="${String(!state.sound)}">${state.sound ? ICON.sound : ICON.mute}</button></div>`;
+    if (!d) {
+      box.innerHTML = top('Profil') + (prof.msg ? `<p class="t-msg">${esc(prof.msg)}</p><button class="pill primary t-wide" type="button" data-p="retry">Qayta urinish</button>` : '<p class="empty">Yuklanmoqda…</p>');
+      return;
+    }
+    const s = d.student;
+    const kids = !lesson && prof.kids.length > 1 && prof.kids.some((k) => k.id === s.id)
+      ? `<div class="p-kids">${prof.kids.map((k) => `<button class="p-kid${k.id === s.id ? ' on' : ''}" type="button" data-p="kid" data-id="${esc(k.id)}">${esc(k.firstName)}</button>`).join('')}</div>` : '';
+    let h = `${top(s.name)}${kids}<p class="p-sub">${esc(s.group)} · ${esc(capFirst(MONTHS[Number(d.season.start.slice(5, 7)) - 1]))} mavsumi</p>`
+      + `<div class="p-stage"><canvas id="pCanvas" role="img" aria-label="Kurashchi gologrammasi" data-p="tap"></canvas></div>`
+      + '<div class="p-mass"><span class="p-kg" id="pKg"></span><span class="p-unit">kg</span><span class="p-plus hide" id="pPlus"></span></div>'
+      + '<p class="p-title" id="pTitle"></p><div class="p-act" id="pAct"></div>';
+    if (!lesson) {
+      if (s.dim) h += '<p class="p-note">Oxirgi darsga kelinmadi, shuning uchun gologramma xiralashdi. Keyingi darsda yana yonadi!</p>';
+      h += `<p class="sect">Qahramon</p><div class="p-set" id="pSet">${lookHtml(s)}</div><p class="sect">Bu oy</p>${historyHtml(d)}`;
+      if (d.medals.length) h += `<p class="sect">Mavsumlar</p>${d.medals.map(medalHtml).join('')}`;
+      h += rulesHtml(d);
+    }
+    box.innerHTML = h;
+    showKg(prof.from !== null && prof.state === 'ready' ? prof.from : d.kg);
+    paintProfAct();
+  }
+  async function setLook(patch) {
+    const d = prof.data;
+    if (!d) return;
+    const s = d.student, old = { figure: s.figure, color: s.color };
+    const apply = (v) => { Object.assign(s, v); if (prof.holo) prof.holo.set({ char: s.figure, color: s.color }); if ($('pSet')) $('pSet').innerHTML = lookHtml(s); };
+    apply(patch);
+    haptic('light');
+    try {
+      await papi('set', { studentId: s.id, ...patch });
+      const kid = prof.kids.find((k) => k.id === s.id);
+      if (kid) Object.assign(kid, patch);
+    } catch (e) { if (prof.data === d) apply(old); }
+  }
+  $('prof').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-p]');
+    if (!b || b.disabled) return;
+    ensureContext(); // the gain's sounds need a context that was started inside a tap
+    const a = b.dataset.p;
+    if (a === 'sound') { toggleSound(); b.innerHTML = state.sound ? ICON.sound : ICON.mute; b.setAttribute('aria-pressed', String(!state.sound)); return; }
+    if (prof.state === 'play') return;
+    if (a === 'back') return closeProfile();
+    if (a === 'retry') return openProfile(prof.id, { back: prof.back });
+    if (a === 'claim') return claimGain();
+    if (a === 'tap') { if (prof.holo) prof.holo.tap(); return haptic('light'); }
+    if (a === 'kid') return b.dataset.id === prof.id ? null : openProfile(b.dataset.id, { back: prof.back });
+    if (a === 'fig') return setLook({ figure: b.dataset.v });
+    if (a === 'color') return setLook({ color: b.dataset.v });
+  });
+  document.addEventListener('visibilitychange', () => { if (prof.holo) { try { if (document.hidden) prof.holo.stop(); else prof.holo.start(); } catch (e) { /* drawn again on the next open */ } } });
+  window.addEventListener('resize', () => { if (prof.holo) { try { prof.holo.resize(); } catch (e) { /* keeps the old size */ } } });
+
+  // Teacher mode: the masses of a group's students for the team strip, the student card and the report.
+  async function ensureMass(force) {
+    const gid = teach.groupId;
+    if (!gid || (!force && teach.mass && teach.mass.groupId === gid)) return;
+    try {
+      const r = await papi('group', { groupId: gid });
+      teach.mass = { groupId: gid, map: new Map((r.students || []).map((s) => [s.id, s])) };
+    } catch (e) { if (!teach.mass || teach.mass.groupId !== gid) teach.mass = { groupId: gid, map: new Map() }; }
+    if (teach.groupId === gid && ['group', 'student', 'report'].includes(teach.view) && $('prof').classList.contains('hide') && !$('teach').classList.contains('hide')) {
+      const y = $('teach').scrollTop;
+      renderTeach();
+      $('teach').scrollTop = y;
+    }
+  }
+  const massOf = (id) => (teach.mass && teach.mass.groupId === teach.groupId && teach.mass.map.get(id)) || null;
+  const miniHtml = (m, cls) => `<canvas class="t-mini${cls || ''}" data-kg="${Number(m.kg)}" data-fig="${m.figure === 'f' ? 'f' : 'm'}" data-color="${esc(m.color)}"${m.dim ? ' data-dim="1"' : ''} aria-hidden="true"></canvas>`;
+  function teamHtml(g) {
+    if (!window.TezHolo || !g.students.some((s) => massOf(s.id))) return '';
+    return `<div class="t-team">${g.students.map((s) => { const m = massOf(s.id); return m ? `<button class="t-fig" type="button" data-t="student" data-id="${esc(s.id)}">${miniHtml(m)}<b>${esc(s.firstName)}</b><small>${kgText(m.kg)} kg</small></button>` : ''; }).join('')}</div>`;
+  }
+  function figureCardHtml(s) {
+    const m = massOf(s.id);
+    if (!m) return '';
+    const seg = [['m', 'Oʻgʻil'], ['f', 'Qiz']].map(([v, t]) => `<button type="button" data-t="fig" data-v="${v}" class="${m.figureSet && m.figure === v ? 'on' : ''}" aria-pressed="${!!m.figureSet && m.figure === v}">${t}</button>`).join('');
+    return `<div class="t-card t-figcard">${window.TezHolo ? miniHtml(m, ' big') : ''}<div class="t-figinfo"><p class="t-big">${kgText(m.kg)} kg · ${esc(m.titleName)}</p>`
+      + `<p class="t-sub">${m.dim ? 'Oxirgi darsga kelmadi: gologramma xira' : m.figureSet ? 'Kurashchi qahramoni' : 'Qahramonni tanlang'}</p><div class="p-seg" role="group" aria-label="Qahramon">${seg}</div></div>`
+      + '<button class="pill t-wide" type="button" data-t="profile">💪 Profilni ochish</button></div>';
+  }
+  // Teacher mode is redrawn after every tap, so a mini figure is drawn once per look and size and then copied.
+  const miniCache = new Map();
+  function paintMinis(root) {
+    if (!window.TezHolo) return;
+    root.querySelectorAll('canvas.t-mini').forEach((cv) => {
+      try {
+        const key = `${cv.dataset.kg}|${cv.dataset.fig}|${cv.dataset.color}|${cv.dataset.dim || ''}|${cv.clientWidth}x${cv.clientHeight}`, hit = miniCache.get(key);
+        if (hit) { cv.width = hit.width; cv.height = hit.height; cv.getContext('2d').drawImage(hit, 0, 0); return; }
+        window.TezHolo.mini(cv, { kg: Number(cv.dataset.kg), char: cv.dataset.fig, color: cv.dataset.color, dim: !!cv.dataset.dim });
+        const copy = document.createElement('canvas');
+        copy.width = cv.width; copy.height = cv.height;
+        copy.getContext('2d').drawImage(cv, 0, 0);
+        if (miniCache.size > 120) miniCache.clear();
+        miniCache.set(key, copy);
+      } catch (e) { /* the tile stays dark */ }
+    });
+  }
+  async function setTeachFigure(v) {
+    const sid = teach.studentId, m = massOf(sid);
+    if (!m || (v !== 'm' && v !== 'f') || teach.busy) return;
+    try {
+      const r = await papi('set', { studentId: sid, figure: v });
+      Object.assign(m, { figure: r.figure, figureSet: true });
+      teach.msg = '';
+    } catch (e) { teach.msg = tErr(e); }
+    if (teach.studentId === sid && teach.view === 'student') renderTeach();
+  }
+  // The family bot opens the page with its own initData, which the trainer's other functions do not accept: only the profile.
+  async function initFamily() {
+    try {
+      const me = await papi('me');
+      prof.kids = Array.isArray(me.kids) ? me.kids : [];
+      state.server = 'ok';
+    } catch (e) {
+      state.server = `xato: ${e.message}`;
+      renderDiag();
+      return welcome('error', e.code === 'invalid_or_expired_init_data' ? 'Sessiya eskirdi: Mini Appʼni yopib, qayta oching.' : `Serverga ulanib boʻlmadi (${e.message}). Internetni tekshirib, qayta urinib koʻring.`);
+    }
+    renderDiag();
+    if (!prof.kids.length) return welcome('info', 'Bu yerda farzandingizning «Tez aytish» profili chiqadi. Avval oʻqituvchidan shaxsiy havolani oling va uni @kidscast_bot ichida oching.');
+    welcome('info', 'Profil ochilmoqda…');
+    const want = query.get('s'), kid = prof.kids.find((k) => k.id === want) || prof.kids[0];
+    openProfile(kid.id, {});
+  }
+
+  // Local preview only: the profile back end over the mock teacher data (?mock=1; with &kc=1 the family view, with
+  // &kids=1 a practice user who has linked children).
+  const MOCKP = { base: { s1: 41.5 }, look: { s1: { figure: 'm', figureSet: true, color: 'moviy' } }, seen: { s1: 38.5 } };
+  const P_TITLES = [{ from: 30, name: 'Yangi kurashchi' }, { from: 35, name: 'Havaskor' }, { from: 45, name: 'Sportchi' }, { from: 60, name: 'Polvon' }, { from: 80, name: 'Chempion' }, { from: 100, name: 'Afsona' }];
+  function mockProfile(action, b) {
+    return new Promise((resolve, reject) => setTimeout(() => { try { resolve(mockProfileNow(action, b)); } catch (e) { reject(e); } }, 150));
+  }
+  function mockProfileNow(action, b) {
+    const today = tday(Date.now()), season = `${today.slice(0, 7)}-01`;
+    const all = MOCKT.groups.filter((g) => !g.archived).flatMap((g) => g.students.filter((s) => s.active).map((s) => ({ g, s })));
+    const lessons = (s) => {
+      const keys = [...new Set([...MOCKT.results.filter((r) => r.studentId === s.id).map((r) => r.key), ...Object.keys(MOCKT.attendance).filter((k) => k.startsWith(`${s.id}|`)).map((k) => k.split('|')[1])])].sort();
+      return keys.map((key) => { const rs = MOCKT.results.filter((r) => r.studentId === s.id && r.key === key), stars = rs.reduce((a, r) => a + r.stars, 0); return { key, said: rs.length, stars, kg: 2 + 0.5 * rs.length + 0.5 * stars }; });
+    };
+    const lookOf = (id) => MOCKP.look[id] || (MOCKP.look[id] = { figure: 'm', figureSet: false, color: 'moviy' });
+    const brief = ({ g, s }) => {
+      const kg = (MOCKP.base[s.id] || 30) + lessons(s).reduce((a, l) => a + l.kg, 0);
+      let i = 0;
+      P_TITLES.forEach((t, k) => { if (kg >= t.from) i = k; });
+      return { id: s.id, kg, title: i, titleName: P_TITLES[i].name, dim: false, ...lookOf(s.id), name: sname(s), firstName: s.firstName, group: g.name };
+    };
+    const find = (id) => all.find((x) => x.s.id === id) || mockFail('student_not_found');
+    if (action === 'me') return { ok: true, role: MOCKT.role, via: 'mock', season, today, titles: P_TITLES, kids: family || query.has('kids') ? all.map(brief) : [] };
+    if (action === 'group') return { ok: true, groupId: b.groupId, season, today, titles: P_TITLES, students: all.filter((x) => x.g.id === b.groupId).map(brief) };
+    if (action === 'seen') { find(b.studentId); MOCKP.seen[b.studentId] = b.kg; return { ok: true }; }
+    if (action === 'set') {
+      find(b.studentId);
+      const look = lookOf(b.studentId);
+      if (b.figure) Object.assign(look, { figure: b.figure, figureSet: true });
+      if (b.color) look.color = b.color;
+      return { ok: true, ...look };
+    }
+    if (action === 'get') {
+      const x = find(b.studentId), st = brief(x), ls = lessons(x.s), base = MOCKP.base[x.s.id] || 30, ws = wsOf(today);
+      const history = ls.map((l) => ({ type: 'lesson', day: l.key, kg: l.kg, said: l.said, stars: l.stars })).reverse();
+      if (base > 30) history.push({ type: 'week', day: ws, kg: 3 }, { type: 'lesson', day: addD(ws, -1), kg: base - 33, said: 4, stars: 9 }, { type: 'missed', day: addD(ws, -2), kg: 0 });
+      const lesson = b.lessonKey ? ls.find((l) => l.key === b.lessonKey) || null : null, seen = MOCKP.seen[x.s.id];
+      return { ok: true, staff: !family, today, student: st, season: { start: season, end: season, daysLeft: 10 }, kg: st.kg, startKg: 30, stars: 0, titles: P_TITLES, colors: Object.keys(COLOR_NAME),
+        seenKg: seen === undefined ? null : seen, lesson: lesson ? { key: lesson.key, kg: lesson.kg, before: st.kg - lesson.kg, said: lesson.said, stars: lesson.stars } : null, history,
+        medals: base > 30 ? [{ season: `${addD(season, -1).slice(0, 7)}-01`, kg: 62.5, title: 3, titleName: 'Polvon', lessons: 8, stars: 41 }] : [] };
+    }
+    return mockFail('not_found');
+  }
+
   // ---------- start ----------
   async function init() {
     buildWelcome();
     paintTotals();
     renderDiag();
     if (!inTelegram && !mock) return welcome('info', 'Bu trenajyor Telegram ichida ishlaydi. Uni botdagi tugma orqali och.');
+    if (family) return initFamily();
     // On a slow connection say so instead of a silent «Yuklanmoqda…».
     const slow = setTimeout(() => { if (!state.server) welcome('info', 'Yuklanmoqda… Internet sekin boʻlsa, biroz kuting.'); }, 7000);
     try {
       // Who is asking in teacher mode comes from tez-aytish-teacher; if that fails, the page works as before.
+      // The profile function tells whether this account is linked to students (then the welcome card offers «Profil»).
+      // The start does not wait for it.
+      papi('me').then((p) => { if (p && Array.isArray(p.kids)) { prof.kids = p.kids; paintProfPill(); renderDiag(); } }).catch(() => {});
       const [s, t] = await Promise.all([api('session'), tapi('state').catch((e) => { state.teachError = e.message; return null; })]);
       state.isAdmin = !!s.isAdmin; state.sttReady = !!(s.sttReady ?? s.speechReady); state.provider = s.sttProvider || '';
       state.sessionStt = state.sttReady;
@@ -1937,6 +2934,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
     if (act === 'treq') return sendTeachRequest();
     if (act === 'tback') return welcome(state.home || 'soon');
     if (act === 'toteach') return enterTeach();
+    if (act === 'profile') return prof.kids.length ? openProfile(prof.kids[0].id, { back: 'welcome' }) : null;
     if (act === 'begin') return begin();
     if (act === 'consent') return acceptConsent();
     if (act === 'reload') return location.reload();
@@ -1978,6 +2976,8 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
         renderTeach();
       });
     }
+    if (a === 'profile') return openProfile(teach.studentId, { back: 'student' });
+    if (a === 'fig') return setTeachFigure(b.dataset.v);
     if (a === 'lshare') return shareLink();
     if (a === 'lcopy') return copyLink(b);
     if (a === 'lrotate') {
@@ -2078,7 +3078,7 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
   $('voice').addEventListener('timeupdate', () => { if (state.vdraw) state.vdraw(); });
   $('voice').addEventListener('ended', () => { if (state.voiceCard) stopVoice(true); });
 
-  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary, showCheck, targetSeconds }; // local preview tests only
+  if (mock) window.__tez = { state, toWav16k, vad, syllables, parse, modulesNow, setView, teach, MOCKT, startLesson, enterTeach, callJson, mountSummary, showCheck, targetSeconds, prof, MOCKP, openProfile, closeProfile, claimGain, activate }; // local preview tests only
   init().catch(fatal);
 })();
 </script>
