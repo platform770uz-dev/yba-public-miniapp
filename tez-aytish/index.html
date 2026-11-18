@@ -2757,7 +2757,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
         : `<div class="p-row"><span><b>${esc(dayLabel(h.day))}</b><small>dars · ${h.said} ta tez aytish · ${h.stars} ⭐</small></span><b>+${kgText(h.kg)} kg</b></div>`)).join('');
   }
   const medalHtml = (m) => `<div class="p-row medal"><span><b>🏅 ${esc(capFirst(MONTHS[Number(m.season.slice(5, 7)) - 1]))} ${esc(m.season.slice(0, 4))}</b><small>${esc(m.titleName)} · ${m.lessons} ta dars · ${m.stars} ⭐</small></span><b>${kgText(m.kg)} kg</b></div>`;
-  const rulesHtml = (d) => `<p class="p-rules"><b>Massa qanday oshadi?</b><br>Darsga kelish: +2 kg. Darsda aytilgan har bir tez aytish: +0,5 kg. Har bir yulduz: +0,5 kg. Hafta davomida hech bir dars qoldirilmasa: yana +3 kg.<br>`
+  const rulesHtml = (d) => `<p class="p-rules"><b>Massa qanday oshadi?</b><br>Darsga kelish: +2 kg. Darsda aytilgan har bir tez aytish: +0,5 kg. Har bir yulduz: +0,5 kg.<br>Uyda aytilgan har bir tez aytish: +0,5 kg. Darsdagidan koʻp har bir yulduz: +0,5 kg. Uyga vazifa toʻliq bajarilsa: +1 kg.<br>Hafta davomida hech bir dars va uyga vazifa qoldirilmasa: yana +3 kg. Uyga vazifa 2 hafta ketma-ket bajarilsa: +1 kg, 3 hafta: +2 kg, 4 haftadan koʻp: +3 kg.<br>Har bir bonus nishoni: +2 kg (har mavsumda qaytadan olinadi). Oʻqituvchining «Barakalla»si: +1 kg.<br>`
     + `<b>Unvonlar:</b> ${d.titles.map((t) => `${esc(t.name)} — ${t.from} kg`).join(', ')}.<br>Har oy yangi mavsum ${kgText(d.startKg)} kg dan boshlanadi, oldingi oyning natijasi medal boʻlib qoladi.</p>`;
   function renderProfile() {
     const d = prof.data, box = $('profIn'), lesson = !!prof.lessonKey;
