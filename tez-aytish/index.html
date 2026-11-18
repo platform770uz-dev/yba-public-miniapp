@@ -293,6 +293,22 @@ body.t-busy .teach-in{opacity:.55;pointer-events:none}
 .p-hw.done{background:#e6f4ea}
 .p-hw.done b{color:var(--ok)}
 .t-chip.hw{background:var(--accent-tint);color:var(--accent)}
+.t-praise{flex:none;min-width:44px;min-height:36px;padding:0 8px;border-radius:18px;border:1.5px solid var(--line);background:var(--bg);font-size:15px}
+.t-praise.on{background:#e6f4ea;border-color:#e6f4ea;opacity:1}
+.p-streak{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--warn-tint);color:var(--warn);font-size:14px;font-weight:700}
+.p-badges{margin-top:10px}
+.p-badge{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:10px 12px;border-radius:14px;background:var(--surface);opacity:.55}
+.p-badge.on{opacity:1;background:#e6f4ea}
+.p-badge i{font-size:22px;font-style:normal;line-height:1}
+.p-badge span{flex:1;min-width:0;display:flex;flex-direction:column}
+.p-badge b{font-size:15px;font-weight:800}
+.p-badge small{font-size:13px;font-weight:600;color:var(--sub)}
+.p-badge em{font-style:normal;font-size:14px;font-weight:800;color:var(--ok)}
+.p-week{margin-top:10px}
+.p-wrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--surface);margin-bottom:6px;font-size:15px;font-weight:700}
+.p-wrow i{font-style:normal;width:20px;color:var(--sub);font-weight:800}
+.p-wrow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-wrow.me{background:var(--accent-tint);color:var(--accent)}
 .p-set{display:flex;align-items:center;gap:10px}
 .p-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface)}
 .p-seg button{min-height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:800;color:var(--sub)}
@@ -994,7 +1010,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   // Speech detection: ignore the first 300 ms (tap, start haptic, mic click), count a loud stretch of 120 ms+ as the
   // start of speech, stop on silence only after 300 ms+ of speech, and never send less than 250 ms to the server.
   const IGNORE_MS = 300, ONSET_MS = 120, MIN_SPEECH_MS = 300, MIN_SUBMIT_MS = 250;
-  const PAGE_VERSION = 'v17';
+  const PAGE_VERSION = 'v18';
   const CONSENT_KEY = 'tez_consent_v3', PROGRESS_KEY = 'tez_progress_v1', SOUND_KEY = 'tez_sound_v1';
   const RING = 377; // circumference of the timer ring (r = 60)
   // Modules group the tongue twisters by the sound they train (ids as on the server). Month-1 plan: one module a
@@ -2247,9 +2263,13 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
     else if (s.done.length >= n) right = `<span class="t-chip ok">✓ ${starSum(s)} ⭐</span>`;
     else right = `<button class="t-start" type="button" data-t="lesson" data-id="${esc(s.id)}">${s.done.length ? `Davom ${s.done.length}/${n}` : 'Boshlash'}</button>`;
     const m = massOf(s.id), hw = m && m.homework && m.homework.state === 'open' ? `<span class="t-chip hw">🏠 ${m.homework.left}</span>` : '';
+    // «Barakalla»: one per student per lesson, straight from the group list while the lesson is going on.
+    const praise = l.status === 'open' && s.consent
+      ? `<button class="t-praise${s.praised ? ' on' : ''}" type="button" data-t="praise" data-id="${esc(s.id)}" aria-label="Barakalla"${s.praised ? ' disabled' : ''}>${s.praised ? '👏✓' : '👏'}</button>`
+      : '';
     // «Keldi» for today's lesson: the family hears it at once through @kidscast_bot.
     const keldi = l.key ? `<button class="t-keldi${s.attended ? ' on' : ''}" type="button" data-t="attend" data-id="${esc(s.id)}" aria-pressed="${s.attended ? 'true' : 'false'}">${s.attended ? '✓ Keldi' : 'Keldi'}</button>` : '';
-    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${hw}${keldi}${right}</div>`;
+    return `<div class="t-row"><button class="t-name" type="button" data-t="student" data-id="${esc(s.id)}">${esc(sname(s))}${s.age ? ` <small>${s.age} yosh</small>` : ''}</button>${hw}${praise}${keldi}${right}</div>`;
   }
   function studentHtml() {
     const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === teach.studentId);
@@ -2488,6 +2508,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
         return { id: g.id, name: g.name, days: g.days, teacherId: 1, teacherName: null, mine: true, lesson: l,
           weeks: { thisStart: ws, thisModule: MOCKT.weeks[`${g.id}|${ws}`] || null, nextStart: addD(ws, 7), nextModule: MOCKT.weeks[`${g.id}|${addD(ws, 7)}`] || null },
           students: g.students.filter((s) => s.active).map((s) => ({ ...s, attended: (l.key && MOCKT.attendance[`${s.id}|${l.key}`]) || null, family: (MOCKT.links[s.id] || { family: [] }).family.length,
+            praised: !!(l.key && MOCKP.praised[`${s.id}|${l.key}`]),
             done: l.key ? l.ids.filter((id) => result(s, l.key, id)).map((id) => ({ id, stars: result(s, l.key, id).stars })) : [] })) };
       }) };
     }
@@ -2533,6 +2554,13 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       k.family = k.family.filter((f) => f.telegramId !== b.telegramId);
       if (k.family.length === before) mockFail('family_not_found');
       return { ok: true, family: k.family };
+    }
+    if (action === 'praise') {
+      const { g, s } = findS(b.studentId), l = mockLesson(g, today), key = `${s.id}|${l.key}`;
+      if (!l.key) mockFail('no_lesson');
+      if (MOCKP.praised[key]) return { ok: true, lessonKey: l.key, already: true, sent: 0, recipients: 0 };
+      MOCKP.praised[key] = 1;
+      return { ok: true, lessonKey: l.key, kg: 1, ...once(`${key}|praise`, linkOf(s.id).family.length) };
     }
     if (action === 'attend') {
       const { g, s } = findS(b.studentId), l = mockLesson(g, today), key = `${s.id}|${l.key}`;
@@ -2700,9 +2728,31 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
   }
   const lookHtml = (s) => `<div class="p-seg" role="group" aria-label="Qahramon">${[['m', 'Oʻgʻil'], ['f', 'Qiz']].map(([v, t]) => `<button type="button" data-p="fig" data-v="${v}" class="${s.figure === v ? 'on' : ''}" aria-pressed="${s.figure === v}">${t}</button>`).join('')}</div>`
     + `<div class="p-dots" role="group" aria-label="Rang">${Object.keys(holoColors()).map((c) => `<button type="button" class="p-dot${s.color === c ? ' on' : ''}" data-p="color" data-v="${esc(c)}" style="background:${esc(holoColors()[c])}" aria-label="${esc(COLOR_NAME[c] || c)}" aria-pressed="${s.color === c}"></button>`).join('')}</div>`;
+  // Badges are earned again every season; the ones still to get are shown greyed, so the child knows what to aim at.
+  const BADGE_ICON = { first3: '⭐', perfect: '🎯', module: '🧩', week_star: '🏅', no_miss: '📅' };
+  function badgesHtml(d) {
+    const list = Array.isArray(d.badges) ? d.badges : [];
+    if (!list.length) return '';
+    const streak = Number(d.streak) || 0;
+    return '<p class="sect">Bonuslar</p>'
+      + (streak >= 2 ? `<div class="p-streak">🔥 Uyga vazifa seriyasi: <b>${streak} hafta ketma-ket</b></div>` : '')
+      + `<div class="p-badges">${list.map((b) => `<div class="p-badge${b.got ? ' on' : ''}"><i>${BADGE_ICON[b.kind] || '🎖'}</i>`
+        + `<span><b>${esc(b.name)}</b><small>${esc(b.note)}</small></span>`
+        + `<em>${b.got ? `+${kgText(b.kg)} kg` : ''}</em></div>`).join('')}</div>`;
+  }
+  // The group's stars this week: names and stars only, never another child's figure.
+  function weekHtml(d) {
+    const w = d.week;
+    if (!w || !w.top || !w.top.length) return '';
+    const place = (w.all || []).findIndex((r) => r.id === d.student.id) + 1;
+    return '<p class="sect">Hafta yulduzlari</p>'
+      + `<div class="p-week">${w.top.map((r, i) => `<div class="p-wrow${r.id === d.student.id ? ' me' : ''}"><i>${i + 1}</i><span>${esc(r.name)}</span><b>${r.stars} ⭐</b></div>`).join('')}`
+      + `${place > 3 ? `<div class="p-wrow me"><i>${place}</i><span>${esc(d.student.firstName)}</span><b>${(w.all[place - 1] || {}).stars || 0} ⭐</b></div>` : ''}</div>`;
+  }
   function historyHtml(d) {
     if (!d.history.length) return '<p class="t-sub">Bu oy hali dars boʻlmagan.</p>';
-    return d.history.map((h) => (h.type === 'week' ? `<div class="p-row"><span><b>Toʻliq hafta</b><small>hech bir dars qoldirilmadi</small></span><b>+${kgText(h.kg)} kg</b></div>`
+    return d.history.map((h) => (h.type === 'bonus' ? `<div class="p-row"><span><b>${BADGE_ICON[h.kind] || '🎁'} ${esc(h.name || '')}</b><small>${h.kind === 'streak' ? `${h.n} hafta ketma-ket` : h.kind === 'week_star' ? `${h.n} yulduz` : 'bonus'}</small></span><b>+${kgText(h.kg)} kg</b></div>`
+      : h.type === 'week' ? `<div class="p-row"><span><b>Toʻliq hafta</b><small>hech bir dars qoldirilmadi</small></span><b>+${kgText(h.kg)} kg</b></div>`
       : h.type === 'missed' ? `<div class="p-row miss"><span><b>${esc(dayLabel(h.day))}</b><small>darsga kelinmadi</small></span><b>—</b></div>`
         : `<div class="p-row"><span><b>${esc(dayLabel(h.day))}</b><small>dars · ${h.said} ta tez aytish · ${h.stars} ⭐</small></span><b>+${kgText(h.kg)} kg</b></div>`)).join('');
   }
@@ -2726,6 +2776,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       + '<p class="p-title" id="pTitle"></p><div class="p-act" id="pAct"></div>';
     if (!lesson) {
       h += homeworkHtml(d);
+      h += badgesHtml(d) + weekHtml(d);
       if (s.dim) h += '<p class="p-note">Oxirgi darsga kelinmadi, shuning uchun gologramma xiralashdi. Keyingi darsda yana yonadi!</p>';
       h += `<p class="sect">Qahramon</p><div class="p-set" id="pSet">${lookHtml(s)}</div><p class="sect">Bu oy</p>${historyHtml(d)}`;
       if (d.medals.length) h += `<p class="sect">Mavsumlar</p>${d.medals.map(medalHtml).join('')}`;
@@ -2850,7 +2901,12 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
 
   // Local preview only: the profile back end over the mock teacher data (?mock=1; with &kc=1 the family view, with
   // &kids=1 a practice user who has linked children).
-  const MOCKP = { base: { s1: 41.5 }, look: { s1: { figure: 'm', figureSet: true, color: 'moviy' } }, seen: { s1: 38.5 }, home: {} };
+  const MOCKP = { base: { s1: 41.5 }, look: { s1: { figure: 'm', figureSet: true, color: 'moviy' } }, seen: { s1: 38.5 }, home: {}, praised: {} };
+  const P_BADGES = [{ kind: 'first3', name: 'Birinchi 3 yulduz', note: 'Mavsumda birinchi marta 3 yulduz' },
+    { kind: 'perfect', name: 'Toʻliq dars', note: 'Bir darsdagi hamma tez aytish 3 yulduzga' },
+    { kind: 'module', name: 'Modul ustasi', note: 'Haftaning barcha tez aytishlari 3 yulduzga (darsda yoki uyda)' },
+    { kind: 'week_star', name: 'Hafta yulduzi', note: 'Guruhda hafta davomida eng koʻp yulduz' },
+    { kind: 'no_miss', name: 'Darssiz oy', note: 'Oy davomida bironta dars qoldirilmadi' }];
   const P_TITLES = [{ from: 30, name: 'Yangi kurashchi' }, { from: 35, name: 'Havaskor' }, { from: 45, name: 'Sportchi' }, { from: 60, name: 'Polvon' }, { from: 80, name: 'Chempion' }, { from: 100, name: 'Afsona' }];
   function mockProfile(action, b) {
     return new Promise((resolve, reject) => setTimeout(() => { try { resolve(mockProfileNow(action, b)); } catch (e) { reject(e); } }, 150));
@@ -2871,6 +2927,7 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       return { id: s.id, kg, title: i, titleName: P_TITLES[i].name, dim: false, ...lookOf(s.id), name: sname(s), firstName: s.firstName, group: g.name };
     };
     const find = (id) => all.find((x) => x.s.id === id) || mockFail('student_not_found');
+    if (action === 'badgesOnly') return null;
     if (action === 'homework') { const x = find(b.studentId); return { ok: true, staff: !family, today, studentId: x.s.id, name: sname(x.s), firstName: x.s.firstName, group: x.g.name, ...mockHwOf(x) }; }
     if (action === 'me') return { ok: true, role: MOCKT.role, via: 'mock', season, today, titles: P_TITLES, kids: family || query.has('kids') ? all.map(brief) : [] };
     if (action === 'group') {
@@ -2896,7 +2953,8 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       return { ok: true, staff: !family, today, student: st, season: { start: season, end: season, daysLeft: 10 }, kg: st.kg, startKg: 30, stars: 0, titles: P_TITLES, colors: Object.keys(COLOR_NAME),
         seenKg: seen === undefined ? null : seen, lesson: lesson ? { key: lesson.key, kg: lesson.kg, before: st.kg - lesson.kg, said: lesson.said, stars: lesson.stars } : null,
         home: b.lessonKey && hwGain && hwGain.key === b.lessonKey ? { ...hwGain, before: st.kg - hwGain.kg } : null,
-        homework: { state: hw.state, left: hw.left, total: hw.total, due: hw.due, dueLabel: hw.dueLabel, missed: hw.missed }, history,
+        homework: { state: hw.state, left: hw.left, total: hw.total, due: hw.due, dueLabel: hw.dueLabel, missed: hw.missed },
+        badges: mockBadgesOf(x), streak: 0, week: mockWeekOf(x.g, x.s.id), history,
         medals: base > 30 ? [{ season: `${addD(season, -1).slice(0, 7)}-01`, kg: 62.5, title: 3, titleName: 'Polvon', lessons: 8, stars: 41 }] : [] };
     }
     return mockFail('not_found');
@@ -2956,6 +3014,22 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       <p class="foot"></p>`;
   }
   // The homework of the local preview: the module of the mock lesson, what the lesson gave and what was said at home.
+  // Badges and the week board of the local preview: worked out from the mock results, enough to see the screens.
+  function mockBadgesOf(x) {
+    const l = mockLesson(x.g, tday(Date.now()));
+    const rs = MOCKT.results.filter((r) => r.studentId === x.s.id);
+    const starsOf = (id) => { const r = rs.find((y) => y.key === l.key && y.id === id); return r ? r.stars : null; };
+    const home = (id) => MOCKP.home[`${x.s.id}|${l.key}|${id}`];
+    const got = { first3: rs.some((r) => r.stars === 3) || Object.keys(MOCKP.home).some((k) => k.startsWith(`${x.s.id}|`) && MOCKP.home[k] === 3) };
+    got.perfect = !!(l.key && l.ids.length && l.ids.every((id) => starsOf(id) === 3));
+    got.module = !!(got.perfect && l.homework.every((id) => home(id) === 3));
+    return P_BADGES.map((b) => ({ ...b, got: got[b.kind] ? 1 : 0, day: got[b.kind] ? l.key : null, kg: got[b.kind] ? 2 : 0 }));
+  }
+  function mockWeekOf(g, me) {
+    const rows = g.students.filter((s) => s.active).map((s) => ({ id: s.id, name: s.firstName,
+      stars: MOCKT.results.filter((r) => r.studentId === s.id).reduce((a, r) => a + r.stars, 0) })).sort((a, b) => b.stars - a.stars);
+    return { from: wsOf(tday(Date.now())), top: rows.filter((r) => r.stars > 0).slice(0, 3), all: rows };
+  }
   function mockHwOf(x) {
     const today = tday(Date.now()), l = mockLesson(x.g, today);
     const base = { state: 'none', lessonKey: null, due: null, dueLabel: null, missed: false, total: 0, left: 0, twisters: [] };
@@ -3100,6 +3174,14 @@ window.TezHolo={KG_MIN:KG_MIN,KG_TOP:KG_TOP,KG_MAX:KG_MAX,COLORS:COLORS,create:c
       });
     }
     if (a === 'profile') return openProfile(teach.studentId, { back: 'student' });
+    if (a === 'praise') {
+      const g = groupById(teach.groupId), s = g && g.students.find((x) => x.id === id);
+      return teachAct(() => tapi('praise', { studentId: id }), (r) => {
+        teach.notice = r.already ? 'Bu darsda allaqachon maqtalgan.'
+          : `👏 ${s ? sname(s) : 'Oʻquvchi'}: +${r.kg} kg${r.sent ? ' · ota-onaga xabar ketdi' : r.recipients ? '' : ' · ota-ona botga ulanmagan'}`;
+        renderTeach();
+      });
+    }
     if (a === 'fig') return setTeachFigure(b.dataset.v);
     if (a === 'lshare') return shareLink();
     if (a === 'lcopy') return copyLink(b);
